@@ -18,7 +18,8 @@ namespace Epitaph.Scripts.Player
 
         private void Start()
         {
-            transform.position = new Vector3(0, characterController.skinWidth, 0);
+            var playerHeight = characterController.height / 2f + characterController.skinWidth;
+            transform.position = new Vector3(0, playerHeight, 0);
         }
 
         private void InitializeComponents()

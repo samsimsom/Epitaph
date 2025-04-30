@@ -9,6 +9,7 @@ namespace Epitaph.Scripts
         [SerializeField] private PlayerMovement playerMovement;
         [SerializeField] private PlayerLook playerLook;
         [SerializeField] private PlayerJump playerJump;
+        [SerializeField] private PlayerCrouch playerCrouch;
         
         private InputSystem_Actions _inputSystemActions;
         private InputSystem_Actions.PlayerActions _playerActions;
@@ -32,23 +33,37 @@ namespace Epitaph.Scripts
             {
                 playerJump = GetComponent<PlayerJump>();
             }
+
+            if (playerCrouch == null)
+            {
+                playerCrouch = GetComponent<PlayerCrouch>();
+            }
         }
         
         private void OnEnable()
         {
             _playerActions.Enable();
             _playerActions.Jump.performed += OnJumpPerformed;
+            _playerActions.Crouch.performed += OnCrouchPerformed;
+
         }
 
         private void OnDisable()
         {
             _playerActions.Jump.performed -= OnJumpPerformed;
+            _playerActions.Crouch.performed -= OnCrouchPerformed;
             _playerActions.Disable();
         }
         
         private void OnJumpPerformed(InputAction.CallbackContext context)
         {
             playerJump.ProcessJump();
+        }
+        
+        private void OnCrouchPerformed(InputAction.CallbackContext context)
+        {
+            Debug.Log("crouch");
+            playerCrouch.OnCrouchPerformed();
         }
 
         private void Update()
