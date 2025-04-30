@@ -6,37 +6,59 @@ namespace Epitaph.Scripts.Player
     public class PlayerLook : MonoBehaviour
     {
         [SerializeField] private CinemachineCamera fpCamera;
-        [SerializeField] private float xSensitivity;
-        [SerializeField] private float ySensitivity;
+        [SerializeField] private float xSensitivity = 1f;
+        [SerializeField] private float ySensitivity = 1f;
 
-        private float _xRotation;
         private CinemachineInputAxisController _inputAxisController;
 
         private void Awake()
         {
-            _inputAxisController = fpCamera.GetComponent<CinemachineInputAxisController>();
+            _inputAxisController = fpCamera != null
+                ? fpCamera.GetComponent<CinemachineInputAxisController>()
+                : null;
         }
 
         private void Start()
         {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-
-            SetCinemachineInputGain();
+            LockCursor();
+            UpdateCameraSensitivity();
         }
 
-        private void SetCinemachineInputGain()
+        private void LockCursor()
         {
-            if (_inputAxisController == null) return;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+
+        private void UpdateCameraSensitivity()
+        {
+            if (_inputAxisController == null || _inputAxisController.Controllers == null) return;
+
             foreach (var controller in _inputAxisController.Controllers)
             {
-                controller.Input.Gain = controller.Name switch
+                switch (controller.Name)
                 {
-                    "Look X (Pan)" => xSensitivity,
-                    "Look Y (Tilt)" => -ySensitivity,
-                    _ => controller.Input.Gain
-                };
+                    case "Look X (Pan)":
+                        controller.Input.Gain = xSensitivity;
+                        break;
+                    case "Look Y (Tilt)":
+                        controller.Input.Gain = -ySensitivity;
+                        break;
+                }
             }
+        }
+
+        // Sensitivity atama istekleri için dışarıya açık fonksiyonlar
+        public void SetXSensitivity(float value)
+        {
+            xSensitivity = value;
+            UpdateCameraSensitivity();
+        }
+
+        public void SetYSensitivity(float value)
+        {
+            ySensitivity = value;
+            UpdateCameraSensitivity();
         }
     }
 }

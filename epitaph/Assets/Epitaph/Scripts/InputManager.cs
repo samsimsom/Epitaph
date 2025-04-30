@@ -1,6 +1,6 @@
 using Epitaph.Scripts.Player;
 using UnityEngine;
-using UnityEngine.Serialization;
+using UnityEngine.InputSystem;
 
 namespace Epitaph.Scripts
 {
@@ -8,6 +8,7 @@ namespace Epitaph.Scripts
     {
         [SerializeField] private PlayerMovement playerMovement;
         [SerializeField] private PlayerLook playerLook;
+        [SerializeField] private PlayerJump playerJump;
         
         private InputSystem_Actions _inputSystemActions;
         private InputSystem_Actions.PlayerActions _playerActions;
@@ -26,16 +27,28 @@ namespace Epitaph.Scripts
             {
                 playerLook = GetComponent<PlayerLook>();
             }
+            
+            if (playerJump == null)
+            {
+                playerJump = GetComponent<PlayerJump>();
+            }
         }
         
         private void OnEnable()
         {
             _playerActions.Enable();
+            _playerActions.Jump.performed += OnJumpPerformed;
         }
 
         private void OnDisable()
         {
+            _playerActions.Jump.performed -= OnJumpPerformed;
             _playerActions.Disable();
+        }
+        
+        private void OnJumpPerformed(InputAction.CallbackContext context)
+        {
+            playerJump.ProcessJump();
         }
 
         private void Update()

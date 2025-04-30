@@ -16,6 +16,11 @@ namespace Epitaph.Scripts.Player
             InitializeComponents();
         }
 
+        private void Start()
+        {
+            transform.position = new Vector3(0, characterController.skinWidth, 0);
+        }
+
         private void InitializeComponents()
         {
             if (characterController == null)
@@ -37,18 +42,13 @@ namespace Epitaph.Scripts.Player
         
         private Vector3 CalculateMovementDirection(Vector2 input)
         {
-            // Get camera direction vectors
             var cameraTransform = playerCamera.transform;
             var forward = cameraTransform.forward;
             var right = cameraTransform.right;
-            
-            // Project to XZ plane (horizontal movement only)
             forward.y = 0;
             right.y = 0;
             forward.Normalize();
             right.Normalize();
-            
-            // Calculate direction based on input and camera orientation
             return (forward * input.y + right * input.x);
         }
         
@@ -56,6 +56,37 @@ namespace Epitaph.Scripts.Player
         {
             var movement = direction * (moveSpeed * Time.deltaTime);
             characterController.Move(movement);
+        }
+
+        // Dışarıdan değişken değiştirme methodları
+        public void SetMoveSpeed(float speed)
+        {
+            moveSpeed = speed;
+        }
+
+        public float GetMoveSpeed()
+        {
+            return moveSpeed;
+        }
+
+        public void SetPlayerCamera(Camera cam)
+        {
+            playerCamera = cam;
+        }
+
+        public Camera GetPlayerCamera()
+        {
+            return playerCamera;
+        }
+
+        public void SetCharacterController(CharacterController controller)
+        {
+            characterController = controller;
+        }
+
+        public CharacterController GetCharacterController()
+        {
+            return characterController;
         }
     }
 }
