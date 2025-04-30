@@ -14,11 +14,12 @@ namespace Epitaph.Scripts.Player
 
         [Header("Ground Check Settings")]
         [SerializeField] private LayerMask groundLayers;
-        [SerializeField] private float groundCheckDistance = 0.2f;
+        [SerializeField] private float groundCheckDistance = 0.5f;
 
         private float _verticalVelocity;
         private bool _isGrounded;
-        private float Gravity => Physics.gravity.y;
+        
+        private static float Gravity => Physics.gravity.y;
 
         private void Awake()
         {
@@ -42,12 +43,6 @@ namespace Epitaph.Scripts.Player
         private void UpdateGroundedStatus()
         {
             _isGrounded = PerformNativeGroundCheck() || PerformCustomGroundCheck();
-#if UNITY_EDITOR
-#if false
-            Debug.Log($"Native IsGrounded: {PerformNativeGroundCheck()}, " +
-                      $"Custom IsGrounded: {PerformCustomGroundCheck()}, Final: {_isGrounded}");
-#endif
-#endif
         }
 
         private bool PerformNativeGroundCheck()
@@ -60,9 +55,11 @@ namespace Epitaph.Scripts.Player
             if (playerBody == null || characterController == null)
                 return false;
             
-            var rayDistance = characterController.height / 2 + groundCheckDistance;
-            return Physics.Raycast(playerBody.position, Vector3.down, rayDistance,
-                groundLayers);
+            var origin = playerBody.position 
+                         + characterController.center 
+                         + Vector3.down * (characterController.height / 2f);
+            var rayDistance = groundCheckDistance;
+            return Physics.Raycast(origin, Vector3.down, rayDistance, groundLayers);
         }
 
         public void ApplyGravity()
@@ -86,14 +83,22 @@ namespace Epitaph.Scripts.Player
 
         public bool IsGrounded() => _isGrounded;
 
-        private void OnDrawGizmosSelected()
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
         {
             if (characterController == null || playerBody == null) return;
 
             Gizmos.color = Color.blue;
-            var lineLen = characterController.height / 2 + groundCheckDistance;
-            Gizmos.DrawLine(playerBody.position, playerBody.position + Vector3.down * lineLen);
+            var origin = playerBody.position 
+                         + characterController.center 
+                         + Vector3.down * (characterController.height / 2f);
+            var rayDistance = groundCheckDistance;
             
+            Gizmos.DrawLine(origin, origin + Vector3.down * rayDistance);
+            Gizmos.DrawWireSphere(origin, 0.05f);
+            Gizmos.DrawWireSphere(origin + Vector3.down * rayDistance, 0.05f);
         }
+#endif
+        
     }
 }

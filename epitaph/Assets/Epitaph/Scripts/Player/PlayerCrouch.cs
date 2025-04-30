@@ -7,6 +7,7 @@ namespace Epitaph.Scripts.Player
     {
         [Header("References")]
         [SerializeField] private CharacterController characterController;
+        [SerializeField] private Transform playerBody;
         [SerializeField] private PlayerMovement playerMovement;
         [SerializeField] private Transform playerCamera;
 
@@ -14,14 +15,17 @@ namespace Epitaph.Scripts.Player
         [SerializeField] private float crouchHeight = 1.0f;
         [SerializeField] private float standingHeight = 2.0f;
         [SerializeField] private float crouchSpeed = 2.0f;
-        [SerializeField] private float standingSpeed = 5.0f;
         [SerializeField] private float crouchCameraYOffset = -0.5f;
         [SerializeField] private float standingCameraYOffset = 0.0f;
         [SerializeField] private float crouchTransitionTime = 0.2f;
 
+        [Header("Ceil Check Settings")]
+        [SerializeField] private LayerMask ceilingLayers;
+        [SerializeField] private float ceilingCheckDistance = 0.5f;
+        
         [Header("State (ReadOnly)")]
         [SerializeField] private bool isCrouching = false;
-
+        
         private float _crouchTransitionTimer;
         private float _initialCameraYLocalPosition;
 
@@ -36,7 +40,8 @@ namespace Epitaph.Scripts.Player
             if (playerCamera == null && playerMovement.GetPlayerCamera() != null)
                 playerCamera = playerMovement.GetPlayerCamera().transform;
             
-            _initialCameraYLocalPosition = playerCamera != null ? playerCamera.localPosition.y : 0f;
+            _initialCameraYLocalPosition = playerCamera != null ? 
+                playerCamera.localPosition.y : 0f;
         }
 
         private void Update()
@@ -44,7 +49,7 @@ namespace Epitaph.Scripts.Player
             SmoothCrouchTransition();
         }
 
-        public void OnCrouchPerformed() // Trigger this from your input system (toggle)
+        public void OnCrouchPerformed()
         {
             if (isCrouching)
                 Stand();
@@ -61,12 +66,13 @@ namespace Epitaph.Scripts.Player
 
         private void Stand()
         {
-            // Headroom kontrolü (engininiz isteğe göre kontrol ekleyebilirsiniz)
+            // Headroom kontrolü
             if (!CanStandUp()) return;
 
             isCrouching = false;
             _crouchTransitionTimer = 0f;
-            playerMovement.SetMoveSpeed(standingSpeed);
+            // _standingSpeed = playerMovement.GetMoveSpeed();
+            // playerMovement.SetMoveSpeed(_standingSpeed);
         }
 
         private void SmoothCrouchTransition()
@@ -76,7 +82,8 @@ namespace Epitaph.Scripts.Player
             var goalCenterY = isCrouching ? crouchHeight / 2f : 0;
             var startCenterY = characterController.center.y;
 
-            var goalCameraY = _initialCameraYLocalPosition + (isCrouching ? crouchCameraYOffset : standingCameraYOffset);
+            var goalCameraY = _initialCameraYLocalPosition + (isCrouching ? 
+                crouchCameraYOffset : standingCameraYOffset);
             var startCameraY = (playerCamera != null) ? playerCamera.localPosition.y : 0f;
 
             if (Mathf.Approximately(startHeight, goalHeight) &&
@@ -86,7 +93,8 @@ namespace Epitaph.Scripts.Player
 
             _crouchTransitionTimer += Time.deltaTime / crouchTransitionTime;
 
-            characterController.height = Mathf.Lerp(startHeight, goalHeight, _crouchTransitionTimer);
+            characterController.height = Mathf.Lerp(startHeight, goalHeight, 
+                _crouchTransitionTimer);
             characterController.center = new Vector3(characterController.center.x,
                 Mathf.Lerp(startCenterY, goalCenterY, _crouchTransitionTimer),
                 characterController.center.z);
@@ -99,19 +107,40 @@ namespace Epitaph.Scripts.Player
 
         private bool CanStandUp()
         {
-            var origin = transform.position + Vector3.up * (crouchHeight / 2f);
-            var checkDistance = (standingHeight - crouchHeight) * 0.9f;
-            // Raycast ile kafa çarpması engelleniyor.
-            return !Physics.Raycast(origin, Vector3.up, checkDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+            var origin = playerBody.position + Vector3.up;
+            var rayDistance = ceilingCheckDistance;
+            
+            return !Physics.Raycast(origin, Vector3.up, rayDistance, ceilingLayers);
         }
 
         public bool IsCrouching() => isCrouching;
-
-        // Inspector üzerinden anlık olarak değiştirmek gerekirse:
+        
         public void SetCrouching(bool crouch)
         {
-            if (crouch && !isCrouching) Crouch();
-            if (!crouch && isCrouching) Stand();
+            switch (crouch)
+            {
+                case true when !isCrouching:
+                    Crouch();
+                    break;
+                case false when isCrouching:
+                    Stand();
+                    break;
+            }
         }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            if (playerBody == null) return;
+            
+            var origin = playerBody.position + Vector3.up;
+            var rayDistance = ceilingCheckDistance;
+            
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawLine(origin, origin + Vector3.up * rayDistance);
+            Gizmos.DrawWireSphere(origin, 0.05f);
+            Gizmos.DrawWireSphere(origin + Vector3.up * rayDistance, 0.05f);
+        }
+#endif
     }
 }

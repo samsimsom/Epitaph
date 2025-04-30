@@ -184,7 +184,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterController: {fileID: 7233690062659458442}
   playerCamera: {fileID: 1424734669156154569}
-  moveSpeed: 3
+  moveSpeed: 5
 --- !u!114 &3684606182195665951
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -249,6 +249,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterController: {fileID: 7233690062659458442}
+  playerBody: {fileID: 7835032580919512665}
   playerMovement: {fileID: 2094282812091735700}
   playerCamera: {fileID: 7486238502538941554}
   crouchHeight: 1
