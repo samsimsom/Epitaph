@@ -1,4 +1,3 @@
-using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,29 +8,24 @@ namespace Epitaph.Scripts.Player
     {
         [Header("References")]
         [SerializeField] private PlayerMovement playerMovement;
-        [SerializeField] private PlayerLook playerLook;
         [SerializeField] private PlayerCrouch playerCrouch;
         [SerializeField] private PlayerGravity playerGravity;
 
         [Header("Sprint Settings")]
         [SerializeField] private float sprintSpeed = 10f;
-        [SerializeField] private float sprintFOVChange = 10f;
-        [SerializeField] private float fovChangeTime = 0.25f;
         [SerializeField] private float sprintStaminaUsage = 10f;
         [SerializeField] private float maxStamina = 100f;
         [SerializeField] private float staminaRecoveryRate = 20f;
         [SerializeField] private float staminaRecoveryDelay = 1f;
 
         [Header("Debug")]
-        [SerializeField] private bool isSprinting = false;
+        [SerializeField] private bool isSprinting;
         [SerializeField] private float currentStamina;
         [SerializeField] private bool canSprint = true;
 
         private float _defaultMoveSpeed;
-        private float _defaultFOV;
         private float _timeSinceLastSprint;
-        private bool _isSprintKeyHeld = false;
-        private CinemachineCamera _playerCamera;
+        private bool _isSprintKeyHeld;
 
         private void Awake()
         {
@@ -41,11 +35,6 @@ namespace Epitaph.Scripts.Player
         private void Start()
         {
             _defaultMoveSpeed = playerMovement.GetMoveSpeed();
-            _playerCamera = playerLook.GetPlayerCamera();
-            if (_playerCamera != null)
-            {
-                _defaultFOV = _playerCamera.Lens.FieldOfView;
-            }
             currentStamina = maxStamina;
         }
 
@@ -58,9 +47,8 @@ namespace Epitaph.Scripts.Player
                 TryStartSprint();
             }
             
-            // Stamina ve FOV güncellemelerini yap
+            // Stamina güncellemelerini yap
             UpdateStamina();
-            UpdateFOV();
         }
 
         private void InitializeComponents()
@@ -95,29 +83,6 @@ namespace Epitaph.Scripts.Player
                 _isSprintKeyHeld = false;
                 StopSprint();
             }
-        }
-
-        private void StartSprint()
-        {
-            // Check if player is in the air (not grounded)
-            if (playerGravity != null && !playerGravity.IsGrounded())
-            {
-                return;
-            }
-
-            // Check if player can sprint (not crouching and has stamina)
-            if (playerCrouch != null && playerCrouch.IsCrouching())
-            {
-                return;
-            }
-
-            if (!canSprint || currentStamina <= 0)
-            {
-                return;
-            }
-
-            isSprinting = true;
-            playerMovement.SetMoveSpeed(sprintSpeed);
         }
 
         private void StopSprint()
@@ -168,15 +133,6 @@ namespace Epitaph.Scripts.Player
             }
         }
 
-        private void UpdateFOV()
-        {
-            if (_playerCamera == null) return;
-
-            var targetFOV = isSprinting ? _defaultFOV + sprintFOVChange : _defaultFOV;
-            _playerCamera.Lens.FieldOfView = Mathf.Lerp(_playerCamera.Lens.FieldOfView, targetFOV, 
-                fovChangeTime * Time.deltaTime * 5f);
-        }
-
         public bool IsSprinting()
         {
             return isSprinting;
@@ -209,6 +165,7 @@ namespace Epitaph.Scripts.Player
             if (isCrouching && isSprinting)
             {
                 StopSprint();
+                playerMovement.SetMoveSpeed(playerCrouch.GetCrouchSpeed());
             }
         }
         
@@ -226,5 +183,6 @@ namespace Epitaph.Scripts.Player
                 }
             }
         }
+        
     }
 }

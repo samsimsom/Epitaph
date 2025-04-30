@@ -133,6 +133,11 @@ namespace Epitaph.Scripts.Player
                     break;
             }
         }
+        
+        public float GetCrouchSpeed()
+        {
+            return crouchSpeed;
+        }
 
 #if UNITY_EDITOR
         private void OnDrawGizmos()
@@ -148,5 +153,7 @@ namespace Epitaph.Scripts.Player
             Gizmos.DrawWireSphere(origin + Vector3.up * rayDistance, 0.05f);
         }
 #endif
+    
+
     }
 }

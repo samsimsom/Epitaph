@@ -734,17 +734,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &563498505 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3684606182195665951, guid: 04fdf09066e8e4c5c82fc1b57b53a404, type: 3}
-  m_PrefabInstance: {fileID: 1264409056819435366}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f8a3dd1770e24bf9a6da043421cb5369, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &596041754
 GameObject:
   m_ObjectHideFlags: 0
@@ -2649,26 +2638,6 @@ PrefabInstance:
     - target: {fileID: 149412788339068492, guid: 04fdf09066e8e4c5c82fc1b57b53a404, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 1424734669156154569, guid: 04fdf09066e8e4c5c82fc1b57b53a404, type: 3}
-      propertyPath: field of view
-      value: 60
-      objectReference: {fileID: 0}
-    - target: {fileID: 2094282812091735700, guid: 04fdf09066e8e4c5c82fc1b57b53a404, type: 3}
-      propertyPath: moveSpeed
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 3839963292849336066, guid: 04fdf09066e8e4c5c82fc1b57b53a404, type: 3}
-      propertyPath: canSprint
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3839963292849336066, guid: 04fdf09066e8e4c5c82fc1b57b53a404, type: 3}
-      propertyPath: playerLook
-      value: 
-      objectReference: {fileID: 563498505}
-    - target: {fileID: 5674716891698460776, guid: 04fdf09066e8e4c5c82fc1b57b53a404, type: 3}
-      propertyPath: crouchSpeed
-      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6669364873529335188, guid: 04fdf09066e8e4c5c82fc1b57b53a404, type: 3}
       propertyPath: m_LocalPosition.x

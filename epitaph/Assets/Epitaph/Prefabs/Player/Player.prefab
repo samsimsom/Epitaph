@@ -51,7 +51,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 101429044235954090}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -186,7 +186,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterController: {fileID: 7233690062659458442}
   playerCamera: {fileID: 1424734669156154569}
-  moveSpeed: 3
+  moveSpeed: 4
 --- !u!114 &3684606182195665951
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -281,12 +281,10 @@ MonoBehaviour:
   playerCrouch: {fileID: 5674716891698460776}
   playerGravity: {fileID: 2048451480808012131}
   sprintSpeed: 6
-  sprintFOVChange: 10
-  fovChangeTime: 0.25
   sprintStaminaUsage: 10
   maxStamina: 100
   staminaRecoveryRate: 20
-  staminaRecoveryDelay: 1
+  staminaRecoveryDelay: 3
   isSprinting: 0
   currentStamina: 0
   canSprint: 1

@@ -11,6 +11,8 @@ namespace Epitaph.Scripts.Player
         [Header("Movement Settings")]
         [SerializeField] private float moveSpeed = 5f;
         
+        private Vector3 _movement;
+        
         private void Awake()
         {
             InitializeComponents();
@@ -55,11 +57,10 @@ namespace Epitaph.Scripts.Player
         
         private void MoveCharacter(Vector3 direction)
         {
-            var movement = direction * (moveSpeed * Time.deltaTime);
-            characterController.Move(movement);
+            _movement = direction * (moveSpeed * Time.deltaTime);
+            characterController.Move(_movement);
         }
-
-        // Dışarıdan değişken değiştirme methodları
+        
         public void SetMoveSpeed(float speed)
         {
             moveSpeed = speed;
@@ -70,21 +71,16 @@ namespace Epitaph.Scripts.Player
             return moveSpeed;
         }
 
-        public void SetPlayerCamera(Camera cam)
+        public Vector3 GetMovement()
         {
-            playerCamera = cam;
+            return _movement;
         }
 
         public Camera GetPlayerCamera()
         {
             return playerCamera;
         }
-
-        public void SetCharacterController(CharacterController controller)
-        {
-            characterController = controller;
-        }
-
+        
         public CharacterController GetCharacterController()
         {
             return characterController;

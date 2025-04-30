@@ -72,7 +72,6 @@ namespace Epitaph.Scripts
         
         private void OnCrouchPerformed(InputAction.CallbackContext context)
         {
-            Debug.Log("crouch");
             playerCrouch.OnCrouchPerformed();
         }
 
