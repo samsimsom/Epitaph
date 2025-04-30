@@ -51,7 +51,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 101429044235954090}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -129,6 +129,7 @@ GameObject:
   - component: {fileID: 2048451480808012131}
   - component: {fileID: 7269650075610193757}
   - component: {fileID: 5674716891698460776}
+  - component: {fileID: 3839963292849336066}
   m_Layer: 3
   m_Name: Player
   m_TagString: Untagged
@@ -170,6 +171,7 @@ MonoBehaviour:
   playerLook: {fileID: 3684606182195665951}
   playerJump: {fileID: 7269650075610193757}
   playerCrouch: {fileID: 5674716891698460776}
+  playerSprint: {fileID: 3839963292849336066}
 --- !u!114 &2094282812091735700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -184,7 +186,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterController: {fileID: 7233690062659458442}
   playerCamera: {fileID: 1424734669156154569}
-  moveSpeed: 5
+  moveSpeed: 3
 --- !u!114 &3684606182195665951
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -255,11 +257,38 @@ MonoBehaviour:
   crouchHeight: 1
   standingHeight: 2
   crouchSpeed: 2
-  standingSpeed: 5
   crouchCameraYOffset: 0.1
   standingCameraYOffset: 0
   crouchTransitionTime: 0.2
+  ceilingLayers:
+    serializedVersion: 2
+    m_Bits: 1
+  ceilingCheckDistance: 0.3
   isCrouching: 0
+--- !u!114 &3839963292849336066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 149412788339068492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39451c3a2dea4c9e8e6b8c66cfde8875, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerMovement: {fileID: 2094282812091735700}
+  playerCrouch: {fileID: 5674716891698460776}
+  sprintSpeed: 5
+  sprintFOVChange: 10
+  fovChangeTime: 0.25
+  sprintStaminaUsage: 10
+  maxStamina: 100
+  staminaRecoveryRate: 20
+  staminaRecoveryDelay: 1
+  isSprinting: 0
+  currentStamina: 0
+  canSprint: 1
 --- !u!1 &377226783690957013
 GameObject:
   m_ObjectHideFlags: 0

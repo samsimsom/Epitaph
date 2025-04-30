@@ -5,6 +5,9 @@ namespace Epitaph.Scripts.Player
     [RequireComponent(typeof(PlayerMovement))]
     public class PlayerCrouch : MonoBehaviour
     {
+        public delegate void CrouchStateHandler(bool isCrouching);
+        public event CrouchStateHandler OnCrouchStateChanged;
+        
         [Header("References")]
         [SerializeField] private CharacterController characterController;
         [SerializeField] private Transform playerBody;
@@ -62,6 +65,7 @@ namespace Epitaph.Scripts.Player
             isCrouching = true;
             _crouchTransitionTimer = 0f;
             playerMovement.SetMoveSpeed(crouchSpeed);
+            OnCrouchStateChanged?.Invoke(true);
         }
 
         private void Stand()
@@ -73,6 +77,7 @@ namespace Epitaph.Scripts.Player
             _crouchTransitionTimer = 0f;
             // _standingSpeed = playerMovement.GetMoveSpeed();
             // playerMovement.SetMoveSpeed(_standingSpeed);
+            OnCrouchStateChanged?.Invoke(false);
         }
 
         private void SmoothCrouchTransition()
