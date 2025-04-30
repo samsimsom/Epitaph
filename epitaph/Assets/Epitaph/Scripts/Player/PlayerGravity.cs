@@ -21,6 +21,11 @@ namespace Epitaph.Scripts.Player
         
         private static float Gravity => Physics.gravity.y;
 
+        private bool _wasGroundedLastFrame;
+        
+        public delegate void GroundedStateHandler(bool isGrounded);
+        public event GroundedStateHandler OnGroundedStateChanged;
+
         private void Awake()
         {
             InitializeComponents();
@@ -42,7 +47,13 @@ namespace Epitaph.Scripts.Player
 
         private void UpdateGroundedStatus()
         {
+            _wasGroundedLastFrame = _isGrounded;
             _isGrounded = PerformNativeGroundCheck() || PerformCustomGroundCheck();
+            
+            if (_wasGroundedLastFrame != _isGrounded)
+            {
+                OnGroundedStateChanged?.Invoke(_isGrounded);
+            }
         }
 
         private bool PerformNativeGroundCheck()

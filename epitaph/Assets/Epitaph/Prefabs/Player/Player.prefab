@@ -279,7 +279,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerMovement: {fileID: 2094282812091735700}
   playerCrouch: {fileID: 5674716891698460776}
-  sprintSpeed: 5
+  playerGravity: {fileID: 2048451480808012131}
+  sprintSpeed: 6
   sprintFOVChange: 10
   fovChangeTime: 0.25
   sprintStaminaUsage: 10

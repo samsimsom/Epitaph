@@ -1,3 +1,4 @@
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,7 +9,9 @@ namespace Epitaph.Scripts.Player
     {
         [Header("References")]
         [SerializeField] private PlayerMovement playerMovement;
+        [SerializeField] private PlayerLook playerLook;
         [SerializeField] private PlayerCrouch playerCrouch;
+        [SerializeField] private PlayerGravity playerGravity;
 
         [Header("Sprint Settings")]
         [SerializeField] private float sprintSpeed = 10f;
@@ -27,7 +30,8 @@ namespace Epitaph.Scripts.Player
         private float _defaultMoveSpeed;
         private float _defaultFOV;
         private float _timeSinceLastSprint;
-        private Camera _playerCamera;
+        private CinemachineCamera _playerCamera;
+        private bool _isSprintKeyHeld = false;
 
         private void Awake()
         {
@@ -37,16 +41,37 @@ namespace Epitaph.Scripts.Player
         private void Start()
         {
             _defaultMoveSpeed = playerMovement.GetMoveSpeed();
-            _playerCamera = playerMovement.GetPlayerCamera();
+            _playerCamera = playerLook.GetPlayerCamera();
             if (_playerCamera != null)
             {
-                _defaultFOV = _playerCamera.fieldOfView;
+                _defaultFOV = _playerCamera.Lens.FieldOfView;
             }
             currentStamina = maxStamina;
         }
 
         private void Update()
         {
+            // Oyuncunun yerde olup olmadığını kontrol et
+            bool isGrounded = playerGravity != null && playerGravity.IsGrounded();
+            
+            // Havadayken sprint yapılmaması için gereken kontroller
+            if (!isGrounded)
+            {
+                // Havadayken sprint yapıyorsa, sprint'i durdur
+                if (isSprinting)
+                {
+                    isSprinting = false;
+                    playerMovement.SetMoveSpeed(_defaultMoveSpeed);
+                }
+            }
+            else if (_isSprintKeyHeld && !isSprinting)
+            {
+                // Yerdeyiz, sprint tuşu basılı ve sprint yapmıyoruz
+                // Sprint'i tekrar başlatmayı dene
+                TryStartSprint();
+            }
+            
+            // Stamina ve FOV güncellemelerini yap
             UpdateStamina();
             UpdateFOV();
         }
@@ -62,6 +87,11 @@ namespace Epitaph.Scripts.Player
             {
                 playerCrouch = GetComponent<PlayerCrouch>();
             }
+            
+            if (playerGravity == null)
+            {
+                playerGravity = GetComponent<PlayerGravity>();
+            }
         }
 
         public void OnSprintPerformed(InputAction.CallbackContext context)
@@ -69,17 +99,25 @@ namespace Epitaph.Scripts.Player
             // Start sprint when button is pressed
             if (context.performed)
             {
-                StartSprint();
+                _isSprintKeyHeld = true;
+                TryStartSprint();
             }
             // Stop sprint when button is released
             else if (context.canceled)
             {
+                _isSprintKeyHeld = false;
                 StopSprint();
             }
         }
 
         private void StartSprint()
         {
+            // Check if player is in the air (not grounded)
+            if (playerGravity != null && !playerGravity.IsGrounded())
+            {
+                return;
+            }
+
             // Check if player can sprint (not crouching and has stamina)
             if (playerCrouch != null && playerCrouch.IsCrouching())
             {
@@ -147,8 +185,9 @@ namespace Epitaph.Scripts.Player
         {
             if (_playerCamera == null) return;
 
-            float targetFOV = isSprinting ? _defaultFOV + sprintFOVChange : _defaultFOV;
-            _playerCamera.fieldOfView = Mathf.Lerp(_playerCamera.fieldOfView, targetFOV, fovChangeTime * Time.deltaTime * 5f);
+            var targetFOV = isSprinting ? _defaultFOV + sprintFOVChange : _defaultFOV;
+            _playerCamera.Lens.FieldOfView = Mathf.Lerp(_playerCamera.Lens.FieldOfView, targetFOV, 
+                fovChangeTime * Time.deltaTime * 5f);
         }
 
         public bool IsSprinting()
@@ -183,6 +222,21 @@ namespace Epitaph.Scripts.Player
             if (isCrouching && isSprinting)
             {
                 StopSprint();
+            }
+        }
+        
+        private void TryStartSprint()
+        {
+            // Eğer oyuncu yerdeyse ve sprint yapabiliyorsa
+            if (playerGravity != null && playerGravity.IsGrounded() &&
+                canSprint && currentStamina > 0)
+            {
+                // Çömelmiyorsa
+                if (playerCrouch == null || !playerCrouch.IsCrouching())
+                {
+                    isSprinting = true;
+                    playerMovement.SetMoveSpeed(sprintSpeed);
+                }
             }
         }
     }

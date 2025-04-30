@@ -60,5 +60,10 @@ namespace Epitaph.Scripts.Player
             ySensitivity = value;
             UpdateCameraSensitivity();
         }
+
+        public CinemachineCamera GetPlayerCamera()
+        {
+            return fpCamera;
+        }
     }
 }
