@@ -679,7 +679,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fpCamera: {fileID: 1247891222681741441}
   xSensitivity: 30
-  ySensitivity: 30
+  ySensitivity: 20
 --- !u!114 &826529696
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -694,7 +694,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterController: {fileID: 1615834403963599779}
   playerCamera: {fileID: 5969090230591626734}
-  moveSpeed: 5
+  moveSpeed: 3
 --- !u!114 &826529697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -729,7 +729,7 @@ MonoBehaviour:
   groundLayers:
     serializedVersion: 2
     m_Bits: 1
-  groundCheckDistance: 0.25
+  groundCheckDistance: 0.3
 --- !u!114 &826529699
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -744,7 +744,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterController: {fileID: 1615834403963599779}
   playerGravity: {fileID: 826529698}
-  jumpHeight: 4
+  jumpHeight: 3.5
   jumpCooldown: 0.1
 --- !u!1 &829485362
 GameObject:
@@ -2151,7 +2151,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UiScaleMode: 0
   m_ReferencePixelsPerUnit: 100
-  m_ScaleFactor: 0.5
+  m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0.5
@@ -2614,7 +2614,7 @@ Canvas:
   m_RenderMode: 1
   m_Camera: {fileID: 5969090230591626734}
   m_PlaneDistance: 1
-  m_PixelPerfect: 0
+  m_PixelPerfect: 1
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
