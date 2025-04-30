@@ -6,8 +6,8 @@ namespace Epitaph.Scripts
 {
     public class InputManager : MonoBehaviour
     {
-        [FormerlySerializedAs("movement")] [SerializeField] private PlayerMovement playerMovement;
-        [FormerlySerializedAs("look")] [SerializeField] private PlayerLook playerLook;
+        [SerializeField] private PlayerMovement playerMovement;
+        [SerializeField] private PlayerLook playerLook;
         
         private InputSystem_Actions _inputSystemActions;
         private InputSystem_Actions.PlayerActions _playerActions;
