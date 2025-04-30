@@ -4,10 +4,9 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player
 {
-    public class Look : MonoBehaviour
+    public class PlayerLook : MonoBehaviour
     {
         [SerializeField] private CinemachineCamera fpCamera;
-        [SerializeField] private Transform fpCameraTransform;
         [SerializeField] private float xSensitivity;
         [SerializeField] private float ySensitivity;
 
@@ -39,17 +38,6 @@ namespace Epitaph.Scripts.Player
                     _ => controller.Input.Gain
                 };
             }
-        }
-
-        public void ProcessLook(Vector2 input)
-        {
-            RotatePlayerHorizontally(input);
-        }
-
-        private void RotatePlayerHorizontally(Vector2 input)
-        {
-            var mouseX = input.x;
-            transform.Rotate(Vector3.up * (mouseX * Time.deltaTime * ySensitivity));
         }
         
     }

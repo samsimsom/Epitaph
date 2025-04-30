@@ -1,13 +1,14 @@
 using System;
 using Epitaph.Scripts.Player;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Epitaph.Scripts
 {
     public class InputManager : MonoBehaviour
     {
-        [SerializeField] private Movement movement;
-        [SerializeField] private Look look;
+        [FormerlySerializedAs("movement")] [SerializeField] private PlayerMovement playerMovement;
+        [FormerlySerializedAs("look")] [SerializeField] private PlayerLook playerLook;
         
         private InputSystem_Actions _inputSystemActions;
         private InputSystem_Actions.PlayerActions _playerActions;
@@ -17,14 +18,14 @@ namespace Epitaph.Scripts
             _inputSystemActions = new InputSystem_Actions();
             _playerActions = _inputSystemActions.Player;
 
-            if (movement == null)
+            if (playerMovement == null)
             {
-                movement = GetComponent<Movement>();
+                playerMovement = GetComponent<PlayerMovement>();
             }
             
-            if (look == null)
+            if (playerLook == null)
             {
-                look = GetComponent<Look>();
+                playerLook = GetComponent<PlayerLook>();
             }
         }
         
@@ -40,12 +41,7 @@ namespace Epitaph.Scripts
 
         private void Update()
         {
-            movement.ProcessMove(_playerActions.Move.ReadValue<Vector2>());
-        }
-
-        private void LateUpdate()
-        {
-            look.ProcessLook(_playerActions.Look.ReadValue<Vector2>());
+            playerMovement.ProcessMove(_playerActions.Move.ReadValue<Vector2>());
         }
     }
 }
