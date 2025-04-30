@@ -1,4 +1,3 @@
-using System;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -39,6 +38,5 @@ namespace Epitaph.Scripts.Player
                 };
             }
         }
-        
     }
 }

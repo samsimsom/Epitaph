@@ -568,8 +568,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fpCamera: {fileID: 1247891222681741441}
-  fpCameraTransform: {fileID: 7690179984418582351}
-  playerTransform: {fileID: 533464362224087979}
   xSensitivity: 30
   ySensitivity: 30
 --- !u!114 &826529696
@@ -585,8 +583,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterController: {fileID: 1615834403963599779}
-  mainCamera: {fileID: 5969090230591626734}
-  speed: 2.5
+  playerCamera: {fileID: 5969090230591626734}
+  moveSpeed: 5
 --- !u!114 &826529697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2663,7 +2661,7 @@ GameObject:
   - component: {fileID: 4140093849946551171}
   - component: {fileID: 3247667525226486879}
   m_Layer: 3
-  m_Name: MainCamera
+  m_Name: PlayerCamera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

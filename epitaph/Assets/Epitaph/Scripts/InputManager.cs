@@ -1,4 +1,3 @@
-using System;
 using Epitaph.Scripts.Player;
 using UnityEngine;
 using UnityEngine.Serialization;

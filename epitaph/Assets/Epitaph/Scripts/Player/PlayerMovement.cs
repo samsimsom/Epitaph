@@ -1,42 +1,61 @@
-using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Epitaph.Scripts.Player
 {
     public class PlayerMovement : MonoBehaviour
     {
+        [Header("References")]
         [SerializeField] private CharacterController characterController;
-        [SerializeField] private Camera mainCamera;
-        [SerializeField] private float speed;
+        [SerializeField] private Camera playerCamera;
 
-        private void Start()
+        [Header("Movement Settings")]
+        [SerializeField] private float moveSpeed = 5f;
+        
+        private void Awake()
+        {
+            InitializeComponents();
+        }
+
+        private void InitializeComponents()
         {
             if (characterController == null)
             {
                 characterController = GetComponent<CharacterController>();
             }
+            
+            if (playerCamera == null)
+            {
+                playerCamera = Camera.main;
+            }
         }
 
         public void ProcessMove(Vector2 input)
         {
-            // Get the camera's forward and right vectors (excluding vertical component)
-            var cameraTransform = mainCamera.transform;
+            var movementDirection = CalculateMovementDirection(input);
+            MoveCharacter(movementDirection);
+        }
+        
+        private Vector3 CalculateMovementDirection(Vector2 input)
+        {
+            // Get camera direction vectors
+            var cameraTransform = playerCamera.transform;
             var forward = cameraTransform.forward;
             var right = cameraTransform.right;
             
-            // Project these vectors onto the XZ plane and normalize them
+            // Project to XZ plane (horizontal movement only)
             forward.y = 0;
             right.y = 0;
             forward.Normalize();
             right.Normalize();
             
-            // Calculate the direction relative to where the player is looking
-            var desiredMoveDirection = (forward * input.y + right * input.x);
-            
-            // Move in that direction
-            characterController.Move(desiredMoveDirection * (speed * Time.deltaTime));
+            // Calculate direction based on input and camera orientation
+            return (forward * input.y + right * input.x);
         }
         
+        private void MoveCharacter(Vector3 direction)
+        {
+            var movement = direction * (moveSpeed * Time.deltaTime);
+            characterController.Move(movement);
+        }
     }
 }
