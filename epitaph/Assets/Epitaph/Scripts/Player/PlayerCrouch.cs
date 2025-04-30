@@ -31,20 +31,22 @@ namespace Epitaph.Scripts.Player
         
         private float _crouchTransitionTimer;
         private float _initialCameraYLocalPosition;
+        private float _standingSpeed;
 
         private void Awake()
         {
             if (characterController == null)
                 characterController = GetComponent<CharacterController>();
-            
+
             if (playerMovement == null)
-                playerMovement = GetComponent<PlayerMovement>();
+                playerMovement = GetComponent<PlayerMovement>(); 
             
             if (playerCamera == null && playerMovement.GetPlayerCamera() != null)
                 playerCamera = playerMovement.GetPlayerCamera().transform;
             
             _initialCameraYLocalPosition = playerCamera != null ? 
                 playerCamera.localPosition.y : 0f;
+            _standingSpeed = playerMovement.GetMoveSpeed();
         }
 
         private void Update()
@@ -75,8 +77,7 @@ namespace Epitaph.Scripts.Player
 
             isCrouching = false;
             _crouchTransitionTimer = 0f;
-            // _standingSpeed = playerMovement.GetMoveSpeed();
-            // playerMovement.SetMoveSpeed(_standingSpeed);
+            playerMovement.SetMoveSpeed(_standingSpeed);
             OnCrouchStateChanged?.Invoke(false);
         }
 

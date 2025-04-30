@@ -30,8 +30,8 @@ namespace Epitaph.Scripts.Player
         private float _defaultMoveSpeed;
         private float _defaultFOV;
         private float _timeSinceLastSprint;
-        private CinemachineCamera _playerCamera;
         private bool _isSprintKeyHeld = false;
+        private CinemachineCamera _playerCamera;
 
         private void Awake()
         {

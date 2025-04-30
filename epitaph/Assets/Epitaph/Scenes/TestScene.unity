@@ -2654,6 +2654,10 @@ PrefabInstance:
       propertyPath: field of view
       value: 60
       objectReference: {fileID: 0}
+    - target: {fileID: 2094282812091735700, guid: 04fdf09066e8e4c5c82fc1b57b53a404, type: 3}
+      propertyPath: moveSpeed
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 3839963292849336066, guid: 04fdf09066e8e4c5c82fc1b57b53a404, type: 3}
       propertyPath: canSprint
       value: 1
@@ -2662,6 +2666,10 @@ PrefabInstance:
       propertyPath: playerLook
       value: 
       objectReference: {fileID: 563498505}
+    - target: {fileID: 5674716891698460776, guid: 04fdf09066e8e4c5c82fc1b57b53a404, type: 3}
+      propertyPath: crouchSpeed
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6669364873529335188, guid: 04fdf09066e8e4c5c82fc1b57b53a404, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

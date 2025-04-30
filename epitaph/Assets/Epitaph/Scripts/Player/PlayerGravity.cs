@@ -70,7 +70,9 @@ namespace Epitaph.Scripts.Player
                          + characterController.center 
                          + Vector3.down * (characterController.height / 2f);
             var rayDistance = groundCheckDistance;
-            return Physics.Raycast(origin, Vector3.down, rayDistance, groundLayers);
+            float radius = characterController.radius;
+            
+            return Physics.CheckSphere(origin, radius, groundLayers);
         }
 
         public void ApplyGravity()
@@ -97,18 +99,21 @@ namespace Epitaph.Scripts.Player
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
-            if (characterController == null || playerBody == null) return;
+            if (characterController == null) return;
 
-            Gizmos.color = Color.blue;
+            Gizmos.color = Color.red;
+    
+            // Yer kontrolü için Sphere pozisyonu
             var origin = playerBody.position 
                          + characterController.center 
                          + Vector3.down * (characterController.height / 2f);
             var rayDistance = groundCheckDistance;
-            
-            Gizmos.DrawLine(origin, origin + Vector3.down * rayDistance);
-            Gizmos.DrawWireSphere(origin, 0.05f);
-            Gizmos.DrawWireSphere(origin + Vector3.down * rayDistance, 0.05f);
+            float radius = characterController.radius;
+    
+            // Sphere'i çizme
+            Gizmos.DrawWireSphere(origin, radius);
         }
+
 #endif
         
     }
