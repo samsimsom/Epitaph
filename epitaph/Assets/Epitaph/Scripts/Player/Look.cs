@@ -12,42 +12,45 @@ namespace Epitaph.Scripts.Player
         [SerializeField] private float ySensitivity;
 
         private float _xRotation;
-        
+        private CinemachineInputAxisController _inputAxisController;
+
+        private void Awake()
+        {
+            _inputAxisController = fpCamera.GetComponent<CinemachineInputAxisController>();
+        }
+
         private void Start()
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-            
-            var inputAxisController = fpCamera.GetComponent<CinemachineInputAxisController>();
-            if (inputAxisController != null)
-            {
-                foreach (var controller in inputAxisController.Controllers)
-                {
-                    if (controller.Name == "Look X (Pan)")
-                    {
-                        controller.Input.Gain = xSensitivity;
-                    }
-                    
-                    if (controller.Name == "Look Y (Tilt)")
-                    {
-                        controller.Input.Gain = -ySensitivity;
-                    }
-                }
-            }
 
-            
+            SetCinemachineInputGain();
+        }
+
+        private void SetCinemachineInputGain()
+        {
+            if (_inputAxisController == null) return;
+            foreach (var controller in _inputAxisController.Controllers)
+            {
+                controller.Input.Gain = controller.Name switch
+                {
+                    "Look X (Pan)" => xSensitivity,
+                    "Look Y (Tilt)" => -ySensitivity,
+                    _ => controller.Input.Gain
+                };
+            }
         }
 
         public void ProcessLook(Vector2 input)
         {
-            var mouseX = input.x;
-            var mouseY = input.y;
-            
-            transform.Rotate(Vector3.up * (mouseX * Time.deltaTime * ySensitivity));
-            _xRotation -= mouseY * Time.deltaTime * xSensitivity;
-            _xRotation = Mathf.Clamp(_xRotation, -85f, 85f);
-            fpCameraTransform.localEulerAngles = new Vector3(_xRotation, fpCameraTransform.localEulerAngles.y, 0f);
-            fpCameraTransform.localRotation = Quaternion.Euler(0f, _xRotation, 0f);
+            RotatePlayerHorizontally(input);
         }
+
+        private void RotatePlayerHorizontally(Vector2 input)
+        {
+            var mouseX = input.x;
+            transform.Rotate(Vector3.up * (mouseX * Time.deltaTime * ySensitivity));
+        }
+        
     }
 }
