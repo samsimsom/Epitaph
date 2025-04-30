@@ -51,20 +51,7 @@ namespace Epitaph.Scripts.Player
 
         private void Update()
         {
-            // Oyuncunun yerde olup olmadığını kontrol et
-            bool isGrounded = playerGravity != null && playerGravity.IsGrounded();
-            
-            // Havadayken sprint yapılmaması için gereken kontroller
-            if (!isGrounded)
-            {
-                // Havadayken sprint yapıyorsa, sprint'i durdur
-                if (isSprinting)
-                {
-                    isSprinting = false;
-                    playerMovement.SetMoveSpeed(_defaultMoveSpeed);
-                }
-            }
-            else if (_isSprintKeyHeld && !isSprinting)
+            if (_isSprintKeyHeld && !isSprinting)
             {
                 // Yerdeyiz, sprint tuşu basılı ve sprint yapmıyoruz
                 // Sprint'i tekrar başlatmayı dene
