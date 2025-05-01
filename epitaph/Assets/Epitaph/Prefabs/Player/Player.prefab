@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 6517628825680354037}
   - component: {fileID: 93510500039061493}
   - component: {fileID: 2958005620507743254}
+  - component: {fileID: 2148302068533800787}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -210,6 +211,25 @@ MonoBehaviour:
   isSprinting: 0
   currentStamina: 0
   canSprint: 1
+--- !u!114 &2148302068533800787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 244287796240432163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 127edf47b7b24503ae438ca3b090c27b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerCamera: {fileID: 6179429294715575811}
+  interactionDistance: 5
+  interactableLayer:
+    serializedVersion: 2
+    m_Bits: 1
+  hitGizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  gizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &1079719532649227608
 GameObject:
   m_ObjectHideFlags: 0
