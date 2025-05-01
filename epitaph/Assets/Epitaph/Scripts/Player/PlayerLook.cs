@@ -1,3 +1,4 @@
+// ReSharper disable CommentTypo
 using Unity.Cinemachine;
 using UnityEngine;
 

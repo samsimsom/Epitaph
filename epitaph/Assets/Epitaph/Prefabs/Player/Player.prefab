@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 2958005620507743254}
   m_Layer: 3
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -106,6 +106,7 @@ MonoBehaviour:
   idleRotationSpeed: 3
   snapAngle: 0.5
   snapThreshold: 0.1
+  movement: {x: 0, y: 0, z: 0}
 --- !u!114 &5157183091332798007
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -550,7 +551,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1485696946158837293
 Transform:
   m_ObjectHideFlags: 0

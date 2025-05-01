@@ -1,8 +1,9 @@
+// ReSharper disable CommentTypo
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player
 {
-    public class PlayerMovement : MonoBehaviour
+    public class PlayerMove : MonoBehaviour
     {
         [Header("References")]
         [SerializeField] private CharacterController characterController;
@@ -18,7 +19,9 @@ namespace Epitaph.Scripts.Player
         [SerializeField] private float snapAngle = 45f;           // Snaplenecek açı (derece)
         [SerializeField] private float snapThreshold = 0.1f;      // Hareket eşiği (karakterin durduğunu anlamak için)
         
-        private Vector3 _movement;
+        [Header("State (ReadOnly)")]
+        [SerializeField] private Vector3 movement;
+        
         private float _lastCameraAngle;
         private float _targetRotation;
         private bool _isRotationSnapping;
@@ -27,19 +30,7 @@ namespace Epitaph.Scripts.Player
         {
             InitializeComponents();
         }
-
-        private void Start()
-        {
-            var playerHeight = characterController.height / 2f + characterController.skinWidth;
-            transform.position += new Vector3(0, playerHeight, 0);
-            _lastCameraAngle = GetCameraYAngle();
-        }
-
-        private void Update()
-        {
-            HandleRotation();
-        }
-
+        
         private void InitializeComponents()
         {
             if (characterController == null)
@@ -53,11 +44,51 @@ namespace Epitaph.Scripts.Player
             }
         }
 
+        private void Start()
+        {
+            // CharacterControllerdan gelen skinWidth offseti pozisyona ekleniyor.
+            var playerHeight = characterController.skinWidth;
+            transform.position += new Vector3(0, playerHeight, 0);
+            
+            // Init playerCamera angle for body rotation.
+            _lastCameraAngle = GetCameraYAngle();
+        }
+
+        private void Update()
+        {
+            HandleRotation();
+        }
+        
         public void ProcessMove(Vector2 input)
         {
             var movementDirection = CalculateMovementDirection(input);
             MoveCharacter(movementDirection);
-            
+            RotateCharacter(movementDirection);
+        }
+
+        #region Move Methods
+        private Vector3 CalculateMovementDirection(Vector2 input)
+        {
+            var cameraTransform = playerCamera.transform;
+            var forward = cameraTransform.forward;
+            var right = cameraTransform.right;
+            forward.y = 0;
+            right.y = 0;
+            forward.Normalize();
+            right.Normalize();
+            return (forward * input.y + right * input.x);
+        }
+
+        private void MoveCharacter(Vector3 direction)
+        {
+            movement = direction * (moveSpeed * Time.deltaTime);
+            characterController.Move(movement);
+        }
+        #endregion
+
+        #region Body Rotation Methods
+        private void RotateCharacter(Vector3 movementDirection)
+        {
             // Karakter hareket ediyorsa hemen döndür
             if (movementDirection.magnitude > snapThreshold)
             {
@@ -70,33 +101,15 @@ namespace Epitaph.Scripts.Player
                 CheckForCameraAngleSnap();
             }
         }
-        
-        private Vector3 CalculateMovementDirection(Vector2 input)
-        {
-            var cameraTransform = playerCamera.transform;
-            var forward = cameraTransform.forward;
-            var right = cameraTransform.right;
-            forward.y = 0;
-            right.y = 0;
-            forward.Normalize();
-            right.Normalize();
-            return (forward * input.y + right * input.x);
-        }
-        
-        private void MoveCharacter(Vector3 direction)
-        {
-            _movement = direction * (moveSpeed * Time.deltaTime);
-            characterController.Move(_movement);
-        }
 
         private void RotateTowardsCameraDirection()
         {
             // Kameranın baktığı yöne göre dönüş açısını hesapla
-            float cameraAngle = GetCameraYAngle();
+            var cameraAngle = GetCameraYAngle();
             _targetRotation = cameraAngle;
             
             // Hızlı dönüş
-            float currentAngle = Mathf.LerpAngle(playerBody.eulerAngles.y, cameraAngle, 
+            var currentAngle = Mathf.LerpAngle(playerBody.eulerAngles.y, cameraAngle, 
                 movingRotationSpeed * Time.deltaTime);
             playerBody.rotation = Quaternion.Euler(0, currentAngle, 0);
         }
@@ -106,7 +119,8 @@ namespace Epitaph.Scripts.Player
             var currentCameraAngle = GetCameraYAngle();
             
             // Kamera açısı değişimini kontrol et
-            var angleDifference = Mathf.Abs(Mathf.DeltaAngle(_lastCameraAngle, currentCameraAngle));
+            var angleDifference = Mathf.Abs(Mathf.DeltaAngle(_lastCameraAngle, 
+                currentCameraAngle));
             
             // Kamera 45 derecelik bir açı değişimi yaptıysa
             if (angleDifference >= snapAngle && !_isRotationSnapping)
@@ -121,29 +135,32 @@ namespace Epitaph.Scripts.Player
         
         private void HandleRotation()
         {
-            if (_isRotationSnapping)
-            {
-                // Yavaşça hedef açıya dön
-                float currentAngle = Mathf.LerpAngle(playerBody.eulerAngles.y, _targetRotation, idleRotationSpeed * Time.deltaTime);
-                playerBody.rotation = Quaternion.Euler(0, currentAngle, 0);
+            if (!_isRotationSnapping) return;
+            
+            // Yavaşça hedef açıya dön
+            var currentAngle = Mathf.LerpAngle(playerBody.eulerAngles.y, _targetRotation,
+                idleRotationSpeed * Time.deltaTime);
+            playerBody.rotation = Quaternion.Euler(0, currentAngle, 0);
                 
-                // Dönüş tamamlandı mı kontrol et
-                if (Mathf.Abs(Mathf.DeltaAngle(playerBody.eulerAngles.y, _targetRotation)) < 0.5f)
-                {
-                    _isRotationSnapping = false;
-                    playerBody.rotation = Quaternion.Euler(0, _targetRotation, 0); // Tam açıya snap
-                }
-            }
+            // Dönüş tamamlandı mı kontrol et
+            if (!(Mathf.Abs(Mathf.DeltaAngle(playerBody.eulerAngles.y, _targetRotation)) <
+                  0.5f)) return;
+            _isRotationSnapping = false;
+            
+            // Tam açıya snap
+            playerBody.rotation = Quaternion.Euler(0, _targetRotation, 0);
         }
         
         private float GetCameraYAngle()
         {
             // Kameranın Y ekseni etrafındaki dönüş açısını hesapla
-            Vector3 cameraForward = playerCamera.transform.forward;
+            var cameraForward = playerCamera.transform.forward;
             cameraForward.y = 0;
             return Mathf.Atan2(cameraForward.x, cameraForward.z) * Mathf.Rad2Deg;
         }
-        
+        #endregion
+
+        #region Public Methods
         public void SetMoveSpeed(float speed)
         {
             moveSpeed = speed;
@@ -156,17 +173,9 @@ namespace Epitaph.Scripts.Player
 
         public Vector3 GetMovement()
         {
-            return _movement;
+            return movement;
         }
-
-        public Camera GetPlayerCamera()
-        {
-            return playerCamera;
-        }
+        #endregion
         
-        public CharacterController GetCharacterController()
-        {
-            return characterController;
-        }
     }
 }

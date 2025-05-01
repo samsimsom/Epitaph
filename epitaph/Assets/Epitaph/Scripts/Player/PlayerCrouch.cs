@@ -1,8 +1,9 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Epitaph.Scripts.Player
 {
-    [RequireComponent(typeof(PlayerMovement))]
+    [RequireComponent(typeof(PlayerMove))]
     public class PlayerCrouch : MonoBehaviour
     {
         public delegate void CrouchStateHandler(bool isCrouching);
@@ -11,7 +12,7 @@ namespace Epitaph.Scripts.Player
         [Header("References")]
         [SerializeField] private CharacterController characterController;
         // [SerializeField] private Transform playerBody;
-        [SerializeField] private PlayerMovement playerMovement;
+        [FormerlySerializedAs("playerMovement")] [SerializeField] private PlayerMove playerMove;
         [SerializeField] private Transform playerCamera;
 
         [Header("Crouch Settings")]
@@ -38,15 +39,12 @@ namespace Epitaph.Scripts.Player
             if (characterController == null)
                 characterController = GetComponent<CharacterController>();
 
-            if (playerMovement == null)
-                playerMovement = GetComponent<PlayerMovement>(); 
-            
-            if (playerCamera == null && playerMovement.GetPlayerCamera() != null)
-                playerCamera = playerMovement.GetPlayerCamera().transform;
+            if (playerMove == null)
+                playerMove = GetComponent<PlayerMove>();
             
             _initialCameraYLocalPosition = playerCamera != null ? 
                 playerCamera.localPosition.y : 0f;
-            _standingSpeed = playerMovement.GetMoveSpeed();
+            _standingSpeed = playerMove.GetMoveSpeed();
         }
 
         private void Update()
@@ -66,7 +64,7 @@ namespace Epitaph.Scripts.Player
         {
             isCrouching = true;
             _crouchTransitionTimer = 0f;
-            playerMovement.SetMoveSpeed(crouchSpeed);
+            playerMove.SetMoveSpeed(crouchSpeed);
             OnCrouchStateChanged?.Invoke(true);
         }
 
@@ -77,7 +75,7 @@ namespace Epitaph.Scripts.Player
 
             isCrouching = false;
             _crouchTransitionTimer = 0f;
-            playerMovement.SetMoveSpeed(_standingSpeed);
+            playerMove.SetMoveSpeed(_standingSpeed);
             OnCrouchStateChanged?.Invoke(false);
         }
 

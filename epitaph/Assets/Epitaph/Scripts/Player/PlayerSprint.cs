@@ -1,13 +1,15 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 namespace Epitaph.Scripts.Player
 {
-    [RequireComponent(typeof(PlayerMovement))]
+    [RequireComponent(typeof(PlayerMove))]
     public class PlayerSprint : MonoBehaviour
     {
+        [FormerlySerializedAs("playerMovement")]
         [Header("References")]
-        [SerializeField] private PlayerMovement playerMovement;
+        [SerializeField] private PlayerMove playerMove;
         [SerializeField] private PlayerCrouch playerCrouch;
         [SerializeField] private PlayerGravity playerGravity;
 
@@ -34,7 +36,7 @@ namespace Epitaph.Scripts.Player
 
         private void Start()
         {
-            _defaultMoveSpeed = playerMovement.GetMoveSpeed();
+            _defaultMoveSpeed = playerMove.GetMoveSpeed();
             currentStamina = maxStamina;
         }
 
@@ -53,9 +55,9 @@ namespace Epitaph.Scripts.Player
 
         private void InitializeComponents()
         {
-            if (playerMovement == null)
+            if (playerMove == null)
             {
-                playerMovement = GetComponent<PlayerMovement>();
+                playerMove = GetComponent<PlayerMove>();
             }
 
             if (playerCrouch == null)
@@ -90,7 +92,7 @@ namespace Epitaph.Scripts.Player
             if (!isSprinting) return;
             
             isSprinting = false;
-            playerMovement.SetMoveSpeed(_defaultMoveSpeed);
+            playerMove.SetMoveSpeed(_defaultMoveSpeed);
         }
 
         private void UpdateStamina()
@@ -165,7 +167,7 @@ namespace Epitaph.Scripts.Player
             if (isCrouching && isSprinting)
             {
                 StopSprint();
-                playerMovement.SetMoveSpeed(playerCrouch.GetCrouchSpeed());
+                playerMove.SetMoveSpeed(playerCrouch.GetCrouchSpeed());
             }
         }
         
@@ -179,7 +181,7 @@ namespace Epitaph.Scripts.Player
                 if (playerCrouch == null || !playerCrouch.IsCrouching())
                 {
                     isSprinting = true;
-                    playerMovement.SetMoveSpeed(sprintSpeed);
+                    playerMove.SetMoveSpeed(sprintSpeed);
                 }
             }
         }
