@@ -81,7 +81,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38a1e6b8c0d334a5495d8bec20071d28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerMovement: {fileID: 6090580529358423993}
+  playerMove: {fileID: 6090580529358423993}
   playerLook: {fileID: 5157183091332798007}
   playerJump: {fileID: 6517628825680354037}
   playerCrouch: {fileID: 93510500039061493}
@@ -120,8 +120,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fpCamera: {fileID: 5021121288978108208}
-  xSensitivity: 30
-  ySensitivity: 20
+  xSensitivity: 20
+  ySensitivity: 15
 --- !u!114 &8961354327455124597
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -174,7 +174,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterController: {fileID: 3166170450961555641}
-  playerMovement: {fileID: 6090580529358423993}
+  playerMove: {fileID: 6090580529358423993}
   playerCamera: {fileID: 3508678718031707347}
   crouchHeight: 1
   standingHeight: 2
@@ -199,7 +199,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39451c3a2dea4c9e8e6b8c66cfde8875, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerMovement: {fileID: 6090580529358423993}
+  playerMove: {fileID: 6090580529358423993}
   playerCrouch: {fileID: 93510500039061493}
   playerGravity: {fileID: 8961354327455124597}
   sprintSpeed: 6

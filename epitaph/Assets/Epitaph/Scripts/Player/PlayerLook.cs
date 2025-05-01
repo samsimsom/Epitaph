@@ -1,4 +1,4 @@
-// ReSharper disable CommentTypo
+// ReSharper disable CommentTypo, IdentifierTypo, InvertIf
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -8,8 +8,28 @@ namespace Epitaph.Scripts.Player
     {
         [SerializeField] private CinemachineCamera fpCamera;
         [SerializeField] private float xSensitivity = 1f;
+        public float XSensitivity
+        {
+            get => xSensitivity;
+            set
+            {
+                xSensitivity = value;
+                UpdateCameraSensitivity();
+            }
+        }
         [SerializeField] private float ySensitivity = 1f;
-
+        public float YSensitivity
+        {
+            get => ySensitivity;
+            set
+            {
+                ySensitivity = value;
+                UpdateCameraSensitivity();
+            }
+        }
+        
+        private float _lastXSensitivity;
+        private float _lastYSensitivity;
         private CinemachineInputAxisController _inputAxisController;
 
         private void Awake()
@@ -25,7 +45,22 @@ namespace Epitaph.Scripts.Player
             UpdateCameraSensitivity();
         }
 
-        private void LockCursor()
+        private void Update()
+        {
+            if (Mathf.Abs(xSensitivity - _lastXSensitivity) > Mathf.Epsilon)
+            {
+                _lastXSensitivity = xSensitivity;
+                UpdateCameraSensitivity();
+            }
+            
+            if (Mathf.Abs(ySensitivity - _lastYSensitivity) > Mathf.Epsilon)
+            {
+                _lastYSensitivity = ySensitivity;
+                UpdateCameraSensitivity();
+            }
+        }
+
+        private static void LockCursor()
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
@@ -37,34 +72,14 @@ namespace Epitaph.Scripts.Player
 
             foreach (var controller in _inputAxisController.Controllers)
             {
-                switch (controller.Name)
+                controller.Input.Gain = controller.Name switch
                 {
-                    case "Look X (Pan)":
-                        controller.Input.Gain = xSensitivity;
-                        break;
-                    case "Look Y (Tilt)":
-                        controller.Input.Gain = -ySensitivity;
-                        break;
-                }
+                    "Look X (Pan)" => xSensitivity,
+                    "Look Y (Tilt)" => -ySensitivity,
+                    _ => controller.Input.Gain
+                };
             }
         }
-
-        // Sensitivity atama istekleri için dışarıya açık fonksiyonlar
-        public void SetXSensitivity(float value)
-        {
-            xSensitivity = value;
-            UpdateCameraSensitivity();
-        }
-
-        public void SetYSensitivity(float value)
-        {
-            ySensitivity = value;
-            UpdateCameraSensitivity();
-        }
-
-        public CinemachineCamera GetPlayerCamera()
-        {
-            return fpCamera;
-        }
+        
     }
 }

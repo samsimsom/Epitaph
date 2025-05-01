@@ -1,3 +1,4 @@
+// ReSharper disable CommentTypo, IdentifierTypo
 using UnityEngine;
 using UnityEngine.Serialization;
 
