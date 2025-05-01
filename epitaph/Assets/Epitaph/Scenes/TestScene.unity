@@ -3067,6 +3067,10 @@ MonoBehaviour:
   playerCamera: {fileID: 164867321225948079}
   playerBody: {fileID: 1376298077}
   moveSpeed: 4
+  movingRotationSpeed: 10
+  idleRotationSpeed: 3
+  snapAngle: 1
+  snapThreshold: 0.1
 --- !u!114 &1000250545445629445
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3810,10 +3814,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 2679347486409603205}
   - {fileID: 1376298077}
   - {fileID: 541932471799379599}
   - {fileID: 4128860035187320258}
-  - {fileID: 2679347486409603205}
   - {fileID: 8532178447125824276}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
