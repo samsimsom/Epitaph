@@ -31,7 +31,7 @@ namespace Epitaph.Scripts.Player
         private void Start()
         {
             var playerHeight = characterController.height / 2f + characterController.skinWidth;
-            transform.position = new Vector3(0, playerHeight, 0);
+            transform.position += new Vector3(0, playerHeight, 0);
             _lastCameraAngle = GetCameraYAngle();
         }
 
