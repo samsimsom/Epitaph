@@ -13,6 +13,7 @@ namespace Epitaph.Scripts
         [SerializeField] private PlayerJump playerJump;
         [SerializeField] private PlayerCrouch playerCrouch;
         [SerializeField] private PlayerSprint playerSprint;
+        [SerializeField] private PlayerInteraction playerInteraction;
         
         private InputSystem_Actions _inputSystemActions;
         private InputSystem_Actions.PlayerActions _playerActions;
@@ -46,6 +47,11 @@ namespace Epitaph.Scripts
             {
                 playerSprint = GetComponent<PlayerSprint>();
             }
+            
+            if (playerInteraction == null)
+            {
+                playerInteraction = GetComponent<PlayerInteraction>();
+            }
         }
         
         private void OnEnable()
@@ -56,7 +62,9 @@ namespace Epitaph.Scripts
             
             _playerActions.Sprint.performed += OnSprintPerformed;
             _playerActions.Sprint.canceled += OnSprintPerformed;
-
+            
+            // Add interaction input
+            _playerActions.Interact.performed += OnInteractPerformed;
         }
 
         private void OnDisable()
@@ -66,6 +74,10 @@ namespace Epitaph.Scripts
             
             _playerActions.Sprint.performed -= OnSprintPerformed;
             _playerActions.Sprint.canceled -= OnSprintPerformed;
+            
+            // Remove interaction input
+            _playerActions.Interact.performed -= OnInteractPerformed;
+            
             _playerActions.Disable();
         }
         
@@ -82,6 +94,11 @@ namespace Epitaph.Scripts
         private void OnSprintPerformed(InputAction.CallbackContext context)
         {
             playerSprint.OnSprintPerformed(context);
+        }
+        
+        private void OnInteractPerformed(InputAction.CallbackContext context)
+        {
+            playerInteraction.ProcessInteraction();
         }
 
         private void Update()

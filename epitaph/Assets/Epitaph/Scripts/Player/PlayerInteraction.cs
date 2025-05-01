@@ -1,5 +1,9 @@
 // ReSharper disable CommentTypo, IdentifierTypo
+using Cysharp.Threading.Tasks;
 using UnityEngine;
+using System;
+using System.Threading;
+using Epitaph.Scripts.Interaction;
 
 namespace Epitaph.Scripts.Player
 {
@@ -11,42 +15,136 @@ namespace Epitaph.Scripts.Player
         [Header("Raycast Settings")]
         public float interactionDistance = 3f;
         public LayerMask interactableLayer;
-
-        [Header("Gizmo Settings")]
+        [SerializeField] private float raycastInterval = 0.05f;
+        
+        [Header("Debug Settings")]
+        public bool showDebugGizmos = true;
         public Color hitGizmoColor = Color.yellow;
         public Color gizmoColor = Color.red;
 
-        private void Update()
+        // Events
+        public event Action<IInteractable> OnInteractableFound;
+        public event Action OnInteractableLost;
+
+        private RaycastHit _lastHit;
+        private bool _didHit;
+        private Vector3 _rayDirection;
+        private Vector3 _rayOrigin;
+        private CancellationTokenSource _cts;
+        private IInteractable _currentInteractable;
+
+        private void Awake()
         {
-            // Send a ray from the center of the camera's view
-            var ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-
-            // Check if the ray hits something on the interactable layer within the
-            // interaction distance
-            if (Physics.Raycast(ray, out var hit, interactionDistance, interactableLayer))
+            if (playerCamera == null)
             {
-                // You can add your interaction logic here
-                // For example, you can call a method on the hit object:
-                // Interactable interactable = hit.collider.GetComponent<Interactable>();
-                // if (interactable != null)
-                // {
-                //     interactable.Interact();
-                // }
+                playerCamera = Camera.main;
+            }
+        }
 
-                if (hit.collider != null)
+        private void OnEnable()
+        {
+            _cts = new CancellationTokenSource();
+            StartRaycastLoop(_cts.Token).Forget();
+        }
+
+        private void OnDisable()
+        {
+            _cts?.Cancel();
+            _cts?.Dispose();
+            _cts = null;
+        }
+
+        private void OnDestroy()
+        {
+            _cts?.Cancel();
+            _cts?.Dispose();
+            _cts = null;
+        }
+
+        private async UniTaskVoid StartRaycastLoop(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                // Calculate ray parameters
+                _rayOrigin = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0)).origin;
+                _rayDirection = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0)).direction;
+
+                // Perform raycast
+                var previousHitState = _didHit; 
+                _didHit = Physics.Raycast(_rayOrigin, _rayDirection, out _lastHit, 
+                    interactionDistance, interactableLayer);
+
+                switch (_didHit)
                 {
-                    // Debug.Log("Hit: " + hit.collider.name);
+                    // Check if we found or lost an interactable
+                    case true when (!previousHitState || _currentInteractable == null):
+                        CheckForInteractable();
+                        break;
+                    case false when previousHitState && _currentInteractable != null:
+                        _currentInteractable = null;
+                        OnInteractableLost?.Invoke();
+                        break;
                 }
 
-                // Draw a green line to the hit point
-                Debug.DrawLine(ray.origin, hit.point, hitGizmoColor);
+                // Run at intervals to reduce CPU usage
+                await UniTask.Delay(TimeSpan.FromSeconds(raycastInterval), 
+                    cancellationToken: cancellationToken);
+            }
+        }
+
+        private void CheckForInteractable()
+        {
+            if (!_didHit || _lastHit.collider == null) return;
+            
+            var interactable = _lastHit.collider.GetComponent<IInteractable>();
+            
+            if (interactable == null) return;
+            _currentInteractable = interactable;
+            OnInteractableFound?.Invoke(interactable);
+        }
+
+        private void Update()
+        {
+            if (!showDebugGizmos) return;
+            
+            // Debug visualization
+            if (_didHit)
+            {
+                Debug.DrawLine(_rayOrigin, _lastHit.point, hitGizmoColor);
             }
             else
             {
-                // Draw a red line for the full interaction distance
-                Debug.DrawLine(ray.origin, ray.origin + ray.direction * 
-                    interactionDistance, gizmoColor);
+                Debug.DrawLine(_rayOrigin, _rayOrigin + _rayDirection * interactionDistance, gizmoColor);
             }
         }
+
+        #region Public Methods
+        // Public method to handle interaction input
+        public void ProcessInteraction()
+        {
+            _currentInteractable?.Interact();
+        }
+
+        // Helper methods
+        public bool IsTargetingInteractable()
+        {
+            return _didHit && _currentInteractable != null;
+        }
+
+        public GameObject GetTargetedObject()
+        {
+            return _didHit ? _lastHit.collider.gameObject : null;
+        }
+
+        public RaycastHit GetLastHit()
+        {
+            return _lastHit;
+        }
+        
+        public IInteractable GetCurrentInteractable()
+        {
+            return _currentInteractable;
+        }
+        #endregion
     }
 }

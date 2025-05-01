@@ -87,6 +87,7 @@ MonoBehaviour:
   playerJump: {fileID: 6517628825680354037}
   playerCrouch: {fileID: 93510500039061493}
   playerSprint: {fileID: 2958005620507743254}
+  playerInteraction: {fileID: 2148302068533800787}
 --- !u!114 &6090580529358423993
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -230,7 +231,9 @@ MonoBehaviour:
   interactionDistance: 8
   interactableLayer:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 64
+  raycastInterval: 0.05
+  showDebugGizmos: 1
   hitGizmoColor: {r: 1, g: 1, b: 0, a: 1}
   gizmoColor: {r: 1, g: 0, b: 0.015686275, a: 1}
 --- !u!1 &1079719532649227608
@@ -1035,7 +1038,7 @@ Canvas:
   serializedVersion: 3
   m_RenderMode: 1
   m_Camera: {fileID: 6179429294715575811}
-  m_PlaneDistance: 1
+  m_PlaneDistance: 0.35
   m_PixelPerfect: 1
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
