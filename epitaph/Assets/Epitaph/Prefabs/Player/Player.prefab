@@ -121,8 +121,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fpCamera: {fileID: 5021121288978108208}
-  xSensitivity: 20
-  ySensitivity: 15
+  xSensitivity: 15
+  ySensitivity: 10
 --- !u!114 &8961354327455124597
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -158,6 +158,9 @@ MonoBehaviour:
   playerGravity: {fileID: 8961354327455124597}
   jumpHeight: 3.5
   jumpCooldown: 0.1
+  jumpBufferTime: 0.2
+  coyoteTime: 0.2
+  useCoyoteTime: 1
   ceilingLayers:
     serializedVersion: 2
     m_Bits: 1
@@ -761,8 +764,8 @@ MonoBehaviour:
         CancelDeltaTime: 0
       InputValue: 0
       Driver:
-        AccelTime: 0.3
-        DecelTime: 0.2
+        AccelTime: 0.2
+        DecelTime: 0.1
     - Name: Look Y (Tilt)
       Owner: {fileID: 417079932407678203}
       Enabled: 1
@@ -774,8 +777,8 @@ MonoBehaviour:
         CancelDeltaTime: 0
       InputValue: -0
       Driver:
-        AccelTime: 0.3
-        DecelTime: 0.2
+        AccelTime: 0.2
+        DecelTime: 0.1
   PlayerIndex: -1
   AutoEnableInputs: 1
 --- !u!1 &6406788737138046568
