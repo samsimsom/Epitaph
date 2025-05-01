@@ -1,3 +1,4 @@
+// ReSharper disable CommentTypo, IdentifierTypo
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player
@@ -5,7 +6,6 @@ namespace Epitaph.Scripts.Player
     public class PlayerGravity : MonoBehaviour
     {
         [Header("References")]
-        [SerializeField] private Transform playerBody;
         [SerializeField] private CharacterController characterController;
 
         [Header("Gravity Settings")]
@@ -15,6 +15,9 @@ namespace Epitaph.Scripts.Player
         [Header("Ground Check Settings")]
         [SerializeField] private LayerMask groundLayers;
 
+        [Header("State (ReadOnly)")]
+        [SerializeField] private float verticalVelocity;
+        
         private float _verticalVelocity;
         private bool _isGrounded;
         
@@ -35,26 +38,22 @@ namespace Epitaph.Scripts.Player
 
         private void Update()
         {
+            verticalVelocity = _verticalVelocity;   // Inspectordaki debug text updateti icin.
             UpdateGroundedStatus();
             ApplyGravity();
         }
 
         private void UpdateGroundedStatus()
         {
-            _isGrounded = PerformNativeGroundCheck() || PerformCustomGroundCheck();
-        }
-
-        private bool PerformNativeGroundCheck()
-        {
-            return characterController.isGrounded;
+            _isGrounded = PerformCustomGroundCheck();
         }
 
         private bool PerformCustomGroundCheck()
         {
-            if (playerBody == null || characterController == null)
+            if (characterController == null)
                 return false;
             
-            var origin = playerBody.position 
+            var origin = characterController.transform.position 
                          + characterController.center 
                          + Vector3.down * (characterController.height / 2f);
             var radius = characterController.radius;
@@ -92,7 +91,7 @@ namespace Epitaph.Scripts.Player
 
             Gizmos.color = Color.red;
             
-            var origin = playerBody.position 
+            var origin = characterController.transform.position 
                          + characterController.center 
                          + Vector3.down * (characterController.height / 2f);
             var radius = characterController.radius;

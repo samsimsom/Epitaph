@@ -1,3 +1,4 @@
+// ReSharper disable CommentTypo, IdentifierTypo, GrammarMistakeInComment
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
@@ -34,6 +35,22 @@ namespace Epitaph.Scripts.Player
             InitializeComponents();
         }
 
+        private void OnEnable()
+        {
+            if (playerCrouch != null)
+            {
+                playerCrouch.OnCrouchStateChanged += HandleCrouchStateChanged;
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (playerCrouch != null)
+            {
+                playerCrouch.OnCrouchStateChanged -= HandleCrouchStateChanged;
+            }
+        }
+        
         private void Start()
         {
             _defaultMoveSpeed = playerMove.GetMoveSpeed();
@@ -86,6 +103,19 @@ namespace Epitaph.Scripts.Player
                 StopSprint();
             }
         }
+        
+        private void TryStartSprint()
+        {
+            // Eğer oyuncu yerdeyse ve sprint yapabiliyorsa
+            if (playerGravity == null || !playerGravity.IsGrounded() 
+                                      || !canSprint || !(currentStamina > 0)) return;
+            
+            // Çömelmiyorsa
+            if (playerCrouch != null && playerCrouch.IsCrouching()) return;
+            
+            isSprinting = true;
+            playerMove.SetMoveSpeed(sprintSpeed);
+        }
 
         private void StopSprint()
         {
@@ -104,37 +134,44 @@ namespace Epitaph.Scripts.Player
                 _timeSinceLastSprint = 0f;
                 
                 // If stamina is depleted, stop sprinting
-                if (currentStamina <= 0)
-                {
-                    currentStamina = 0;
-                    canSprint = false;
-                    StopSprint();
-                }
+                if (!(currentStamina <= 0)) return;
+                
+                currentStamina = 0;
+                canSprint = false;
+                StopSprint();
             }
             // If not sprinting, recover stamina after delay
             else
             {
                 _timeSinceLastSprint += Time.deltaTime;
+
+                if (!(_timeSinceLastSprint >= staminaRecoveryDelay)) return;
                 
-                if (_timeSinceLastSprint >= staminaRecoveryDelay)
+                currentStamina += staminaRecoveryRate * Time.deltaTime;
+                    
+                // If stamina is recovered enough, allow sprinting again
+                if (currentStamina > maxStamina * 0.15f)
                 {
-                    currentStamina += staminaRecoveryRate * Time.deltaTime;
+                    canSprint = true;
+                }
                     
-                    // If stamina is recovered enough, allow sprinting again
-                    if (currentStamina > maxStamina * 0.15f)
-                    {
-                        canSprint = true;
-                    }
-                    
-                    // Cap stamina at max
-                    if (currentStamina > maxStamina)
-                    {
-                        currentStamina = maxStamina;
-                    }
+                // Cap stamina at max
+                if (currentStamina > maxStamina)
+                {
+                    currentStamina = maxStamina;
                 }
             }
+            
         }
-
+        
+        private void HandleCrouchStateChanged(bool isCrouching)
+        {
+            if (!isCrouching || !isSprinting) return;
+            
+            StopSprint();
+            playerMove.SetMoveSpeed(playerCrouch.GetCrouchSpeed());
+        }
+        
         public bool IsSprinting()
         {
             return isSprinting;
@@ -143,47 +180,6 @@ namespace Epitaph.Scripts.Player
         public float GetStaminaPercentage()
         {
             return currentStamina / maxStamina;
-        }
-
-        // If the player starts crouching while sprinting, stop the sprint
-        private void OnEnable()
-        {
-            if (playerCrouch != null)
-            {
-                playerCrouch.OnCrouchStateChanged += HandleCrouchStateChanged;
-            }
-        }
-
-        private void OnDisable()
-        {
-            if (playerCrouch != null)
-            {
-                playerCrouch.OnCrouchStateChanged -= HandleCrouchStateChanged;
-            }
-        }
-
-        private void HandleCrouchStateChanged(bool isCrouching)
-        {
-            if (isCrouching && isSprinting)
-            {
-                StopSprint();
-                playerMove.SetMoveSpeed(playerCrouch.GetCrouchSpeed());
-            }
-        }
-        
-        private void TryStartSprint()
-        {
-            // Eğer oyuncu yerdeyse ve sprint yapabiliyorsa
-            if (playerGravity != null && playerGravity.IsGrounded() &&
-                canSprint && currentStamina > 0)
-            {
-                // Çömelmiyorsa
-                if (playerCrouch == null || !playerCrouch.IsCrouching())
-                {
-                    isSprinting = true;
-                    playerMove.SetMoveSpeed(sprintSpeed);
-                }
-            }
         }
         
     }

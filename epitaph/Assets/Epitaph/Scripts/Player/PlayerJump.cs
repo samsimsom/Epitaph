@@ -17,9 +17,6 @@ namespace Epitaph.Scripts.Player
         [SerializeField] private LayerMask ceilingLayers;
         [SerializeField] private float ceilingCheckDistance = 0.5f;
         
-        // [Header("State (ReadOnly)")]
-        // [SerializeField] private bool isJumping;
-        
         private bool _canJump = true;
         private float _jumpCooldownTimer;
         

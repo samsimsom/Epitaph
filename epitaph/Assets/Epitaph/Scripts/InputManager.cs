@@ -53,6 +53,7 @@ namespace Epitaph.Scripts
             _playerActions.Enable();
             _playerActions.Jump.performed += OnJumpPerformed;
             _playerActions.Crouch.performed += OnCrouchPerformed;
+            
             _playerActions.Sprint.performed += OnSprintPerformed;
             _playerActions.Sprint.canceled += OnSprintPerformed;
 
@@ -62,6 +63,7 @@ namespace Epitaph.Scripts
         {
             _playerActions.Jump.performed -= OnJumpPerformed;
             _playerActions.Crouch.performed -= OnCrouchPerformed;
+            
             _playerActions.Sprint.performed -= OnSprintPerformed;
             _playerActions.Sprint.canceled -= OnSprintPerformed;
             _playerActions.Disable();

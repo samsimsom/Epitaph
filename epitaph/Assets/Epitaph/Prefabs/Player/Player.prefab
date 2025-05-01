@@ -134,13 +134,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b92ce255878c941e3816523fa0945852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerBody: {fileID: 7082457408950883439}
   characterController: {fileID: 3166170450961555641}
   gravityMultiplier: 2.5
   groundedGravity: -5
   groundLayers:
     serializedVersion: 2
     m_Bits: 1
+  verticalVelocity: 0
 --- !u!114 &6517628825680354037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -160,7 +160,7 @@ MonoBehaviour:
   ceilingLayers:
     serializedVersion: 2
     m_Bits: 1
-  ceilingCheckDistance: 0.3
+  ceilingCheckDistance: 1
 --- !u!114 &93510500039061493
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -185,7 +185,7 @@ MonoBehaviour:
   ceilingLayers:
     serializedVersion: 2
     m_Bits: 1
-  ceilingCheckDistance: 0.3
+  ceilingCheckDistance: 1
   isCrouching: 0
 --- !u!114 &2958005620507743254
 MonoBehaviour:
@@ -741,8 +741,8 @@ MonoBehaviour:
         CancelDeltaTime: 0
       InputValue: 0
       Driver:
-        AccelTime: 0.1
-        DecelTime: 0.1
+        AccelTime: 0.3
+        DecelTime: 0.2
     - Name: Look Y (Tilt)
       Owner: {fileID: 417079932407678203}
       Enabled: 1
@@ -754,8 +754,8 @@ MonoBehaviour:
         CancelDeltaTime: 0
       InputValue: -0
       Driver:
-        AccelTime: 0.1
-        DecelTime: 0.1
+        AccelTime: 0.3
+        DecelTime: 0.2
   PlayerIndex: -1
   AutoEnableInputs: 1
 --- !u!1 &6406788737138046568

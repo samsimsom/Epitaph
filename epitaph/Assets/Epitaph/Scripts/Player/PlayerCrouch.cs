@@ -1,6 +1,5 @@
 // ReSharper disable CommentTypo, IdentifierTypo
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Epitaph.Scripts.Player
 {
@@ -12,8 +11,7 @@ namespace Epitaph.Scripts.Player
         
         [Header("References")]
         [SerializeField] private CharacterController characterController;
-        // [SerializeField] private Transform playerBody;
-        [FormerlySerializedAs("playerMovement")] [SerializeField] private PlayerMove playerMove;
+        [SerializeField] private PlayerMove playerMove;
         [SerializeField] private Transform playerCamera;
 
         [Header("Crouch Settings")]
@@ -21,7 +19,7 @@ namespace Epitaph.Scripts.Player
         [SerializeField] private float standingHeight = 2.0f;
         [SerializeField] private float crouchSpeed = 2.0f;
         [SerializeField] private float crouchCameraYOffset = -0.5f;
-        [SerializeField] private float standingCameraYOffset = 0.0f;
+        [SerializeField] private float standingCameraYOffset;
         [SerializeField] private float crouchTransitionTime = 0.2f;
 
         [Header("Ceil Check Settings")]
@@ -71,7 +69,6 @@ namespace Epitaph.Scripts.Player
 
         private void Stand()
         {
-            // Headroom kontrolü
             if (!CanStandUp()) return;
 
             isCrouching = false;
