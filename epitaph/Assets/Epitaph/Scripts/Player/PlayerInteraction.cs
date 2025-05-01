@@ -35,7 +35,7 @@ namespace Epitaph.Scripts.Player
 
                 if (hit.collider != null)
                 {
-                    Debug.Log("Hit: " + hit.collider.name);
+                    // Debug.Log("Hit: " + hit.collider.name);
                 }
 
                 // Draw a green line to the hit point

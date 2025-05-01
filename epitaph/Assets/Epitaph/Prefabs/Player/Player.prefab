@@ -224,12 +224,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerCamera: {fileID: 6179429294715575811}
-  interactionDistance: 5
+  interactionDistance: 8
   interactableLayer:
     serializedVersion: 2
     m_Bits: 1
-  hitGizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  gizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  hitGizmoColor: {r: 1, g: 1, b: 0, a: 1}
+  gizmoColor: {r: 1, g: 0, b: 0.015686275, a: 1}
 --- !u!1 &1079719532649227608
 GameObject:
   m_ObjectHideFlags: 0
