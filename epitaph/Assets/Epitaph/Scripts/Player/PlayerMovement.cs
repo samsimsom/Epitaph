@@ -7,6 +7,7 @@ namespace Epitaph.Scripts.Player
         [Header("References")]
         [SerializeField] private CharacterController characterController;
         [SerializeField] private Camera playerCamera;
+        [SerializeField] private Transform playerBody;
 
         [Header("Movement Settings")]
         [SerializeField] private float moveSpeed = 5f;
