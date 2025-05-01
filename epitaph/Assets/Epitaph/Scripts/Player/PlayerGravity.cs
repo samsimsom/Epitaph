@@ -14,17 +14,11 @@ namespace Epitaph.Scripts.Player
 
         [Header("Ground Check Settings")]
         [SerializeField] private LayerMask groundLayers;
-        [SerializeField] private float groundCheckDistance = 0.5f;
 
         private float _verticalVelocity;
         private bool _isGrounded;
         
         private static float Gravity => Physics.gravity.y;
-
-        private bool _wasGroundedLastFrame;
-        
-        public delegate void GroundedStateHandler(bool isGrounded);
-        public event GroundedStateHandler OnGroundedStateChanged;
 
         private void Awake()
         {
@@ -47,13 +41,7 @@ namespace Epitaph.Scripts.Player
 
         private void UpdateGroundedStatus()
         {
-            _wasGroundedLastFrame = _isGrounded;
             _isGrounded = PerformNativeGroundCheck() || PerformCustomGroundCheck();
-            
-            if (_wasGroundedLastFrame != _isGrounded)
-            {
-                OnGroundedStateChanged?.Invoke(_isGrounded);
-            }
         }
 
         private bool PerformNativeGroundCheck()
@@ -69,13 +57,12 @@ namespace Epitaph.Scripts.Player
             var origin = playerBody.position 
                          + characterController.center 
                          + Vector3.down * (characterController.height / 2f);
-            var rayDistance = groundCheckDistance;
-            float radius = characterController.radius;
+            var radius = characterController.radius;
             
             return Physics.CheckSphere(origin, radius, groundLayers);
         }
 
-        public void ApplyGravity()
+        private void ApplyGravity()
         {
             if (_isGrounded && _verticalVelocity < 0)
             {
@@ -90,11 +77,13 @@ namespace Epitaph.Scripts.Player
             characterController.Move(verticalMovement);
         }
 
+        #region Public Methods
         public float GetVerticalVelocity() => _verticalVelocity;
 
         public void SetVerticalVelocity(float velocity) => _verticalVelocity = velocity;
 
         public bool IsGrounded() => _isGrounded;
+        #endregion
 
 #if UNITY_EDITOR
         private void OnDrawGizmos()
@@ -102,18 +91,14 @@ namespace Epitaph.Scripts.Player
             if (characterController == null) return;
 
             Gizmos.color = Color.red;
-    
-            // Yer kontrolü için Sphere pozisyonu
+            
             var origin = playerBody.position 
                          + characterController.center 
                          + Vector3.down * (characterController.height / 2f);
-            var rayDistance = groundCheckDistance;
-            float radius = characterController.radius;
-    
-            // Sphere'i çizme
+            var radius = characterController.radius;
+            
             Gizmos.DrawWireSphere(origin, radius);
         }
-
 #endif
         
     }

@@ -3069,7 +3069,7 @@ MonoBehaviour:
   moveSpeed: 4
   movingRotationSpeed: 10
   idleRotationSpeed: 3
-  snapAngle: 1
+  snapAngle: 0.5
   snapThreshold: 0.1
 --- !u!114 &1000250545445629445
 MonoBehaviour:
@@ -3078,19 +3078,18 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1413786639026329898}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b92ce255878c941e3816523fa0945852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   playerBody: {fileID: 9022880250531649855}
-  characterController: {fileID: 0}
+  characterController: {fileID: 8461957402971949117}
   gravityMultiplier: 2.5
   groundedGravity: -5
   groundLayers:
     serializedVersion: 2
     m_Bits: 1
-  groundCheckDistance: 0.3
 --- !u!33 &1134714388902022354
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -3406,7 +3405,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1413786639026329898}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 39451c3a2dea4c9e8e6b8c66cfde8875, type: 3}
   m_Name: 
@@ -3899,13 +3898,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1413786639026329898}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2832e89053ca41dd9eafd44d2de2a8f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterController: {fileID: 0}
-  playerBody: {fileID: 9022880250531649855}
+  characterController: {fileID: 8461957402971949117}
+  playerBody: {fileID: 1376298077}
   playerMovement: {fileID: 908731283602754034}
   playerCamera: {fileID: 8532178447125824276}
   crouchHeight: 1
@@ -3978,15 +3977,19 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1413786639026329898}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e17c27b55bc4801a1f27e23e95b9738, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterController: {fileID: 0}
+  characterController: {fileID: 8461957402971949117}
   playerGravity: {fileID: 1000250545445629445}
   jumpHeight: 3.5
   jumpCooldown: 0.1
+  ceilingLayers:
+    serializedVersion: 2
+    m_Bits: 1
+  ceilingCheckDistance: 0.3
 --- !u!143 &8461957402971949117
 CharacterController:
   m_ObjectHideFlags: 0

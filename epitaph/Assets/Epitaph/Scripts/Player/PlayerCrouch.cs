@@ -10,7 +10,7 @@ namespace Epitaph.Scripts.Player
         
         [Header("References")]
         [SerializeField] private CharacterController characterController;
-        [SerializeField] private Transform playerBody;
+        // [SerializeField] private Transform playerBody;
         [SerializeField] private PlayerMovement playerMovement;
         [SerializeField] private Transform playerCamera;
 
@@ -27,7 +27,7 @@ namespace Epitaph.Scripts.Player
         [SerializeField] private float ceilingCheckDistance = 0.5f;
         
         [Header("State (ReadOnly)")]
-        [SerializeField] private bool isCrouching = false;
+        [SerializeField] private bool isCrouching;
         
         private float _crouchTransitionTimer;
         private float _initialCameraYLocalPosition;
@@ -113,7 +113,7 @@ namespace Epitaph.Scripts.Player
 
         private bool CanStandUp()
         {
-            var origin = playerBody.position + Vector3.up;
+            var origin = characterController.transform.position + Vector3.up;
             var rayDistance = ceilingCheckDistance;
             
             return !Physics.Raycast(origin, Vector3.up, rayDistance, ceilingLayers);
@@ -142,9 +142,9 @@ namespace Epitaph.Scripts.Player
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
-            if (playerBody == null) return;
+            if (characterController == null) return;
             
-            var origin = playerBody.position + Vector3.up;
+            var origin = characterController.transform.position + Vector3.up;
             var rayDistance = ceilingCheckDistance;
             
             Gizmos.color = Color.cyan;

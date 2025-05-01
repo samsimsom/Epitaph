@@ -12,6 +12,13 @@ namespace Epitaph.Scripts.Player
         [SerializeField] private float jumpHeight = 2f;
         [SerializeField] private float jumpCooldown = 0.1f;
         
+        [Header("Ceil Check Settings")]
+        [SerializeField] private LayerMask ceilingLayers;
+        [SerializeField] private float ceilingCheckDistance = 0.5f;
+        
+        // [Header("State (ReadOnly)")]
+        // [SerializeField] private bool isJumping;
+        
         private bool _canJump = true;
         private float _jumpCooldownTimer;
         
@@ -40,34 +47,49 @@ namespace Epitaph.Scripts.Player
         
         private void HandleJumpCooldown()
         {
-            if (!_canJump)
+            if (_canJump) return;
+            
+            _jumpCooldownTimer -= Time.deltaTime;
+            if (_jumpCooldownTimer <= 0)
             {
-                _jumpCooldownTimer -= Time.deltaTime;
-                if (_jumpCooldownTimer <= 0)
-                {
-                    _canJump = true;
-                }
+                _canJump = true;
             }
         }
         
         public bool CanJump()
         {
-            return _canJump && playerGravity.IsGrounded();
+            var origin = characterController.transform.position + Vector3.up;
+            var rayDistance = ceilingCheckDistance;
+            
+            return _canJump && playerGravity.IsGrounded() && 
+                   !Physics.Raycast(origin, Vector3.up, rayDistance, ceilingLayers);
         }
         
         public void ProcessJump()
         {
             if (!CanJump()) return;
             
-            // v = sqrt(2 * g * h) - zıplama için gereken hız formülü
             var jumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(Physics.gravity.y) * jumpHeight);
-            
-            // Dikey hızı ayarla
             playerGravity.SetVerticalVelocity(jumpVelocity);
             
-            // Zıplama sonrası soğuma süresini başlat
             _canJump = false;
             _jumpCooldownTimer = jumpCooldown;
         }
+        
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            if (characterController == null) return;
+            
+            var origin = characterController.transform.position + Vector3.up;
+            var rayDistance = ceilingCheckDistance;
+            
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(origin, origin + Vector3.up * rayDistance);
+            Gizmos.DrawWireSphere(origin, 0.05f);
+            Gizmos.DrawWireSphere(origin + Vector3.up * rayDistance, 0.05f);
+        }
+#endif
+
     }
 }
