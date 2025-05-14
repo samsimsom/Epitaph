@@ -1,0 +1,83 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+namespace Epitaph.Scripts
+{
+    public class PlayerInput : MonoBehaviour, PlayerInputActions.IPlayerActions
+    {
+        public Vector2 mouseDelta;
+        public Vector2 moveInput;
+        public bool isMoveInput;
+        
+        private PlayerInputActions _playerInputActions;
+        
+        private void Awake()
+        {
+            if (_playerInputActions != null) return;
+            
+            _playerInputActions = new PlayerInputActions();
+            _playerInputActions.Player.SetCallbacks(this);
+        }
+        
+        private void OnEnable()
+        {
+            _playerInputActions.Player.Enable();
+        }
+
+        private void OnDisable()
+        {
+            _playerInputActions.Player.Disable();
+        }
+        
+        // ---------------------------------------------------------------------------- //
+        #region Player Input Actions
+        public void OnMove(InputAction.CallbackContext context)
+        {
+            moveInput = context.ReadValue<Vector2>();
+            isMoveInput = moveInput.magnitude > 0.1f;
+        }
+
+        public void OnLook(InputAction.CallbackContext context)
+        {
+            mouseDelta = context.ReadValue<Vector2>();
+        }
+
+        public void OnAttack(InputAction.CallbackContext context)
+        {
+            
+        }
+
+        public void OnInteract(InputAction.CallbackContext context)
+        {
+            
+        }
+
+        public void OnCrouch(InputAction.CallbackContext context)
+        {
+            
+        }
+
+        public void OnJump(InputAction.CallbackContext context)
+        {
+            
+        }
+
+        public void OnPrevious(InputAction.CallbackContext context)
+        {
+            
+        }
+
+        public void OnNext(InputAction.CallbackContext context)
+        {
+            
+        }
+
+        public void OnSprint(InputAction.CallbackContext context)
+        {
+            
+        }
+        #endregion
+        // ---------------------------------------------------------------------------- //
+        
+    }
+}
