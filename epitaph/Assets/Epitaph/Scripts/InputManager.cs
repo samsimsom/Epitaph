@@ -1,4 +1,3 @@
-// ReSharper disable CommentTypo, IdentifierTypo
 using Epitaph.Scripts.Player;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -8,7 +7,7 @@ namespace Epitaph.Scripts
 {
     public class InputManager : MonoBehaviour
     {
-        [FormerlySerializedAs("playerMovement")] [SerializeField] private PlayerMove playerMove;
+        [SerializeField] private PlayerMove playerMove;
         [SerializeField] private PlayerLook playerLook;
         [SerializeField] private PlayerJump playerJump;
         [SerializeField] private PlayerCrouch playerCrouch;

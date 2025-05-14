@@ -1,4 +1,3 @@
-// ReSharper disable CommentTypo, IdentifierTypo
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player
@@ -38,17 +37,19 @@ namespace Epitaph.Scripts.Player
 
         private void Update()
         {
-            verticalVelocity = _verticalVelocity;   // Inspectordaki debug text updateti icin.
+            // Inspectordaki debug text updateti icin.
+            verticalVelocity = _verticalVelocity;
+            
             UpdateGroundedStatus();
             ApplyGravity();
         }
 
         private void UpdateGroundedStatus()
         {
-            _isGrounded = PerformCustomGroundCheck();
+            _isGrounded = PerformGroundCheck();
         }
 
-        private bool PerformCustomGroundCheck()
+        private bool PerformGroundCheck()
         {
             if (characterController == null)
                 return false;
@@ -82,9 +83,14 @@ namespace Epitaph.Scripts.Player
         public void SetVerticalVelocity(float velocity) => _verticalVelocity = velocity;
 
         public bool IsGrounded() => _isGrounded;
+
+        public void SetGroundedGravity(float gravity)
+        {
+            groundedGravity = gravity;
+        }
         #endregion
 
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             if (characterController == null) return;
@@ -98,7 +104,7 @@ namespace Epitaph.Scripts.Player
             
             Gizmos.DrawWireSphere(origin, radius);
         }
-#endif
+        #endif
         
     }
 }

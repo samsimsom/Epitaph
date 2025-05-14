@@ -1,4 +1,3 @@
-// ReSharper disable CommentTypo, IdentifierTypo
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player
@@ -13,6 +12,7 @@ namespace Epitaph.Scripts.Player
         [SerializeField] private CharacterController characterController;
         [SerializeField] private PlayerMove playerMove;
         [SerializeField] private Transform playerCamera;
+        [SerializeField] private PlayerGravity playerGravity;
 
         [Header("Crouch Settings")]
         [SerializeField] private float crouchHeight = 1.0f;
@@ -61,6 +61,7 @@ namespace Epitaph.Scripts.Player
 
         private void Crouch()
         {
+            playerGravity.SetGroundedGravity(-100f);
             isCrouching = true;
             _crouchTransitionTimer = 0f;
             playerMove.SetMoveSpeed(crouchSpeed);
