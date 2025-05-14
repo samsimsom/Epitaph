@@ -2263,7 +2263,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 74117f645ca87544896e430b75e9a316, type: 2}
+  - {fileID: 2100000, guid: 34d5d83009c3e484f8fc28bc2b391f0b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2306,7 +2306,7 @@ Transform:
   m_LocalScale: {x: 5, y: 2, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1636157233}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1182727855 stripped
 Transform:
@@ -2961,7 +2961,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1636157233
 Transform:
   m_ObjectHideFlags: 0
@@ -2975,7 +2975,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1176248885}
   - {fileID: 1777519833}
   - {fileID: 947711020}
   - {fileID: 1182727855}
@@ -3643,5 +3642,6 @@ SceneRoots:
   - {fileID: 535471640}
   - {fileID: 394096501009898222}
   - {fileID: 531311072}
+  - {fileID: 1176248885}
   - {fileID: 1636157233}
   - {fileID: 1299462938}
