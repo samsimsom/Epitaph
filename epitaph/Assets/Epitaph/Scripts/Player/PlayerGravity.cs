@@ -9,7 +9,8 @@ namespace Epitaph.Scripts.Player
 
         [Header("Gravity Settings")]
         [SerializeField] private float gravityMultiplier = 2.5f;
-        [SerializeField] private float groundedGravity = -0.5f;
+        [SerializeField] private float groundedGravity = -5f;
+        [SerializeField] private float maxFallSpeed = -10f;
 
         [Header("Ground Check Settings")]
         [SerializeField] private LayerMask groundLayers;
@@ -71,6 +72,10 @@ namespace Epitaph.Scripts.Player
             else
             {
                 _verticalVelocity += Gravity * gravityMultiplier * Time.deltaTime;
+        
+                // Terminal hız sınırı kontrolü
+                if (_verticalVelocity < maxFallSpeed)
+                    _verticalVelocity = maxFallSpeed;
             }
 
             var verticalMovement = Vector3.up * (_verticalVelocity * Time.deltaTime);
