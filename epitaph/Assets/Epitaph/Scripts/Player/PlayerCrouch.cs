@@ -126,7 +126,8 @@ namespace Epitaph.Scripts.Player
 
         private bool CanStandUp()
         {
-            var origin = characterController.transform.position + Vector3.up;
+            var origin = new Vector3(characterController.transform.position.x, 
+                characterController.height, characterController.transform.position.z);
             var rayDistance = playerData.ceilingCheckDistance;
             
             return !Physics.Raycast(origin, Vector3.up, rayDistance,
@@ -138,7 +139,8 @@ namespace Epitaph.Scripts.Player
         {
             if (characterController == null) return;
             
-            var origin = characterController.transform.position + Vector3.up;
+            var origin = new Vector3(characterController.transform.position.x, 
+                characterController.height, characterController.transform.position.z);
             var rayDistance = playerData.ceilingCheckDistance;
             
             Gizmos.color = Color.cyan;

@@ -35,7 +35,7 @@ namespace Epitaph.Scripts.Player.PlayerSO
         public float crouchGroundedGravity = -100f;
         [Space]
         public LayerMask ceilingLayers;
-        public float ceilingCheckDistance = 0.5f;
+        public float ceilingCheckDistance = 0.3f;
         
         [Header("Sprint Settings")]
         public bool isSprinting;

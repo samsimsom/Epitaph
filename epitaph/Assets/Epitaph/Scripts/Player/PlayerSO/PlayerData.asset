@@ -28,16 +28,16 @@ MonoBehaviour:
   maxSlideSpeed: 10
   isCrouching: 0
   crouchHeight: 1
-  standingHeight: 2
+  standingHeight: 1.8
   crouchSpeed: 2
-  crouchCameraYOffset: -0.5
+  crouchCameraYOffset: 0.1
   standingCameraYOffset: 0
   crouchTransitionTime: 0.4
   crouchGroundedGravity: -100
   ceilingLayers:
     serializedVersion: 2
     m_Bits: 1
-  ceilingCheckDistance: 0.5
+  ceilingCheckDistance: 0.3
   isSprinting: 0
   sprintSpeed: 7
   sprintStaminaUsage: 10
