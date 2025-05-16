@@ -3887,8 +3887,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fpCamera: {fileID: 4672070752199661022}
-  xSensitivity: 50
-  ySensitivity: 50
+  xSensitivity: 30
+  ySensitivity: 20
+  referenceScreenWidth: 1920
 --- !u!114 &3353039796398045786
 MonoBehaviour:
   m_ObjectHideFlags: 0

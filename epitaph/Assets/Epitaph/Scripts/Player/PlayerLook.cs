@@ -9,6 +9,7 @@ namespace Epitaph.Scripts.Player
         [SerializeField] private CinemachineCamera fpCamera;
         [SerializeField] private float xSensitivity = 20f;
         [SerializeField] private float ySensitivity = 20f;
+        [SerializeField] private float referenceAspect = 16f/9f;
         
         private CinemachineInputAxisController _inputAxisController;
 
@@ -38,12 +39,18 @@ namespace Epitaph.Scripts.Player
 
         private void UpdateCameraSensitivity()
         {
+            // Mevcut en-boy oranı
+            var currentAspect = (float)Screen.width / Screen.height;
+            
+            // En-boy oranı çarpanı
+            var aspectMultiplier = referenceAspect / currentAspect;
+            
             foreach (var controller in _inputAxisController.Controllers)
             {
                 controller.Input.Gain = controller.Name switch
                 {
-                    "Look X (Pan)" => xSensitivity,
-                    "Look Y (Tilt)" => -ySensitivity,
+                    "Look X (Pan)" => xSensitivity * aspectMultiplier,
+                    "Look Y (Tilt)" => -ySensitivity,  // Dikey hassasiyeti sabit tutuyoruz
                     _ => controller.Input.Gain
                 };
             }
