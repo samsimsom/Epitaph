@@ -43,7 +43,7 @@ namespace Epitaph.Scripts.Player
             
             _initialCameraYLocalPosition = playerCamera != null ? 
                 playerCamera.localPosition.y : 0f;
-            _standingSpeed = playerMove.GetMoveSpeed();
+            // _standingSpeed = playerMove.GetMoveSpeed();
         }
 
         private void Update()
@@ -64,7 +64,7 @@ namespace Epitaph.Scripts.Player
             playerGravity.SetGroundedGravity(-100f);
             isCrouching = true;
             _crouchTransitionTimer = 0f;
-            playerMove.SetMoveSpeed(crouchSpeed);
+            // playerMove.SetMoveSpeed(crouchSpeed);
             OnCrouchStateChanged?.Invoke(true);
         }
 
@@ -74,7 +74,7 @@ namespace Epitaph.Scripts.Player
 
             isCrouching = false;
             _crouchTransitionTimer = 0f;
-            playerMove.SetMoveSpeed(_standingSpeed);
+            // playerMove.SetMoveSpeed(_standingSpeed);
             OnCrouchStateChanged?.Invoke(false);
         }
 

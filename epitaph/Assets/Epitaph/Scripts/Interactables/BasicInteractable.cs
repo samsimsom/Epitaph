@@ -1,4 +1,3 @@
-// ReSharper disable CommentTypo, IdentifierTypo
 using Epitaph.Scripts.Interaction;
 using UnityEngine;
 

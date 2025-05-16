@@ -53,7 +53,7 @@ namespace Epitaph.Scripts.Player
         
         private void Start()
         {
-            _defaultMoveSpeed = playerMove.GetMoveSpeed();
+            // _defaultMoveSpeed = playerMove.GetMoveSpeed();
             currentStamina = maxStamina;
         }
 
@@ -114,7 +114,7 @@ namespace Epitaph.Scripts.Player
             if (playerCrouch != null && playerCrouch.IsCrouching()) return;
             
             isSprinting = true;
-            playerMove.SetMoveSpeed(sprintSpeed);
+            // playerMove.SetMoveSpeed(sprintSpeed);
         }
 
         private void StopSprint()
@@ -122,7 +122,7 @@ namespace Epitaph.Scripts.Player
             if (!isSprinting) return;
             
             isSprinting = false;
-            playerMove.SetMoveSpeed(_defaultMoveSpeed);
+            // playerMove.SetMoveSpeed(_defaultMoveSpeed);
         }
 
         private void UpdateStamina()
@@ -169,7 +169,7 @@ namespace Epitaph.Scripts.Player
             if (!isCrouching || !isSprinting) return;
             
             StopSprint();
-            playerMove.SetMoveSpeed(playerCrouch.GetCrouchSpeed());
+            // playerMove.SetMoveSpeed(playerCrouch.GetCrouchSpeed());
         }
         
         public bool IsSprinting()

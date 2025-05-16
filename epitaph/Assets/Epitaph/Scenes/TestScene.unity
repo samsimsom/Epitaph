@@ -3592,6 +3592,7 @@ GameObject:
   - component: {fileID: 3353039796398045784}
   - component: {fileID: 3353039796398045785}
   - component: {fileID: 3353039796398045786}
+  - component: {fileID: 3353039796398045787}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -3872,7 +3873,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerInput: {fileID: 3191299988895250157}
   characterController: {fileID: 3353039796398045783}
-  playerCamera: {fileID: 5816859175627605229}
+  playerLook: {fileID: 3353039796398045785}
   moveSpeed: 4
 --- !u!114 &3353039796398045785
 MonoBehaviour:
@@ -3886,10 +3887,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8a3dd1770e24bf9a6da043421cb5369, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerCamera: {fileID: 5816859175627605229}
   fpCamera: {fileID: 4672070752199661022}
   xSensitivity: 30
   ySensitivity: 20
-  referenceScreenWidth: 1920
+  referenceAspect: 1.7777778
 --- !u!114 &3353039796398045786
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3914,6 +3916,28 @@ MonoBehaviour:
   slideVelocity: 5
   maxSlideSpeed: 10
   verticalVelocity: 0
+--- !u!114 &3353039796398045787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 440225597234669261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 127edf47b7b24503ae438ca3b090c27b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerInput: {fileID: 3191299988895250157}
+  playerLook: {fileID: 3353039796398045785}
+  interactionDistance: 3
+  interactableLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  raycastInterval: 0.1
+  showDebugGizmos: 1
+  hitGizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  gizmoColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!4 &3875708229605123645
 Transform:
   m_ObjectHideFlags: 0

@@ -8,7 +8,7 @@ namespace Epitaph.Scripts.Player
         [Header("References")] 
         [SerializeField] private PlayerInput playerInput;
         [SerializeField] private CharacterController characterController;
-        [SerializeField] private Camera playerCamera;
+        [SerializeField] private PlayerLook playerLook;
 
         [Header("Movement Settings")]
         [SerializeField] private float moveSpeed = 5f;
@@ -36,11 +36,6 @@ namespace Epitaph.Scripts.Player
             {
                 characterController = GetComponent<CharacterController>();
             }
-            
-            if (playerCamera == null)
-            {
-                playerCamera = Camera.main;
-            }
         }
         
         private void AdjustPlayerPosition()
@@ -53,14 +48,27 @@ namespace Epitaph.Scripts.Player
         #region Move Methods
         private Vector3 CalculateMoveDirection(Vector2 input)
         {
-            var cameraTransform = playerCamera.transform;
+            // Kamera referansını al
+            var cameraTransform = playerLook.CameraTransform;
+    
+            // Kameranın ileri ve sağ vektörlerini al
             var forward = cameraTransform.forward;
             var right = cameraTransform.right;
+    
+            // Y bileşenini sıfırla (yatay düzlemde hareket için)
             forward.y = 0;
             right.y = 0;
+    
+            // Vektörleri normalize et
             forward.Normalize();
             right.Normalize();
-            return (forward * input.y + right * input.x);
+    
+            // İleri/geri hareketi için forward vektörünü, sağ/sol hareketi
+            // için right vektörünü kullan
+            // ve bunları input değerlerine göre ölçeklendir
+            var moveDirection = (forward * input.y) + (right * input.x);
+    
+            return moveDirection;
         }
 
         public void ProcessMove(Vector2 input)
@@ -68,23 +76,6 @@ namespace Epitaph.Scripts.Player
             var direction = CalculateMoveDirection(input);
             var movement = direction * (moveSpeed * Time.deltaTime);
             characterController.Move(movement);
-        }
-        #endregion
-
-        // private void OnControllerColliderHit(ControllerColliderHit hit)
-        // {
-        //     Debug.Log(hit.gameObject.name);
-        // }
-
-        #region Public Methods
-        public void SetMoveSpeed(float speed)
-        {
-            moveSpeed = speed;
-        }
-
-        public float GetMoveSpeed()
-        {
-            return moveSpeed;
         }
         #endregion
         

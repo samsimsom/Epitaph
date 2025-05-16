@@ -1,4 +1,3 @@
-// ReSharper disable CommentTypo, IdentifierTypo, InvertIf
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -6,10 +5,14 @@ namespace Epitaph.Scripts.Player
 {
     public class PlayerLook : MonoBehaviour
     {
+        [SerializeField] private Camera playerCamera;
         [SerializeField] private CinemachineCamera fpCamera;
         [SerializeField] private float xSensitivity = 20f;
         [SerializeField] private float ySensitivity = 20f;
         [SerializeField] private float referenceAspect = 16f/9f;
+        
+        public Camera PlayerCamera => playerCamera;
+        public Transform CameraTransform => fpCamera.transform;
         
         private CinemachineInputAxisController _inputAxisController;
 

@@ -1,16 +1,16 @@
-// ReSharper disable CommentTypo, IdentifierTypo
-using Cysharp.Threading.Tasks;
-using UnityEngine;
 using System;
 using System.Threading;
+using Cysharp.Threading.Tasks;
 using Epitaph.Scripts.Interaction;
+using UnityEngine;
 
 namespace Epitaph.Scripts.Player
 {
     public class PlayerInteraction : MonoBehaviour
     {
         [Header("References")]
-        [SerializeField] private Camera playerCamera;
+        [SerializeField] private PlayerInput playerInput;
+        [SerializeField] private PlayerLook playerLook;
         
         [Header("Raycast Settings")]
         public float interactionDistance = 3f;
@@ -33,18 +33,15 @@ namespace Epitaph.Scripts.Player
         private CancellationTokenSource _cts;
         private IInteractable _currentInteractable;
 
-        private void Awake()
-        {
-            if (playerCamera == null)
-            {
-                playerCamera = Camera.main;
-            }
-        }
+        private void Awake() { }
 
         private void OnEnable()
         {
             _cts = new CancellationTokenSource();
             StartRaycastLoop(_cts.Token).Forget();
+            
+            if (playerInput != null)
+                playerInput.OnInteractPerformed += ProcessInteraction;
         }
 
         private void OnDisable()
@@ -52,6 +49,9 @@ namespace Epitaph.Scripts.Player
             _cts?.Cancel();
             _cts?.Dispose();
             _cts = null;
+            
+            if (playerInput != null)
+                playerInput.OnInteractPerformed -= ProcessInteraction;
         }
 
         private void OnDestroy()
@@ -66,8 +66,8 @@ namespace Epitaph.Scripts.Player
             while (!cancellationToken.IsCancellationRequested)
             {
                 // Calculate ray parameters
-                _rayOrigin = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0)).origin;
-                _rayDirection = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0)).direction;
+                _rayOrigin = playerLook.PlayerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0)).origin;
+                _rayDirection = playerLook.PlayerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0)).direction;
 
                 // Perform raycast
                 var previousHitState = _didHit; 
