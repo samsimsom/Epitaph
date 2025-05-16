@@ -9,6 +9,7 @@ namespace Epitaph.Scripts.Player
     {
         // TODO: Karakter yuksek biyerde crouch yapiyorsa, groundedGravity'i -100 kaliyor.'
         // Bunu cozmenin yolunu bul.
+        // TODO: Karakter Crouch yapmaya basladiginda, hizi yavaslamali.
         [Header("Data")]
         [SerializeField] private PlayerData playerData;
         
