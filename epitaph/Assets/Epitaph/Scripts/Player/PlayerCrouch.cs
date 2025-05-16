@@ -7,9 +7,8 @@ namespace Epitaph.Scripts.Player
 {
     public class PlayerCrouch : MonoBehaviour
     {
-        public delegate void CrouchStateHandler(bool isCrouching);
-        public event CrouchStateHandler OnCrouchStateChanged;
-        
+        // TODO: Karakter yuksek biyerde crouch yapiyorsa, groundedGravity'i -100 kaliyor.'
+        // Bunu cozmenin yolunu bul.
         [Header("Data")]
         [SerializeField] private PlayerData playerData;
         
@@ -21,9 +20,7 @@ namespace Epitaph.Scripts.Player
         [Header("State (ReadOnly)")]
         [SerializeField] private bool isCrouching;
         
-        private float _crouchTransitionTimer;
         private float _initialCameraYLocalPosition;
-        private float _standingSpeed;
 
         private void Awake()
         {
@@ -44,11 +41,6 @@ namespace Epitaph.Scripts.Player
         {
             playerInput.OnCrouchActivated -= OnCrouchActivated;
             playerInput.OnCrouchDeactivated -= OnCrouchDeactivated;
-        }
-
-        private void Update()
-        {
-            // SmoothCrouchTransition();
         }
         
         private void OnCrouchActivated()
@@ -77,17 +69,12 @@ namespace Epitaph.Scripts.Player
         private void Crouch()
         {
             isCrouching = true;
-            _crouchTransitionTimer = 0f;
-            OnCrouchStateChanged?.Invoke(true);
         }
 
         private void Stand()
         {
             if (!CanStandUp()) return;
-
             isCrouching = false;
-            _crouchTransitionTimer = 0f;
-            OnCrouchStateChanged?.Invoke(false);
         }
 
         private void SmoothCrouchTransition()
@@ -103,7 +90,7 @@ namespace Epitaph.Scripts.Player
                 onValueChange: newHeight =>
                 {
                     characterController.height = newHeight;
-                }
+                }, Ease.OutQuad
             );
 
             // Animate center.y
@@ -113,10 +100,10 @@ namespace Epitaph.Scripts.Player
                     var center = characterController.center;
                     center.y = newCenterY;
                     characterController.center = center;
-                }
+                }, Ease.OutQuad
             );
 
-            // Optionally: Animate camera position for smoother effect
+            // Animate camera position for smoother effect
             if (playerCamera != null)
             {
                 var startCameraY = playerCamera.localPosition.y;
@@ -130,42 +117,10 @@ namespace Epitaph.Scripts.Player
                         var camPos = playerCamera.localPosition;
                         camPos.y = newCameraY;
                         playerCamera.localPosition = camPos;
-                    }
+                    }, Ease.OutQuad
                 );
             }
         }
-        
-#if false
-        private void SmoothCrouchTransition()
-        {
-            var goalHeight = isCrouching ? playerData.crouchHeight : playerData.standingHeight;
-            var startHeight = characterController.height;
-            var goalCenterY = isCrouching ? playerData.crouchHeight / 2f : 0;
-            var startCenterY = characterController.center.y;
-
-            var goalCameraY = _initialCameraYLocalPosition + (isCrouching ? 
-                playerData.crouchCameraYOffset : playerData.standingCameraYOffset);
-            var startCameraY = (playerCamera != null) ? playerCamera.localPosition.y : 0f;
-
-            if (Mathf.Approximately(startHeight, goalHeight) &&
-                Mathf.Approximately(startCenterY, goalCenterY) &&
-                Mathf.Approximately(startCameraY, goalCameraY))
-                return;
-
-            _crouchTransitionTimer += Time.deltaTime / playerData.crouchTransitionTime;
-
-            characterController.height = Mathf.Lerp(startHeight, goalHeight, 
-                _crouchTransitionTimer);
-            characterController.center = new Vector3(characterController.center.x,
-                Mathf.Lerp(startCenterY, goalCenterY, _crouchTransitionTimer),
-                characterController.center.z);
-
-            if (playerCamera == null) return;
-            var camLocalPos = playerCamera.localPosition;
-            camLocalPos.y = Mathf.Lerp(startCameraY, goalCameraY, _crouchTransitionTimer);
-            playerCamera.localPosition = camLocalPos;
-        }
-#endif
 
         private bool CanStandUp()
         {

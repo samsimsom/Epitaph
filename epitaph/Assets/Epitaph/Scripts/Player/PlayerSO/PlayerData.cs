@@ -17,22 +17,20 @@ namespace Epitaph.Scripts.Player.PlayerSO
         public float groundedGravity;
         public float maxFallSpeed;
         public LayerMask groundLayers;
-        
+        [Space]
         public float slopeForce;
         public float slopeForceRayLength;
         public float slideVelocity;
         public float maxSlideSpeed;
         
         [Header("Crouch Data")]
-        [Header("Crouch Settings")]
         public float crouchHeight = 1.0f;
         public float standingHeight = 2.0f;
         public float crouchSpeed = 2.0f;
         public float crouchCameraYOffset = -0.5f;
         public float standingCameraYOffset;
         public float crouchTransitionTime = 0.2f;
-
-        [Header("Ceil Check Settings")]
+        [Space]
         public LayerMask ceilingLayers;
         public float ceilingCheckDistance = 0.5f;
     }
