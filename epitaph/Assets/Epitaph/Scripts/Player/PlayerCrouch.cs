@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player
 {
-    [RequireComponent(typeof(PlayerMove))]
     public class PlayerCrouch : MonoBehaviour
     {
         public delegate void CrouchStateHandler(bool isCrouching);
@@ -16,9 +15,7 @@ namespace Epitaph.Scripts.Player
         [Header("References")]
         [SerializeField] private PlayerInput playerInput;
         [SerializeField] private CharacterController characterController;
-        [SerializeField] private PlayerMove playerMove;
         [SerializeField] private Transform playerCamera;
-        [SerializeField] private PlayerGravity playerGravity;
         
         [Header("State (ReadOnly)")]
         [SerializeField] private bool isCrouching;
@@ -31,13 +28,9 @@ namespace Epitaph.Scripts.Player
         {
             if (characterController == null)
                 characterController = GetComponent<CharacterController>();
-
-            if (playerMove == null)
-                playerMove = GetComponent<PlayerMove>();
             
             _initialCameraYLocalPosition = playerCamera != null ? 
                 playerCamera.localPosition.y : 0f;
-            // _standingSpeed = playerMove.GetMoveSpeed();
         }
 
         private void OnEnable()
