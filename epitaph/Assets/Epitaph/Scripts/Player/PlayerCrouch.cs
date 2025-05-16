@@ -53,13 +53,6 @@ namespace Epitaph.Scripts.Player
         
         private void OnCrouchActivated()
         {
-            OnCrouchPerformed();
-        }
-        
-        private void OnCrouchDeactivated() { }
-
-        private void OnCrouchPerformed()
-        {
             if (isCrouching)
             {
                 Stand();
@@ -71,6 +64,8 @@ namespace Epitaph.Scripts.Player
             // Always call this to handle smooth transition for both crouch and stand
             SmoothCrouchTransition();
         }
+        
+        private void OnCrouchDeactivated() { }
 
         private void Crouch()
         {
@@ -114,22 +109,22 @@ namespace Epitaph.Scripts.Player
             );
 
             // Animate camera position for smoother effect
-            if (playerCamera != null)
-            {
-                var startCameraY = playerCamera.localPosition.y;
-                var endCameraY = _initialCameraYLocalPosition + 
-                                 (isCrouching ? playerData.crouchCameraYOffset : 
-                                     playerData.standingCameraYOffset);
+            if (playerCamera == null) return;
+            
+            var startCameraY = playerCamera.localPosition.y;
+            var endCameraY = _initialCameraYLocalPosition + 
+                             (isCrouching ? playerData.crouchCameraYOffset : 
+                                 playerData.standingCameraYOffset);
 
-                Tween.Custom(startCameraY, endCameraY, playerData.crouchTransitionTime,
-                    onValueChange: newCameraY =>
-                    {
-                        var camPos = playerCamera.localPosition;
-                        camPos.y = newCameraY;
-                        playerCamera.localPosition = camPos;
-                    }, Ease.OutQuad
-                );
-            }
+            Tween.Custom(startCameraY, endCameraY, playerData.crouchTransitionTime,
+                onValueChange: newCameraY =>
+                {
+                    var camPos = playerCamera.localPosition;
+                    camPos.y = newCameraY;
+                    playerCamera.localPosition = camPos;
+                }, Ease.OutQuad
+            );
+            
         }
 
         private bool CanStandUp()
@@ -137,7 +132,8 @@ namespace Epitaph.Scripts.Player
             var origin = characterController.transform.position + Vector3.up;
             var rayDistance = playerData.ceilingCheckDistance;
             
-            return !Physics.Raycast(origin, Vector3.up, rayDistance, playerData.ceilingLayers);
+            return !Physics.Raycast(origin, Vector3.up, rayDistance,
+                playerData.ceilingLayers);
         }
 
 #if UNITY_EDITOR

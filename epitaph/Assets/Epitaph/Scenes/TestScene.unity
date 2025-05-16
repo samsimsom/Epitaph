@@ -3793,7 +3793,7 @@ CharacterController:
   m_Radius: 0.3
   m_SlopeLimit: 45
   m_StepOffset: 0.3
-  m_SkinWidth: 0.04
+  m_SkinWidth: 0.02
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &3353039796398045784
@@ -3877,7 +3877,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
-  playerInput: {fileID: 3191299988895250157}
   characterController: {fileID: 3353039796398045783}
   playerCamera: {fileID: 4827514545549067334}
   isCrouching: 0

@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb77bc1e450c413693c5950d22a7d722, type: 3}
   m_Name: PlayerData
   m_EditorClassIdentifier: 
-  speed: 3
   walkSpeed: 3
   lookSensitivity: {x: 20, y: 20}
   referanceAspect: 1.777778
@@ -32,6 +31,7 @@ MonoBehaviour:
   crouchCameraYOffset: -0.5
   standingCameraYOffset: 0
   crouchTransitionTime: 0.4
+  crouchGroundedGravity: -100
   ceilingLayers:
     serializedVersion: 2
     m_Bits: 1
