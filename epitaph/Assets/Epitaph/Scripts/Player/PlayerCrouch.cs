@@ -7,6 +7,7 @@ namespace Epitaph.Scripts.Player
 {
     public class PlayerCrouch : MonoBehaviour
     {
+        public static event Action<bool> OnCrouchStateChanged;
         public static event Action<float> OnChangeCrouchSpeed;
         public static event Action<float> OnChangeGroundedGravity;
         
@@ -16,9 +17,6 @@ namespace Epitaph.Scripts.Player
         [Header("References")]
         [SerializeField] private CharacterController characterController;
         [SerializeField] private Transform playerCamera;
-        
-        [Header("State (ReadOnly)")]
-        [SerializeField] private bool isCrouching;
         
         private float _initialCameraYLocalPosition;
 
@@ -50,7 +48,7 @@ namespace Epitaph.Scripts.Player
         
         private void OnCrouchActivated()
         {
-            if (isCrouching)
+            if (playerData.isCrouching)
             {
                 Stand();
             }
@@ -66,7 +64,8 @@ namespace Epitaph.Scripts.Player
 
         private void Crouch()
         {
-            isCrouching = true;
+            playerData.isCrouching = true;
+            OnCrouchStateChanged?.Invoke(playerData.isCrouching);
             OnChangeGroundedGravity?.Invoke(playerData.crouchGroundedGravity);
             OnChangeCrouchSpeed?.Invoke(playerData.crouchSpeed);
         }
@@ -74,7 +73,8 @@ namespace Epitaph.Scripts.Player
         private void Stand()
         {
             if (!CanStandUp()) return;
-            isCrouching = false;
+            playerData.isCrouching = false;
+            OnCrouchStateChanged?.Invoke(playerData.isCrouching);
             OnChangeGroundedGravity?.Invoke(playerData.groundedGravity);
             OnChangeCrouchSpeed?.Invoke(playerData.walkSpeed);
         }
@@ -82,10 +82,10 @@ namespace Epitaph.Scripts.Player
         private void SmoothCrouchTransition()
         {
             var startHeight = characterController.height;
-            var endHeight = isCrouching ? playerData.crouchHeight : playerData.standingHeight;
+            var endHeight = playerData.isCrouching ? playerData.crouchHeight : playerData.standingHeight;
 
             var startCenterY = characterController.center.y;
-            var endCenterY = isCrouching ? playerData.crouchHeight / 2f : 0f;
+            var endCenterY = playerData.isCrouching ? playerData.crouchHeight / 2f : 0f;
 
             // Animate height
             Tween.Custom(startHeight, endHeight, playerData.crouchTransitionTime,
@@ -110,7 +110,7 @@ namespace Epitaph.Scripts.Player
             
             var startCameraY = playerCamera.localPosition.y;
             var endCameraY = _initialCameraYLocalPosition + 
-                             (isCrouching ? playerData.crouchCameraYOffset : 
+                             (playerData.isCrouching ? playerData.crouchCameraYOffset : 
                                  playerData.standingCameraYOffset);
 
             Tween.Custom(startCameraY, endCameraY, playerData.crouchTransitionTime,

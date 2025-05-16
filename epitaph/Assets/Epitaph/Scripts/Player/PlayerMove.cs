@@ -24,11 +24,13 @@ namespace Epitaph.Scripts.Player
 
         private void OnEnable()
         {
+            PlayerSprint.OnChangeSprintSpeed += speed => { _speed = speed; };
             PlayerCrouch.OnChangeCrouchSpeed += speed => { _speed = speed; };
         }
 
         private void OnDisable()
         {
+            PlayerSprint.OnChangeSprintSpeed -= speed => { _speed = speed; };
             PlayerCrouch.OnChangeCrouchSpeed -= speed => { _speed = speed; };
         }
 

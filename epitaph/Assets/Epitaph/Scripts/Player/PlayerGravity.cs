@@ -63,6 +63,7 @@ namespace Epitaph.Scripts.Player
         private void UpdateGroundedStatus()
         {
             _isGrounded = PerformGroundCheck();
+            playerData.isGrounded = _isGrounded;
         }
 
         private bool PerformGroundCheck()

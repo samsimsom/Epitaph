@@ -17,8 +17,8 @@ namespace Epitaph.Scripts
 
         // public event Action OnLockOnToggled;
 
-        // public event Action OnSprintActivated;
-        // public event Action OnSprintDeactivated;
+        public static event Action OnSprintActivated;
+        public static event Action OnSprintDeactivated;
         
         // public event Action OnPreviousActivated;
         // public event Action OnPreviousDeactivated;
@@ -111,7 +111,14 @@ namespace Epitaph.Scripts
 
         public void OnSprint(InputAction.CallbackContext context)
         {
-            
+            if (context.performed)
+            {
+                OnSprintActivated?.Invoke();
+            }
+            else if (context.canceled)
+            {
+                OnSprintDeactivated?.Invoke();
+            }
         }
         #endregion
         // ---------------------------------------------------------------------------- //

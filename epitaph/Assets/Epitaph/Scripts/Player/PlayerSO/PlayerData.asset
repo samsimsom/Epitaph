@@ -15,6 +15,7 @@ MonoBehaviour:
   walkSpeed: 3
   lookSensitivity: {x: 20, y: 20}
   referanceAspect: 1.777778
+  isGrounded: 1
   gravityMultiplier: 2.5
   groundedGravity: -5
   maxFallSpeed: -10
@@ -25,6 +26,7 @@ MonoBehaviour:
   slopeForceRayLength: 1.5
   slideVelocity: 5
   maxSlideSpeed: 10
+  isCrouching: 0
   crouchHeight: 1
   standingHeight: 2
   crouchSpeed: 2
@@ -36,3 +38,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   ceilingCheckDistance: 0.5
+  isSprinting: 0
+  sprintSpeed: 7
+  sprintStaminaUsage: 10
+  maxStamina: 50
+  staminaRecoveryRate: 10
+  staminaRecoveryDelay: 3
+  staminaEnoughPercentage: 0.3

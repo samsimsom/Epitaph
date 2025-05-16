@@ -13,6 +13,7 @@ namespace Epitaph.Scripts.Player.PlayerSO
         public float referanceAspect;
 
         [Header("Gravity Data")] 
+        public bool isGrounded;
         public float gravityMultiplier;
         public float groundedGravity;
         public float maxFallSpeed;
@@ -24,6 +25,7 @@ namespace Epitaph.Scripts.Player.PlayerSO
         public float maxSlideSpeed;
         
         [Header("Crouch Data")]
+        public bool isCrouching;
         public float crouchHeight = 1.0f;
         public float standingHeight = 2.0f;
         public float crouchSpeed = 2.0f;
@@ -34,5 +36,14 @@ namespace Epitaph.Scripts.Player.PlayerSO
         [Space]
         public LayerMask ceilingLayers;
         public float ceilingCheckDistance = 0.5f;
+        
+        [Header("Sprint Settings")]
+        public bool isSprinting;
+        public float sprintSpeed = 10f;
+        public float sprintStaminaUsage = 10f;
+        public float maxStamina = 100f;
+        public float staminaRecoveryRate = 20f;
+        public float staminaRecoveryDelay = 1f;
+        public float staminaEnoughPercentage= 0.30f;
     }
 }
