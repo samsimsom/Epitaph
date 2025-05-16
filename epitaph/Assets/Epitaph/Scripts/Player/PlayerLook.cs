@@ -8,28 +8,8 @@ namespace Epitaph.Scripts.Player
     {
         [SerializeField] private CinemachineCamera fpCamera;
         [SerializeField] private float xSensitivity = 1f;
-        public float XSensitivity
-        {
-            get => xSensitivity;
-            set
-            {
-                xSensitivity = value;
-                UpdateCameraSensitivity();
-            }
-        }
         [SerializeField] private float ySensitivity = 1f;
-        public float YSensitivity
-        {
-            get => ySensitivity;
-            set
-            {
-                ySensitivity = value;
-                UpdateCameraSensitivity();
-            }
-        }
         
-        private float _lastXSensitivity;
-        private float _lastYSensitivity;
         private CinemachineInputAxisController _inputAxisController;
 
         private void Awake()
@@ -43,21 +23,6 @@ namespace Epitaph.Scripts.Player
         {
             LockCursor();
             UpdateCameraSensitivity();
-        }
-
-        private void Update()
-        {
-            if (Mathf.Abs(xSensitivity - _lastXSensitivity) > Mathf.Epsilon)
-            {
-                _lastXSensitivity = xSensitivity;
-                UpdateCameraSensitivity();
-            }
-            
-            if (Mathf.Abs(ySensitivity - _lastYSensitivity) > Mathf.Epsilon)
-            {
-                _lastYSensitivity = ySensitivity;
-                UpdateCameraSensitivity();
-            }
         }
 
         private static void LockCursor()
