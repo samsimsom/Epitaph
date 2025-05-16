@@ -1,3 +1,4 @@
+using Epitaph.Scripts.Player.PlayerSO;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -5,11 +6,12 @@ namespace Epitaph.Scripts.Player
 {
     public class PlayerLook : MonoBehaviour
     {
+        [Header("Data")]
+        [SerializeField] private PlayerData playerData;
+        
+        [Header("References")]
         [SerializeField] private Camera playerCamera;
         [SerializeField] private CinemachineCamera fpCamera;
-        [SerializeField] private float xSensitivity = 20f;
-        [SerializeField] private float ySensitivity = 20f;
-        [SerializeField] private float referenceAspect = 16f/9f;
         
         public Camera PlayerCamera => playerCamera;
         public Transform CameraTransform => fpCamera.transform;
@@ -46,14 +48,14 @@ namespace Epitaph.Scripts.Player
             var currentAspect = (float)Screen.width / Screen.height;
             
             // En-boy oranı çarpanı
-            var aspectMultiplier = referenceAspect / currentAspect;
+            var aspectMultiplier = playerData.referanceAspect / currentAspect;
             
             foreach (var controller in _inputAxisController.Controllers)
             {
                 controller.Input.Gain = controller.Name switch
                 {
-                    "Look X (Pan)" => xSensitivity * aspectMultiplier,
-                    "Look Y (Tilt)" => -ySensitivity,  // Dikey hassasiyeti sabit tutuyoruz
+                    "Look X (Pan)" => playerData.lookSensitivity.x * aspectMultiplier,
+                    "Look Y (Tilt)" => -playerData.lookSensitivity.y * aspectMultiplier,
                     _ => controller.Input.Gain
                 };
             }

@@ -10,8 +10,8 @@ namespace Epitaph.Scripts
         // public event Action OnAimActivated;
         // public event Action OnAimDeactivated;
 
-        // public event Action OnCrouchActivated;
-        // public event Action OnCrouchDeactivated;
+        public event Action OnCrouchActivated;
+        public event Action OnCrouchDeactivated;
 
         // public event Action OnJumpPerformed;
 
@@ -84,7 +84,14 @@ namespace Epitaph.Scripts
 
         public void OnCrouch(InputAction.CallbackContext context)
         {
-            
+            if (context.started)
+            {
+                OnCrouchActivated?.Invoke();
+            }
+            else if (context.canceled)
+            {
+                OnCrouchDeactivated?.Invoke();
+            }
         }
 
         public void OnJump(InputAction.CallbackContext context)

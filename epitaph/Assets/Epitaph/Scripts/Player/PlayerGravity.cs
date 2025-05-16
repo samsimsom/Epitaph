@@ -1,25 +1,15 @@
+using Epitaph.Scripts.Player.PlayerSO;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player
 {
     public class PlayerGravity : MonoBehaviour
     {
+        [Header("Data")]
+        [SerializeField] private PlayerData playerData;
+        
         [Header("References")]
         [SerializeField] private CharacterController characterController;
-
-        [Header("Gravity Settings")]
-        [SerializeField] private float gravityMultiplier = 2.5f;
-        [SerializeField] private float groundedGravity = -5f;
-        [SerializeField] private float maxFallSpeed = -10f;
-
-        [Header("Ground Check Settings")]
-        [SerializeField] private LayerMask groundLayers;
-
-        [Header("Slope Settings")]
-        [SerializeField] private float slopeForce = 5f;
-        [SerializeField] private float slopeForceRayLength = 1.5f;
-        [SerializeField] private float slideVelocity = 5f;
-        [SerializeField] private float maxSlideSpeed = 10f;
 
         [Header("State (ReadOnly)")]
         [SerializeField] private float verticalVelocity;
@@ -66,22 +56,22 @@ namespace Epitaph.Scripts.Player
                          + Vector3.down * (characterController.height / 2f);
             var radius = characterController.radius;
             
-            return Physics.CheckSphere(origin, radius, groundLayers);
+            return Physics.CheckSphere(origin, radius, playerData.groundLayers);
         }
 
         private void ApplyGravity()
         {
             if (_isGrounded && _verticalVelocity < 0)
             {
-                _verticalVelocity = groundedGravity;
+                _verticalVelocity = playerData.groundedGravity;
             }
             else
             {
-                _verticalVelocity += Gravity * gravityMultiplier * Time.deltaTime;
+                _verticalVelocity += Gravity * playerData.gravityMultiplier * Time.deltaTime;
         
                 // Terminal hız sınırı kontrolü
-                if (_verticalVelocity < maxFallSpeed)
-                    _verticalVelocity = maxFallSpeed;
+                if (_verticalVelocity < playerData.maxFallSpeed)
+                    _verticalVelocity = playerData.maxFallSpeed;
             }
 
             var movement = Vector3.up * (_verticalVelocity * Time.deltaTime);
@@ -100,8 +90,8 @@ namespace Epitaph.Scripts.Player
             
             // Aşağıya doğru bir ışın gönder ve eğimi kontrol et
             if (Physics.Raycast(transform.position, Vector3.down, out hit, 
-                       (characterController.height / 2f) + slopeForceRayLength, 
-                       groundLayers))
+                       (characterController.height / 2f) + playerData.slopeForceRayLength, 
+                       playerData.groundLayers))
             {
                 var slopeNormal = hit.normal;
                 var slopeAngle = Vector3.Angle(slopeNormal, Vector3.up);
@@ -115,32 +105,18 @@ namespace Epitaph.Scripts.Player
             
                     // Kayma miktarını hesapla
                     var slideAmount = Mathf.Clamp(
-                        slideVelocity + (slopeAngle / 90f) * slopeForce, 
-                        0, 
-                        maxSlideSpeed
+                        playerData.slideVelocity + (slopeAngle / 90f) * playerData.slopeForce, 
+                        0, playerData.maxSlideSpeed
                     );
             
                     // Kayma yönünde hareket ekle
                     moveDirection += slopeDirection.normalized * (slideAmount * Time.deltaTime);
             
                     // Eğim üzerinde ekstra yerçekimi uygula
-                    _verticalVelocity = groundedGravity * 2; // Eğim üzerinde daha güçlü yerçekimi
+                    _verticalVelocity = playerData.groundedGravity * 2;
                 }
             }
         }
-
-        #region Public Methods
-        public float GetVerticalVelocity() => _verticalVelocity;
-
-        public void SetVerticalVelocity(float velocity) => _verticalVelocity = velocity;
-
-        public bool IsGrounded() => _isGrounded;
-
-        public void SetGroundedGravity(float gravity)
-        {
-            groundedGravity = gravity;
-        }
-        #endregion
 
         #if UNITY_EDITOR
         private void OnDrawGizmos()

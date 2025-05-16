@@ -1,17 +1,18 @@
 using System;
+using Epitaph.Scripts.Player.PlayerSO;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player
 {
     public class PlayerMove : MonoBehaviour
     {
-        [Header("References")] 
+        [Header("Data")]
+        [SerializeField] private PlayerData playerData;
+        
+        [Header("References")]
         [SerializeField] private PlayerInput playerInput;
         [SerializeField] private CharacterController characterController;
         [SerializeField] private PlayerLook playerLook;
-
-        [Header("Movement Settings")]
-        [SerializeField] private float moveSpeed = 5f;
 
         #region MonoBehaviour Methots
         private void Awake()
@@ -74,7 +75,7 @@ namespace Epitaph.Scripts.Player
         public void ProcessMove(Vector2 input)
         {
             var direction = CalculateMoveDirection(input);
-            var movement = direction * (moveSpeed * Time.deltaTime);
+            var movement = direction * (playerData.moveSpeed * Time.deltaTime);
             characterController.Move(movement);
         }
         #endregion

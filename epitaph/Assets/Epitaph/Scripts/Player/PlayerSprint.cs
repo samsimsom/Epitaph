@@ -1,4 +1,4 @@
-// ReSharper disable CommentTypo, IdentifierTypo, GrammarMistakeInComment
+#if false
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
@@ -184,3 +184,4 @@ namespace Epitaph.Scripts.Player
         
     }
 }
+#endif

@@ -1,4 +1,4 @@
-// ReSharper disable CommentTypo, IdentifierTypo
+#if false
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player
@@ -156,3 +156,4 @@ namespace Epitaph.Scripts.Player
 
     }
 }
+#endif
