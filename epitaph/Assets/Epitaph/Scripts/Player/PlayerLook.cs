@@ -7,12 +7,17 @@ namespace Epitaph.Scripts.Player
     public class PlayerLook : MonoBehaviour
     {
         [SerializeField] private CinemachineCamera fpCamera;
-        [SerializeField] private float xSensitivity = 1f;
-        [SerializeField] private float ySensitivity = 1f;
+        [SerializeField] private float xSensitivity = 20f;
+        [SerializeField] private float ySensitivity = 20f;
         
         private CinemachineInputAxisController _inputAxisController;
 
         private void Awake()
+        {
+            InitializeComponents();
+        }
+
+        private void InitializeComponents()
         {
             _inputAxisController = fpCamera != null
                 ? fpCamera.GetComponent<CinemachineInputAxisController>()
@@ -33,8 +38,6 @@ namespace Epitaph.Scripts.Player
 
         private void UpdateCameraSensitivity()
         {
-            if (_inputAxisController == null || _inputAxisController.Controllers == null) return;
-
             foreach (var controller in _inputAxisController.Controllers)
             {
                 controller.Input.Gain = controller.Name switch
