@@ -1,6 +1,7 @@
 using System;
 using Epitaph.Scripts.Player.PlayerSO;
 using UnityEngine;
+using PrimeTween;
 
 namespace Epitaph.Scripts.Player
 {
@@ -47,7 +48,7 @@ namespace Epitaph.Scripts.Player
 
         private void Update()
         {
-            SmoothCrouchTransition();
+            // SmoothCrouchTransition();
         }
         
         private void OnCrouchActivated()
@@ -61,13 +62,16 @@ namespace Epitaph.Scripts.Player
         {
             if (isCrouching)
             {
+                playerData.groundedGravity = -5f;
                 Stand();
             }
             else
             {
+                playerData.groundedGravity = -100f;
                 Crouch();
             }
-
+            // Always call this to handle smooth transition for both crouch and stand
+            SmoothCrouchTransition();
         }
 
         private void Crouch()
@@ -86,6 +90,52 @@ namespace Epitaph.Scripts.Player
             OnCrouchStateChanged?.Invoke(false);
         }
 
+        private void SmoothCrouchTransition()
+        {
+            var startHeight = characterController.height;
+            var endHeight = isCrouching ? playerData.crouchHeight : playerData.standingHeight;
+
+            var startCenterY = characterController.center.y;
+            var endCenterY = isCrouching ? playerData.crouchHeight / 2f : 0f;
+
+            // Animate height
+            Tween.Custom(startHeight, endHeight, playerData.crouchTransitionTime,
+                onValueChange: newHeight =>
+                {
+                    characterController.height = newHeight;
+                }
+            );
+
+            // Animate center.y
+            Tween.Custom(startCenterY, endCenterY, playerData.crouchTransitionTime,
+                onValueChange: newCenterY =>
+                {
+                    var center = characterController.center;
+                    center.y = newCenterY;
+                    characterController.center = center;
+                }
+            );
+
+            // Optionally: Animate camera position for smoother effect
+            if (playerCamera != null)
+            {
+                var startCameraY = playerCamera.localPosition.y;
+                var endCameraY = _initialCameraYLocalPosition + 
+                                 (isCrouching ? playerData.crouchCameraYOffset : 
+                                     playerData.standingCameraYOffset);
+
+                Tween.Custom(startCameraY, endCameraY, playerData.crouchTransitionTime,
+                    onValueChange: newCameraY =>
+                    {
+                        var camPos = playerCamera.localPosition;
+                        camPos.y = newCameraY;
+                        playerCamera.localPosition = camPos;
+                    }
+                );
+            }
+        }
+        
+#if false
         private void SmoothCrouchTransition()
         {
             var goalHeight = isCrouching ? playerData.crouchHeight : playerData.standingHeight;
@@ -115,6 +165,7 @@ namespace Epitaph.Scripts.Player
             camLocalPos.y = Mathf.Lerp(startCameraY, goalCameraY, _crouchTransitionTimer);
             playerCamera.localPosition = camLocalPos;
         }
+#endif
 
         private bool CanStandUp()
         {
@@ -122,26 +173,6 @@ namespace Epitaph.Scripts.Player
             var rayDistance = playerData.ceilingCheckDistance;
             
             return !Physics.Raycast(origin, Vector3.up, rayDistance, playerData.ceilingLayers);
-        }
-
-        public bool IsCrouching() => isCrouching;
-        
-        public void SetCrouching(bool crouch)
-        {
-            switch (crouch)
-            {
-                case true when !isCrouching:
-                    Crouch();
-                    break;
-                case false when isCrouching:
-                    Stand();
-                    break;
-            }
-        }
-        
-        public float GetCrouchSpeed()
-        {
-            return playerData.crouchSpeed;
         }
 
 #if UNITY_EDITOR
