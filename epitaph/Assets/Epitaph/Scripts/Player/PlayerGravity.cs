@@ -15,6 +15,12 @@ namespace Epitaph.Scripts.Player
         [Header("Ground Check Settings")]
         [SerializeField] private LayerMask groundLayers;
 
+        [Header("Slope Settings")]
+        [SerializeField] private float slopeForce = 5f;
+        [SerializeField] private float slopeForceRayLength = 1.5f;
+        [SerializeField] private float slideVelocity = 5f;
+        [SerializeField] private float maxSlideSpeed = 10f;
+
         [Header("State (ReadOnly)")]
         [SerializeField] private float verticalVelocity;
         
@@ -78,8 +84,49 @@ namespace Epitaph.Scripts.Player
                     _verticalVelocity = maxFallSpeed;
             }
 
-            var verticalMovement = Vector3.up * (_verticalVelocity * Time.deltaTime);
-            characterController.Move(verticalMovement);
+            var movement = Vector3.up * (_verticalVelocity * Time.deltaTime);
+            HandleSlope(ref movement); // Eğimli yüzeyleri işle
+            
+            characterController.Move(movement);
+        }
+
+        private void HandleSlope(ref Vector3 moveDirection)
+        {
+            // Eğer karakter havadaysa, eğimi kontrol etme
+            if (!_isGrounded)
+                return;
+            
+            RaycastHit hit;
+            
+            // Aşağıya doğru bir ışın gönder ve eğimi kontrol et
+            if (Physics.Raycast(transform.position, Vector3.down, out hit, 
+                       (characterController.height / 2f) + slopeForceRayLength, 
+                       groundLayers))
+            {
+                var slopeNormal = hit.normal;
+                var slopeAngle = Vector3.Angle(slopeNormal, Vector3.up);
+        
+                // Eğer eğim, CharacterController'ın tırmanabilme açısından fazlaysa kayma uygula
+                if (slopeAngle > characterController.slopeLimit)
+                {
+                    // Eğim yönünü hesapla
+                    var slopeDirection = Vector3.Cross(
+                        Vector3.Cross(Vector3.up, slopeNormal), slopeNormal);
+            
+                    // Kayma miktarını hesapla
+                    var slideAmount = Mathf.Clamp(
+                        slideVelocity + (slopeAngle / 90f) * slopeForce, 
+                        0, 
+                        maxSlideSpeed
+                    );
+            
+                    // Kayma yönünde hareket ekle
+                    moveDirection += slopeDirection.normalized * (slideAmount * Time.deltaTime);
+            
+                    // Eğim üzerinde ekstra yerçekimi uygula
+                    _verticalVelocity = groundedGravity * 2; // Eğim üzerinde daha güçlü yerçekimi
+                }
+            }
         }
 
         #region Public Methods
