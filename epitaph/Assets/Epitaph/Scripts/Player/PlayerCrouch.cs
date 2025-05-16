@@ -7,9 +7,6 @@ namespace Epitaph.Scripts.Player
 {
     public class PlayerCrouch : MonoBehaviour
     {
-        // TODO: Karakter yuksek biyerde crouch yapiyorsa, groundedGravity'i -100 kaliyor.'
-        // Bunu cozmenin yolunu bul.
-        
         public static event Action<float> OnChangeCrouchSpeed;
         public static event Action<float> OnChangeGroundedGravity;
         
