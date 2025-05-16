@@ -10,8 +10,8 @@ namespace Epitaph.Scripts
         // public event Action OnAimActivated;
         // public event Action OnAimDeactivated;
 
-        public event Action OnCrouchActivated;
-        public event Action OnCrouchDeactivated;
+        public static event Action OnCrouchActivated;
+        public static event Action OnCrouchDeactivated;
 
         // public event Action OnJumpPerformed;
 

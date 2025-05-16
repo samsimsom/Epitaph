@@ -13,13 +13,25 @@ namespace Epitaph.Scripts.Player
         [SerializeField] private PlayerInput playerInput;
         [SerializeField] private CharacterController characterController;
         [SerializeField] private PlayerLook playerLook;
+        
+        private float _speed;
 
         #region MonoBehaviour Methots
         private void Awake()
         {
-            InitializeComponents();
+            Initialize();
         }
-        
+
+        private void OnEnable()
+        {
+            PlayerCrouch.OnChangeCrouchSpeed += speed => { _speed = speed; };
+        }
+
+        private void OnDisable()
+        {
+            PlayerCrouch.OnChangeCrouchSpeed -= speed => { _speed = speed; };
+        }
+
         private void Start()
         {
             AdjustPlayerPosition();
@@ -31,12 +43,14 @@ namespace Epitaph.Scripts.Player
         }
         #endregion
         
-        private void InitializeComponents()
+        private void Initialize()
         {
             if (characterController == null)
             {
                 characterController = GetComponent<CharacterController>();
             }
+            
+            _speed = playerData.walkSpeed;
         }
         
         private void AdjustPlayerPosition()
@@ -75,7 +89,7 @@ namespace Epitaph.Scripts.Player
         public void ProcessMove(Vector2 input)
         {
             var direction = CalculateMoveDirection(input);
-            var movement = direction * (playerData.moveSpeed * Time.deltaTime);
+            var movement = direction * (_speed * Time.deltaTime);
             characterController.Move(movement);
         }
         #endregion

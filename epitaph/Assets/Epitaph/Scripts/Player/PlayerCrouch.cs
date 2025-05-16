@@ -9,12 +9,14 @@ namespace Epitaph.Scripts.Player
     {
         // TODO: Karakter yuksek biyerde crouch yapiyorsa, groundedGravity'i -100 kaliyor.'
         // Bunu cozmenin yolunu bul.
-        // TODO: Karakter Crouch yapmaya basladiginda, hizi yavaslamali.
+        
+        public static event Action<float> OnChangeCrouchSpeed;
+        public static event Action<float> OnChangeGroundedGravity;
+        
         [Header("Data")]
         [SerializeField] private PlayerData playerData;
         
         [Header("References")]
-        [SerializeField] private PlayerInput playerInput;
         [SerializeField] private CharacterController characterController;
         [SerializeField] private Transform playerCamera;
         
@@ -25,23 +27,28 @@ namespace Epitaph.Scripts.Player
 
         private void Awake()
         {
-            if (characterController == null)
-                characterController = GetComponent<CharacterController>();
-            
-            _initialCameraYLocalPosition = playerCamera != null ? 
-                playerCamera.localPosition.y : 0f;
+            Initialize();
         }
 
         private void OnEnable()
         {
-            playerInput.OnCrouchActivated += OnCrouchActivated;
-            playerInput.OnCrouchDeactivated += OnCrouchDeactivated;
+            PlayerInput.OnCrouchActivated += OnCrouchActivated;
+            PlayerInput.OnCrouchDeactivated += OnCrouchDeactivated;
         }
         
         private void OnDisable()
         {
-            playerInput.OnCrouchActivated -= OnCrouchActivated;
-            playerInput.OnCrouchDeactivated -= OnCrouchDeactivated;
+            PlayerInput.OnCrouchActivated -= OnCrouchActivated;
+            PlayerInput.OnCrouchDeactivated -= OnCrouchDeactivated;
+        }
+        
+        private void Initialize()
+        {
+            if (characterController == null)
+                characterController = GetComponent<CharacterController>();
+
+            _initialCameraYLocalPosition = playerCamera != null ? 
+                playerCamera.localPosition.y : 0f;
         }
         
         private void OnCrouchActivated()
@@ -55,12 +62,10 @@ namespace Epitaph.Scripts.Player
         {
             if (isCrouching)
             {
-                playerData.groundedGravity = -5f;
                 Stand();
             }
             else
             {
-                playerData.groundedGravity = -100f;
                 Crouch();
             }
             // Always call this to handle smooth transition for both crouch and stand
@@ -70,12 +75,16 @@ namespace Epitaph.Scripts.Player
         private void Crouch()
         {
             isCrouching = true;
+            OnChangeGroundedGravity?.Invoke(playerData.crouchGroundedGravity);
+            OnChangeCrouchSpeed?.Invoke(playerData.crouchSpeed);
         }
 
         private void Stand()
         {
             if (!CanStandUp()) return;
             isCrouching = false;
+            OnChangeGroundedGravity?.Invoke(playerData.groundedGravity);
+            OnChangeCrouchSpeed?.Invoke(playerData.walkSpeed);
         }
 
         private void SmoothCrouchTransition()

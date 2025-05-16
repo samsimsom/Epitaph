@@ -6,7 +6,7 @@ namespace Epitaph.Scripts.Player.PlayerSO
     public class PlayerData : ScriptableObject
     {
         [Header("Movement Data")]
-        public float moveSpeed;
+        public float walkSpeed;
         
         [Header("Look Data")]
         public Vector2 lookSensitivity;
@@ -30,6 +30,7 @@ namespace Epitaph.Scripts.Player.PlayerSO
         public float crouchCameraYOffset = -0.5f;
         public float standingCameraYOffset;
         public float crouchTransitionTime = 0.2f;
+        public float crouchGroundedGravity = -100f;
         [Space]
         public LayerMask ceilingLayers;
         public float ceilingCheckDistance = 0.5f;

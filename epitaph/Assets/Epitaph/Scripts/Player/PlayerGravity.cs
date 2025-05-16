@@ -1,3 +1,4 @@
+using System;
 using Epitaph.Scripts.Player.PlayerSO;
 using UnityEngine;
 
@@ -14,6 +15,7 @@ namespace Epitaph.Scripts.Player
         [Header("State (ReadOnly)")]
         [SerializeField] private float verticalVelocity;
         
+        private float _groundedGravity;
         private float _verticalVelocity;
         private bool _isGrounded;
         
@@ -21,15 +23,32 @@ namespace Epitaph.Scripts.Player
 
         private void Awake()
         {
-            InitializeComponents();
+            Initialize();
         }
 
-        private void InitializeComponents()
+        private void OnEnable()
+        {
+            PlayerCrouch.OnChangeGroundedGravity += groundedGravity =>
+            {
+                _groundedGravity = groundedGravity;
+            };
+        }
+
+        private void OnDisable()
+        {
+            PlayerCrouch.OnChangeGroundedGravity -= groundedGravity =>
+            {
+                groundedGravity = _groundedGravity;
+            };
+        }
+
+        private void Initialize()
         {
             if (characterController == null)
             {
                 characterController = GetComponent<CharacterController>();
             }
+            _groundedGravity = playerData.groundedGravity;
         }
 
         private void Update()
@@ -63,7 +82,7 @@ namespace Epitaph.Scripts.Player
         {
             if (_isGrounded && _verticalVelocity < 0)
             {
-                _verticalVelocity = playerData.groundedGravity;
+                _verticalVelocity = _groundedGravity;
             }
             else
             {
