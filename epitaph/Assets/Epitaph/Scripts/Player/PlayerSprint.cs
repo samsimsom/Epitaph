@@ -17,8 +17,7 @@ namespace Epitaph.Scripts.Player
         [Header("Debug")]
         [SerializeField] private float currentStamina;
         [SerializeField] private bool canSprint = true;
-
-        private float _defaultMoveSpeed;
+        
         private float _timeSinceLastSprint;
         private bool _isSprintKeyHeld;
 
@@ -43,7 +42,6 @@ namespace Epitaph.Scripts.Player
         
         private void Start()
         {
-            // _defaultMoveSpeed = playerMove.GetMoveSpeed();
             currentStamina = playerData.maxStamina;
         }
 
@@ -51,12 +49,9 @@ namespace Epitaph.Scripts.Player
         {
             if (_isSprintKeyHeld && !playerData.isSprinting)
             {
-                // Yerdeyiz, sprint tuşu basılı ve sprint yapmıyoruz
-                // Sprint'i tekrar başlatmayı dene
                 TryStartSprint();
             }
             
-            // Stamina güncellemelerini yap
             UpdateStamina();
         }
 

@@ -103,8 +103,7 @@ namespace Epitaph.Scripts.Player
         private void HandleSlope(ref Vector3 moveDirection)
         {
             // Eğer karakter havadaysa, eğimi kontrol etme
-            if (!_isGrounded)
-                return;
+            if (!_isGrounded) return;
             
             RaycastHit hit;
             
