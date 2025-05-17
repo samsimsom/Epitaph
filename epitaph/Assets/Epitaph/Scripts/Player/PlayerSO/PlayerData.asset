@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkSpeed: 2.5
   currentVelocity: {x: 0, y: 0, z: 0}
-  lookSensitivity: {x: 15, y: 15}
+  lookSensitivity: {x: 20, y: 15}
   referanceAspect: 1.777778
   isGrounded: 1
   gravityMultiplier: 2.5
@@ -30,7 +30,7 @@ MonoBehaviour:
   slopeForceRayLength: 1.5
   slideVelocity: 5
   maxSlideSpeed: 5
-  isCrouching: 0
+  isCrouching: 1
   crouchHeight: 0.75
   standingHeight: 1.8
   crouchSpeed: 1.5

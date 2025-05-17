@@ -811,7 +811,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36d1163fa822e8b418a0a603ec078d5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Damping: 0
+  Damping: 0.1
 --- !u!114 &466055240036302041
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -891,7 +891,7 @@ MonoBehaviour:
         CancelDeltaTime: 0
       InputValue: 0
       Driver:
-        AccelTime: 0.1
+        AccelTime: 0.5
         DecelTime: 0.1
     - Name: Look Y (Tilt)
       Owner: {fileID: 466055240036302041}
@@ -904,7 +904,7 @@ MonoBehaviour:
         CancelDeltaTime: 0
       InputValue: -0
       Driver:
-        AccelTime: 0.1
+        AccelTime: 0.5
         DecelTime: 0.1
   PlayerIndex: -1
   AutoEnableInputs: 1
