@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Epitaph.Scripts.Player.PlayerSO
+namespace Epitaph.Scripts.Player.ScriptableObjects.MovementSO
 {
     [CreateAssetMenu(fileName = "PlayerMovementData", menuName = "Systems/Movement System", order = 0)]
     public class PlayerMovementData : ScriptableObject

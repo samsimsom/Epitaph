@@ -1,4 +1,4 @@
-using Epitaph.Scripts.Player.PlayerSO;
+using Epitaph.Scripts.Player.ScriptableObjects.MovementSO;
 using Unity.Cinemachine;
 using UnityEngine;
 
