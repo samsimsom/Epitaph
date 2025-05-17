@@ -18,6 +18,9 @@ namespace Epitaph.Scripts.Player.PlayerSO
         public float groundedGravity;
         public float maxFallSpeed;
         public LayerMask groundLayers;
+        [Space] 
+        public bool isFalling = false;
+        public float fallThreshold = 0.2f;
         [Space]
         public float slopeForce;
         public float slopeForceRayLength;

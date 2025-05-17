@@ -5,6 +5,7 @@ using UnityEngine;
 namespace Epitaph.Scripts.Player
 {
     public class PlayerGravity : MonoBehaviour
+
     {
         [Header("Data")]
         [SerializeField] private PlayerData playerData;
@@ -14,6 +15,9 @@ namespace Epitaph.Scripts.Player
 
         [Header("State (ReadOnly)")]
         [SerializeField] private float verticalVelocity;
+        
+        private float _ungroundedTime;
+        private bool _isFalling;
         
         private float _groundedGravity;
         private float _verticalVelocity;
@@ -49,14 +53,15 @@ namespace Epitaph.Scripts.Player
                 characterController = GetComponent<CharacterController>();
             }
             _groundedGravity = playerData.groundedGravity;
+            _ungroundedTime = 0f;
+            playerData.isFalling = false;
         }
 
         private void Update()
         {
-            // Inspectordaki debug text updateti icin.
             verticalVelocity = _verticalVelocity;
-            
             UpdateGroundedStatus();
+            UpdateFallingStatus();
             ApplyGravity();
         }
 
@@ -64,6 +69,23 @@ namespace Epitaph.Scripts.Player
         {
             _isGrounded = PerformGroundCheck();
             playerData.isGrounded = _isGrounded;
+        }
+        
+        private void UpdateFallingStatus()
+        {
+            if (!_isGrounded)
+            {
+                _ungroundedTime += Time.deltaTime;
+                if (_ungroundedTime > playerData.fallThreshold)
+                {
+                    playerData.isFalling = true;
+                }
+            }
+            else
+            {
+                _ungroundedTime = 0f;
+                playerData.isFalling = false;
+            }
         }
 
         private bool PerformGroundCheck()
@@ -95,43 +117,31 @@ namespace Epitaph.Scripts.Player
             }
 
             var movement = Vector3.up * (_verticalVelocity * Time.deltaTime);
-            HandleSlope(ref movement); // Eğimli yüzeyleri işle
+            HandleSlope(ref movement);
             
             characterController.Move(movement);
         }
 
         private void HandleSlope(ref Vector3 moveDirection)
         {
-            // Eğer karakter havadaysa, eğimi kontrol etme
             if (!_isGrounded) return;
             
             RaycastHit hit;
-            
-            // Aşağıya doğru bir ışın gönder ve eğimi kontrol et
             if (Physics.Raycast(transform.position, Vector3.down, out hit, 
                        (characterController.height / 2f) + playerData.slopeForceRayLength, 
                        playerData.groundLayers))
             {
                 var slopeNormal = hit.normal;
                 var slopeAngle = Vector3.Angle(slopeNormal, Vector3.up);
-        
-                // Eğer eğim, CharacterController'ın tırmanabilme açısından fazlaysa kayma uygula
                 if (slopeAngle > characterController.slopeLimit)
                 {
-                    // Eğim yönünü hesapla
                     var slopeDirection = Vector3.Cross(
                         Vector3.Cross(Vector3.up, slopeNormal), slopeNormal);
-            
-                    // Kayma miktarını hesapla
                     var slideAmount = Mathf.Clamp(
                         playerData.slideVelocity + (slopeAngle / 90f) * playerData.slopeForce, 
                         0, playerData.maxSlideSpeed
                     );
-            
-                    // Kayma yönünde hareket ekle
                     moveDirection += slopeDirection.normalized * (slideAmount * Time.deltaTime);
-            
-                    // Eğim üzerinde ekstra yerçekimi uygula
                     _verticalVelocity = playerData.groundedGravity * 2;
                 }
             }
@@ -152,6 +162,5 @@ namespace Epitaph.Scripts.Player
             Gizmos.DrawWireSphere(origin, radius);
         }
         #endif
-        
     }
 }

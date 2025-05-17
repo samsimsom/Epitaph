@@ -22,6 +22,8 @@ MonoBehaviour:
   groundLayers:
     serializedVersion: 2
     m_Bits: 1
+  isFalling: 0
+  fallThreshold: 0.1
   slopeForce: 5
   slopeForceRayLength: 1.5
   slideVelocity: 5
