@@ -34,7 +34,7 @@ MonoBehaviour:
   crouchHeight: 0.75
   standingHeight: 1.8
   crouchSpeed: 1.5
-  crouchCameraYOffset: 0.1
+  crouchCameraYOffset: -0.05
   standingCameraYOffset: 0
   crouchTransitionTime: 0.45
   crouchGroundedGravity: -100
