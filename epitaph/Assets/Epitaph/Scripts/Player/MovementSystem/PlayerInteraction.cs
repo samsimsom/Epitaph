@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 using Epitaph.Scripts.Interaction;
 using UnityEngine;
 
-namespace Epitaph.Scripts.Player
+namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class PlayerInteraction : MonoBehaviour
     {

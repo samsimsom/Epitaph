@@ -2,9 +2,8 @@ using System;
 using Epitaph.Scripts.Player.PlayerSO;
 using PrimeTween;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Epitaph.Scripts.Player
+namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class PlayerCrouch : MonoBehaviour
     {
@@ -68,7 +67,10 @@ namespace Epitaph.Scripts.Player
             }
             else
             {
-                Crouch();
+                if (playerMovementData.isGrounded)
+                {
+                    Crouch();
+                }
             }
             // Always call this to handle smooth transition for both crouch and stand
             SmoothCrouchTransition();

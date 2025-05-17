@@ -1,8 +1,7 @@
 using Epitaph.Scripts.Player.PlayerSO;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Epitaph.Scripts.Player
+namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class PlayerGravity : MonoBehaviour
 
@@ -19,7 +18,6 @@ namespace Epitaph.Scripts.Player
         private bool _isFalling;
         
         private float _groundedGravity;
-        private float _verticalVelocity;
         private bool _isGrounded;
         
         private static float Gravity => Physics.gravity.y;
@@ -104,26 +102,26 @@ namespace Epitaph.Scripts.Player
 
         private void ApplyGravity()
         {
-            if (_isGrounded && _verticalVelocity < 0)
+            if (_isGrounded && playerMovementData.verticalVelocity < 0)
             {
-                _verticalVelocity = _groundedGravity;
+                playerMovementData.verticalVelocity = _groundedGravity;
             }
             else
             {
-                _verticalVelocity += Gravity * playerMovementData.gravityMultiplier * Time.deltaTime;
-        
+                playerMovementData.verticalVelocity += Gravity * playerMovementData.gravityMultiplier * Time.deltaTime;
+
                 // Terminal hız sınırı kontrolü
-                if (_verticalVelocity < playerMovementData.maxFallSpeed)
-                    _verticalVelocity = playerMovementData.maxFallSpeed;
+                if (playerMovementData.verticalVelocity < playerMovementData.maxFallSpeed)
+                    playerMovementData.verticalVelocity = playerMovementData.maxFallSpeed;
             }
 
-            var movement = Vector3.up * (_verticalVelocity * Time.deltaTime);
+            var movement = Vector3.up * (playerMovementData.verticalVelocity * Time.deltaTime);
             HandleSlope(ref movement);
-            
+    
             characterController.Move(movement);
             playerMovementData.currentVelocity.y = characterController.velocity.y;
-            
         }
+
 
         private void HandleSlope(ref Vector3 moveDirection)
         {
@@ -152,7 +150,7 @@ namespace Epitaph.Scripts.Player
                             0, playerMovementData.maxSlideSpeed
                         );
                         moveDirection += slopeDirection.normalized * (slideAmount * Time.deltaTime);
-                        _verticalVelocity = playerMovementData.groundedGravity * 2;
+                        playerMovementData.verticalVelocity = playerMovementData.groundedGravity * 2;
                     }
                     // (opsiyonel) threshold süresi dolmadan burada oyuncu ilerleyebilir,
                     // yani ek bir şey yapmanız gerekmez

@@ -1,15 +1,13 @@
 using System;
 using Epitaph.Scripts.Player.PlayerSO;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Epitaph.Scripts.Player
+namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class PlayerSprint : MonoBehaviour
     {
         public static event Action<float> OnChangeSprintSpeed;
         
-        [FormerlySerializedAs("playerData")]
         [Header("Data")]
         [SerializeField] private PlayerMovementData playerMovementData;
 

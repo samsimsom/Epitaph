@@ -1,14 +1,14 @@
-using System;
 using Epitaph.Scripts.Player.PlayerSO;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Epitaph.Scripts.Player
+namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class PlayerHeadBob : MonoBehaviour
     {
-        [FormerlySerializedAs("playerData")] [SerializeField] private PlayerMovementData playerMovementData;
-        [SerializeField] private PlayerInput playerInput;
+        [Header("Data")]
+        [SerializeField] private PlayerMovementData playerMovementData;
+        
+        [Header("References")]
         [SerializeField] private Transform playerCamera;
 
         public float amount = 0.05f;
@@ -25,13 +25,19 @@ namespace Epitaph.Scripts.Player
 
         private void Update()
         {
+            CheckForHeadBobTrigger();
+            StopHeadBob();
+        }
+
+        private void CheckForHeadBobTrigger()
+        {
             if (playerMovementData.currentVelocity.sqrMagnitude > treshold)
             {
                 StartHeadBob();
             }
         }
 
-        private Vector3 StartHeadBob()
+        private void StartHeadBob()
         {
             var pos = Vector3.zero;
             pos.y += Mathf.Lerp(pos.y, Mathf.Sin(Time.time * frequenct) 
@@ -40,14 +46,16 @@ namespace Epitaph.Scripts.Player
                                        * amount * 1.6f, smooth * Time.deltaTime);
             playerCamera.transform.localPosition += pos;
 
-            return pos;
+            // return pos;
         }
 
         private void StopHeadBob()
         {
             if (playerCamera.transform.localPosition == _startPosition) return;
             
-            playerCamera.transform.localPosition = Vector3.Lerp(playerCamera.transform.localPosition, _startPosition, smooth * Time.deltaTime);
+            playerCamera.transform.localPosition = Vector3.Lerp(
+                playerCamera.transform.localPosition, _startPosition,
+                smooth * Time.deltaTime);
         }
     }
 }

@@ -1,9 +1,7 @@
-#if true
-using System;
 using Epitaph.Scripts.Player.PlayerSO;
 using UnityEngine;
 
-namespace Epitaph.Scripts.Player
+namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class PlayerJump : MonoBehaviour
     {
@@ -12,19 +10,6 @@ namespace Epitaph.Scripts.Player
         
         [Header("References")]
         [SerializeField] private CharacterController characterController;
-        
-        [Header("Jump Settings")]
-        [SerializeField] private float jumpHeight = 2f;
-        [SerializeField] private float jumpCooldown = 0.1f;
-        [SerializeField] private float jumpBufferTime = 0.2f;
-        
-        [Header("Coyote Time Settings")]
-        [SerializeField] private float coyoteTime = 0.2f;
-        [SerializeField] private bool useCoyoteTime = true;
-        
-        [Header("Ceil Check Settings")]
-        [SerializeField] private LayerMask ceilingLayers;
-        [SerializeField] private float ceilingCheckDistance = 0.5f;
         
         private bool _canJump = true;
         private float _jumpCooldownTimer;
@@ -75,14 +60,14 @@ namespace Epitaph.Scripts.Player
         
         private void HandleCoyoteTime()
         {
-            if (!useCoyoteTime) return;
+            if (!playerMovementData.useCoyoteTime) return;
             
             var isGrounded = playerMovementData.isGrounded;
             
             // Yerdeyken coyote sayacını max değerine ayarla
             if (isGrounded)
             {
-                _coyoteTimeCounter = coyoteTime;
+                _coyoteTimeCounter = playerMovementData.coyoteTime;
             }
             else
             {
@@ -116,13 +101,27 @@ namespace Epitaph.Scripts.Player
         
         public bool CanJump()
         {
-            var origin = characterController.transform.position + Vector3.up;
-            var rayDistance = ceilingCheckDistance;
-            var cannotHitCeiling = !Physics.Raycast(origin, Vector3.up, rayDistance,
-                ceilingLayers);
-            var isInCoyoteTime = useCoyoteTime && _coyoteTimeCounter > 0;
+            ComputeCeilingRayOrigin(out var radius, out var rayDistance, 
+                out var originTip, out var originRoot);
+            var cannotHitCeiling = !Physics.Raycast(originRoot, Vector3.up, rayDistance,
+                playerMovementData.ceilingLayers);
+            var isInCoyoteTime = playerMovementData.useCoyoteTime && _coyoteTimeCounter > 0;
             
-            return _canJump && (playerMovementData.isGrounded || isInCoyoteTime) && cannotHitCeiling;
+            return !playerMovementData.isCrouching && _canJump && (playerMovementData.isGrounded || isInCoyoteTime) && cannotHitCeiling;
+        }
+        
+        private void ComputeCeilingRayOrigin(out float radius, 
+            out float rayDistance, out Vector3 originTip, out Vector3 originRoot)
+        {
+            radius = characterController.radius;
+            rayDistance = playerMovementData.ceilingCheckDistance;
+            originTip = characterController.transform.position
+                        + characterController.center
+                        + Vector3.up * (characterController.height / 2f)
+                        + Vector3.up * rayDistance;
+            originRoot = characterController.transform.position
+                         + characterController.center
+                         + Vector3.up * (characterController.height / 2f);
         }
         
         public void ProcessJump()
@@ -134,35 +133,36 @@ namespace Epitaph.Scripts.Player
             else
             {
                 // Zıplayamasa bile jump buffer'ı başlat
-                _jumpBufferCounter = jumpBufferTime;
+                _jumpBufferCounter = playerMovementData.jumpBufferTime;
             }
         }
         
         private void ExecuteJump()
         {
-            var jumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(Physics.gravity.y) * jumpHeight);
-            // playerGravity.SetVerticalVelocity(jumpVelocity);
-            
+            var jumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(Physics.gravity.y) * 
+                                          playerMovementData.jumpHeight);
+            playerMovementData.verticalVelocity = jumpVelocity;
+    
             _canJump = false;
-            _jumpCooldownTimer = jumpCooldown;
+            _jumpCooldownTimer = playerMovementData.jumpCooldown;
             _coyoteTimeCounter = 0; // Zıpladıktan sonra coyote time'ı sıfırla
         }
+
         
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             if (characterController == null) return;
             
-            var origin = characterController.transform.position + Vector3.up;
-            var rayDistance = ceilingCheckDistance;
+            ComputeCeilingRayOrigin(out var radius, out var rayDistance, 
+                out var originTip, out var originRoot);
             
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(origin, origin + Vector3.up * rayDistance);
-            Gizmos.DrawWireSphere(origin, 0.05f);
-            Gizmos.DrawWireSphere(origin + Vector3.up * rayDistance, 0.05f);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(originRoot, originRoot + Vector3.up * rayDistance);
+            Gizmos.DrawWireSphere(originRoot, 0.05f);
+            Gizmos.DrawWireSphere(originRoot + Vector3.up * rayDistance, 0.05f);
         }
 #endif
 
     }
 }
-#endif

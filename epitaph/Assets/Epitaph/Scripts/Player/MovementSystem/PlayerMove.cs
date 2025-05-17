@@ -1,12 +1,10 @@
 using Epitaph.Scripts.Player.PlayerSO;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Epitaph.Scripts.Player
+namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class PlayerMove : MonoBehaviour
     {
-        [FormerlySerializedAs("playerData")]
         [Header("Data")]
         [SerializeField] private PlayerMovementData playerMovementData;
         
@@ -25,14 +23,14 @@ namespace Epitaph.Scripts.Player
 
         private void OnEnable()
         {
-            PlayerSprint.OnChangeSprintSpeed += speed => { _speed = speed; };
-            PlayerCrouch.OnChangeCrouchSpeed += speed => { _speed = speed; };
+            PlayerSprint.OnChangeSprintSpeed += OnChangeSprintSpeed;
+            PlayerCrouch.OnChangeCrouchSpeed += OnChangeCrouchSpeed;
         }
 
         private void OnDisable()
         {
-            PlayerSprint.OnChangeSprintSpeed -= speed => { _speed = speed; };
-            PlayerCrouch.OnChangeCrouchSpeed -= speed => { _speed = speed; };
+            PlayerSprint.OnChangeSprintSpeed -= OnChangeSprintSpeed;
+            PlayerCrouch.OnChangeCrouchSpeed -= OnChangeCrouchSpeed;
         }
 
         private void Start()
@@ -45,6 +43,16 @@ namespace Epitaph.Scripts.Player
             ProcessMove(playerInput.moveInput);
         }
         #endregion
+        
+        private void OnChangeCrouchSpeed(float obj)
+        {
+            _speed = obj;
+        }
+
+        private void OnChangeSprintSpeed(float obj)
+        {
+            _speed = obj;
+        }
         
         private void Initialize()
         {
