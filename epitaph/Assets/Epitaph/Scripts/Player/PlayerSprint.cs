@@ -1,9 +1,6 @@
-#if true
 using System;
 using Epitaph.Scripts.Player.PlayerSO;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
 
 namespace Epitaph.Scripts.Player
 {
@@ -140,4 +137,3 @@ namespace Epitaph.Scripts.Player
         
     }
 }
-#endif

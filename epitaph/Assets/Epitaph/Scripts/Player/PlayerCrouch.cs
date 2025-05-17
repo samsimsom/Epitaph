@@ -1,7 +1,7 @@
 using System;
 using Epitaph.Scripts.Player.PlayerSO;
-using UnityEngine;
 using PrimeTween;
+using UnityEngine;
 
 namespace Epitaph.Scripts.Player
 {
