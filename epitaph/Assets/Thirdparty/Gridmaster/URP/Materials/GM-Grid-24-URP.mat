@@ -115,16 +115,16 @@ Material:
     - _CastShadows: 1
     - _Cull: 2
     - _Dirt: 0
-    - _Dirt_Blend: 0.5
-    - _Dirt_Height: 0.5
+    - _Dirt_Blend: 2
+    - _Dirt_Height: 1
     - _DstBlend: 0
     - _Edge_Sharpness: 20
     - _Emission: 0
     - _Emission_Map_Multiplier: 1
     - _Emission_Tiling: 1
-    - _Metallic: 0.5
+    - _Metallic: 0
     - _Metallic_Map_Multiplier: 1
-    - _Metallic_Tiling: 1
+    - _Metallic_Tiling: 0
     - _Offset1: 0
     - _QueueControl: 0
     - _QueueOffset: 0
