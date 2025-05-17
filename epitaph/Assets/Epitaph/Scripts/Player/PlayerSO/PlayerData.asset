@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PlayerData
   m_EditorClassIdentifier: 
   walkSpeed: 3
-  lookSensitivity: {x: 20, y: 20}
+  lookSensitivity: {x: 15, y: 15}
   referanceAspect: 1.777778
   isGrounded: 1
   gravityMultiplier: 2.5
