@@ -41,7 +41,7 @@ MonoBehaviour:
     m_Bits: 1
   ceilingCheckDistance: 0.3
   isSprinting: 0
-  sprintSpeed: 7
+  sprintSpeed: 5
   sprintStaminaUsage: 10
   maxStamina: 50
   staminaRecoveryRate: 10
