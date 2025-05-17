@@ -94,12 +94,13 @@ namespace Epitaph.Scripts.Player
         {
             var startHeight = characterController.height;
             var endHeight = playerData.isCrouching ? playerData.crouchHeight : playerData.standingHeight;
+            var duration = playerData.isCrouching ? playerData.crouchTransitionTime : playerData.crouchTransitionTime / 2f;
 
             var startCenterY = characterController.center.y;
             var endCenterY = playerData.isCrouching ? playerData.crouchHeight / 2f : 0f;
 
             // Animate height
-            Tween.Custom(startHeight, endHeight, playerData.crouchTransitionTime,
+            Tween.Custom(startHeight, endHeight, duration,
                 onValueChange: newHeight =>
                 {
                     characterController.height = newHeight;
@@ -107,7 +108,7 @@ namespace Epitaph.Scripts.Player
             );
 
             // Animate center.y
-            Tween.Custom(startCenterY, endCenterY, playerData.crouchTransitionTime,
+            Tween.Custom(startCenterY, endCenterY, duration,
                 onValueChange: newCenterY =>
                 {
                     var center = characterController.center;
@@ -124,7 +125,7 @@ namespace Epitaph.Scripts.Player
                              (playerData.isCrouching ? playerData.crouchCameraYOffset : 
                                  playerData.standingCameraYOffset);
 
-            Tween.Custom(startCameraY, endCameraY, playerData.crouchTransitionTime,
+            Tween.Custom(startCameraY, endCameraY, duration,
                 onValueChange: newCameraY =>
                 {
                     var camPos = playerCamera.localPosition;
@@ -137,27 +138,43 @@ namespace Epitaph.Scripts.Player
 
         private bool CanStandUp()
         {
-            var origin = new Vector3(characterController.transform.position.x, 
-                characterController.height, characterController.transform.position.z);
-            var rayDistance = playerData.ceilingCheckDistance;
+            if (characterController == null) return false;
             
-            return !Physics.Raycast(origin, Vector3.up, rayDistance,
-                playerData.ceilingLayers);
+            ComputeCeilingRayOrigin(out var radius, out var rayDistance, 
+                out var originTip, out var originRoot);
+            
+            var raycast = !Physics.Raycast(originRoot, Vector3.up, rayDistance, playerData.ceilingLayers);
+            var raySphere = !Physics.CheckSphere(originTip, radius, playerData.ceilingLayers);
+            
+            return raycast && raySphere;
         }
-        
+
+        private void ComputeCeilingRayOrigin(out float radius, 
+            out float rayDistance, out Vector3 originTip, out Vector3 originRoot)
+        {
+            radius = characterController.radius;
+            rayDistance = playerData.ceilingCheckDistance;
+            originTip = characterController.transform.position
+                        + characterController.center
+                        + Vector3.up * (characterController.height / 2f)
+                        + Vector3.up * rayDistance;
+            originRoot = characterController.transform.position
+                         + characterController.center
+                         + Vector3.up * (characterController.height / 2f);
+        }
+
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             if (characterController == null) return;
             
-            var origin = new Vector3(characterController.transform.position.x, 
-                characterController.height, characterController.transform.position.z);
-            var rayDistance = playerData.ceilingCheckDistance;
+            ComputeCeilingRayOrigin(out var radius, out var rayDistance, 
+                out var originTip, out var originRoot);
             
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawLine(origin, origin + Vector3.up * rayDistance);
-            Gizmos.DrawWireSphere(origin, 0.05f);
-            Gizmos.DrawWireSphere(origin + Vector3.up * rayDistance, 0.05f);
+            var color = CanStandUp() ? Color.green : Color.red;
+            Gizmos.color = color;
+            Gizmos.DrawLine(originRoot, originRoot + Vector3.up * rayDistance);
+            Gizmos.DrawWireSphere(originTip, radius);
         }
 #endif
     }

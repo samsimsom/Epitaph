@@ -15,6 +15,8 @@ namespace Epitaph.Scripts.Player
         [Header("State (ReadOnly)")]
         [SerializeField] private float verticalVelocity;
         
+        private float _steepSlopeTime = 0f;
+        
         private float _ungroundedTime;
         private bool _isFalling;
         
@@ -89,15 +91,18 @@ namespace Epitaph.Scripts.Player
 
         private bool PerformGroundCheck()
         {
-            if (characterController == null)
-                return false;
+            if (characterController == null) return false;
             
-            var origin = characterController.transform.position 
-                         + characterController.center 
-                         + Vector3.down * (characterController.height / 2f);
-            var radius = characterController.radius;
-            
+            ComputeGroundCheckSphere(out var radius, out var origin);
             return Physics.CheckSphere(origin, radius, playerData.groundLayers);
+        }
+
+        private void ComputeGroundCheckSphere(out float radius, out Vector3 origin)
+        {
+            radius = characterController.radius;
+            origin = characterController.transform.position 
+                     + characterController.center 
+                     + Vector3.down * (characterController.height / 2f);
         }
 
         private void ApplyGravity()
@@ -123,26 +128,44 @@ namespace Epitaph.Scripts.Player
 
         private void HandleSlope(ref Vector3 moveDirection)
         {
-            if (!_isGrounded) return;
-            
+            if (!_isGrounded) {
+                _steepSlopeTime = 0f;
+                return;
+            }
+
             RaycastHit hit;
-            if (Physics.Raycast(transform.position, Vector3.down, out hit, 
-                       (characterController.height / 2f) + playerData.slopeForceRayLength, 
+            if (Physics.Raycast(transform.position, Vector3.down, out hit,
+                       (characterController.height / 2f) + playerData.slopeForceRayLength,
                        playerData.groundLayers))
             {
                 var slopeNormal = hit.normal;
                 var slopeAngle = Vector3.Angle(slopeNormal, Vector3.up);
                 if (slopeAngle > characterController.slopeLimit)
                 {
-                    var slopeDirection = Vector3.Cross(
-                        Vector3.Cross(Vector3.up, slopeNormal), slopeNormal);
-                    var slideAmount = Mathf.Clamp(
-                        playerData.slideVelocity + (slopeAngle / 90f) * playerData.slopeForce, 
-                        0, playerData.maxSlideSpeed
-                    );
-                    moveDirection += slopeDirection.normalized * (slideAmount * Time.deltaTime);
-                    _verticalVelocity = playerData.groundedGravity * 2;
+                    _steepSlopeTime += Time.deltaTime;
+                    if (_steepSlopeTime >= playerData.slopeClimbThreshold)
+                    {
+                        // Kaymaya başla
+                        var slopeDirection = Vector3.Cross(
+                            Vector3.Cross(Vector3.up, slopeNormal), slopeNormal);
+                        var slideAmount = Mathf.Clamp(
+                            playerData.slideVelocity + (slopeAngle / 90f) * playerData.slopeForce,
+                            0, playerData.maxSlideSpeed
+                        );
+                        moveDirection += slopeDirection.normalized * (slideAmount * Time.deltaTime);
+                        _verticalVelocity = playerData.groundedGravity * 2;
+                    }
+                    // (opsiyonel) threshold süresi dolmadan burada oyuncu ilerleyebilir,
+                    // yani ek bir şey yapmanız gerekmez
                 }
+                else
+                {
+                    _steepSlopeTime = 0f; // çok dik değil, sayaç sıfırlanır
+                }
+            }
+            else
+            {
+                _steepSlopeTime = 0f;
             }
         }
 
@@ -150,14 +173,11 @@ namespace Epitaph.Scripts.Player
         private void OnDrawGizmos()
         {
             if (characterController == null) return;
-
-            Gizmos.color = Color.red;
             
-            var origin = characterController.transform.position 
-                         + characterController.center 
-                         + Vector3.down * (characterController.height / 2f);
-            var radius = characterController.radius;
+            ComputeGroundCheckSphere(out var radius, out var origin);
             
+            var color = _isGrounded ? Color.green : Color.red;
+            Gizmos.color = color;
             Gizmos.DrawWireSphere(origin, radius);
         }
         #endif

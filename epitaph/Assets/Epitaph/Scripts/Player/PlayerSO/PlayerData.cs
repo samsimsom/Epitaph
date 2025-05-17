@@ -22,6 +22,7 @@ namespace Epitaph.Scripts.Player.PlayerSO
         public bool isFalling = false;
         public float fallThreshold = 0.2f;
         [Space]
+        public float slopeClimbThreshold = 0.5f;
         public float slopeForce;
         public float slopeForceRayLength;
         public float slideVelocity;

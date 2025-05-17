@@ -24,22 +24,23 @@ MonoBehaviour:
     m_Bits: 1
   isFalling: 0
   fallThreshold: 0.1
-  slopeForce: 5
+  slopeClimbThreshold: 0.5
+  slopeForce: 2.5
   slopeForceRayLength: 1.5
   slideVelocity: 5
-  maxSlideSpeed: 10
+  maxSlideSpeed: 5
   isCrouching: 0
-  crouchHeight: 1
+  crouchHeight: 0.75
   standingHeight: 1.8
   crouchSpeed: 2
   crouchCameraYOffset: 0.1
   standingCameraYOffset: 0
-  crouchTransitionTime: 0.4
+  crouchTransitionTime: 0.45
   crouchGroundedGravity: -100
   ceilingLayers:
     serializedVersion: 2
     m_Bits: 1
-  ceilingCheckDistance: 0.6
+  ceilingCheckDistance: 0.5
   isSprinting: 0
   sprintSpeed: 5
   sprintStaminaUsage: 10
