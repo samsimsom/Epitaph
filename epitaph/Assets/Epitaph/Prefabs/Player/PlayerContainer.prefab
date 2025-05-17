@@ -591,8 +591,8 @@ MonoBehaviour:
   playerData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
   playerInput: {fileID: 6714602076716250306}
   playerCamera: {fileID: 1283019351832019577}
-  amount: 0.05
-  frequenct: 5
+  amount: 0.01
+  frequenct: 10
   smooth: 10
   treshold: 2
 --- !u!114 &4892555416731267345
