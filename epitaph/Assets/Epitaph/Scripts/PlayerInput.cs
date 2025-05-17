@@ -12,8 +12,8 @@ namespace Epitaph.Scripts
 
         public static event Action OnCrouchActivated;
         public static event Action OnCrouchDeactivated;
-
-        // public event Action OnJumpPerformed;
+        
+        public static event Action OnJumpPerformed;
 
         // public event Action OnLockOnToggled;
 
@@ -96,7 +96,10 @@ namespace Epitaph.Scripts
 
         public void OnJump(InputAction.CallbackContext context)
         {
-            
+            if (context.performed)
+            {
+                OnJumpPerformed?.Invoke();
+            }
         }
 
         public void OnPrevious(InputAction.CallbackContext context)

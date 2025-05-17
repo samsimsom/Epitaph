@@ -1,6 +1,7 @@
 using System;
 using Epitaph.Scripts.Player.PlayerSO;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Epitaph.Scripts.Player
 {
@@ -8,8 +9,9 @@ namespace Epitaph.Scripts.Player
     {
         public static event Action<float> OnChangeSprintSpeed;
         
+        [FormerlySerializedAs("playerData")]
         [Header("Data")]
-        [SerializeField] private PlayerData playerData;
+        [SerializeField] private PlayerMovementData playerMovementData;
 
         [Header("Debug")]
         [SerializeField] private float currentStamina;
@@ -39,12 +41,12 @@ namespace Epitaph.Scripts.Player
         
         private void Start()
         {
-            currentStamina = playerData.maxStamina;
+            currentStamina = playerMovementData.maxStamina;
         }
 
         private void Update()
         {
-            if (_isSprintKeyHeld && !playerData.isSprinting)
+            if (_isSprintKeyHeld && !playerMovementData.isSprinting)
             {
                 TryStartSprint();
             }
@@ -71,29 +73,29 @@ namespace Epitaph.Scripts.Player
         private void TryStartSprint()
         {
             // Eğer oyuncu yerdeyse ve sprint yapabiliyorsa
-            if (!playerData.isGrounded || !canSprint || !(currentStamina > 0)) return;
+            if (!playerMovementData.isGrounded || !canSprint || !(currentStamina > 0)) return;
             
             // Çömelmiyorsa
-            if (playerData.isCrouching) return;
+            if (playerMovementData.isCrouching) return;
             
-            playerData.isSprinting = true;
-            OnChangeSprintSpeed?.Invoke(playerData.sprintSpeed);
+            playerMovementData.isSprinting = true;
+            OnChangeSprintSpeed?.Invoke(playerMovementData.sprintSpeed);
         }
 
         private void StopSprint()
         {
-            if (!playerData.isSprinting) return;
+            if (!playerMovementData.isSprinting) return;
             
-            playerData.isSprinting = false;
-            OnChangeSprintSpeed?.Invoke(playerData.walkSpeed);
+            playerMovementData.isSprinting = false;
+            OnChangeSprintSpeed?.Invoke(playerMovementData.walkSpeed);
         }
 
         private void UpdateStamina()
         {
             // If sprinting, reduce stamina
-            if (playerData.isSprinting)
+            if (playerMovementData.isSprinting)
             {
-                currentStamina -= playerData.sprintStaminaUsage * Time.deltaTime;
+                currentStamina -= playerMovementData.sprintStaminaUsage * Time.deltaTime;
                 _timeSinceLastSprint = 0f;
                 
                 // If stamina is depleted, stop sprinting
@@ -108,20 +110,20 @@ namespace Epitaph.Scripts.Player
             {
                 _timeSinceLastSprint += Time.deltaTime;
 
-                if (!(_timeSinceLastSprint >= playerData.staminaRecoveryDelay)) return;
+                if (!(_timeSinceLastSprint >= playerMovementData.staminaRecoveryDelay)) return;
                 
-                currentStamina += playerData.staminaRecoveryRate * Time.deltaTime;
+                currentStamina += playerMovementData.staminaRecoveryRate * Time.deltaTime;
                     
                 // If stamina is recovered enough, allow sprinting again
-                if (currentStamina > playerData.maxStamina * playerData.staminaEnoughPercentage)
+                if (currentStamina > playerMovementData.maxStamina * playerMovementData.staminaEnoughPercentage)
                 {
                     canSprint = true;
                 }
                     
                 // Cap stamina at max
-                if (currentStamina > playerData.maxStamina)
+                if (currentStamina > playerMovementData.maxStamina)
                 {
-                    currentStamina = playerData.maxStamina;
+                    currentStamina = playerMovementData.maxStamina;
                 }
             }
             
@@ -129,10 +131,10 @@ namespace Epitaph.Scripts.Player
         
         private void HandleCrouchStateChanged(bool isCrouching)
         {
-            if (!isCrouching || !playerData.isSprinting) return;
+            if (!isCrouching || !playerMovementData.isSprinting) return;
             
             StopSprint();
-            OnChangeSprintSpeed?.Invoke(playerData.crouchSpeed);
+            OnChangeSprintSpeed?.Invoke(playerMovementData.crouchSpeed);
         }
         
     }

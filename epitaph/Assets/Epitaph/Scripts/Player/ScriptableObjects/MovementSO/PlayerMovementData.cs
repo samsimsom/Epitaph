@@ -2,8 +2,8 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.PlayerSO
 {
-    [CreateAssetMenu(fileName = "PlayerData", menuName = "Player/PlayerData", order = 0)]
-    public class PlayerData : ScriptableObject
+    [CreateAssetMenu(fileName = "PlayerMovementData", menuName = "Systems/Movement System", order = 0)]
+    public class PlayerMovementData : ScriptableObject
     {
         [Header("Movement Data")]
         public float walkSpeed;
@@ -18,6 +18,7 @@ namespace Epitaph.Scripts.Player.PlayerSO
         public float gravityMultiplier;
         public float groundedGravity;
         public float maxFallSpeed;
+        public float verticalVelocity;
         public LayerMask groundLayers;
         [Space] 
         public bool isFalling = false;

@@ -1,13 +1,15 @@
 using Epitaph.Scripts.Player.PlayerSO;
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Epitaph.Scripts.Player
 {
     public class PlayerLook : MonoBehaviour
     {
+        [FormerlySerializedAs("playerData")]
         [Header("Data")]
-        [SerializeField] private PlayerData playerData;
+        [SerializeField] private PlayerMovementData playerMovementData;
         
         [Header("References")]
         [SerializeField] private Camera playerCamera;
@@ -48,14 +50,14 @@ namespace Epitaph.Scripts.Player
             var currentAspect = (float)Screen.width / Screen.height;
             
             // En-boy oranı çarpanı
-            var aspectMultiplier = playerData.referanceAspect / currentAspect;
+            var aspectMultiplier = playerMovementData.referanceAspect / currentAspect;
             
             foreach (var controller in _inputAxisController.Controllers)
             {
                 controller.Input.Gain = controller.Name switch
                 {
-                    "Look X (Pan)" => playerData.lookSensitivity.x * aspectMultiplier,
-                    "Look Y (Tilt)" => -playerData.lookSensitivity.y * aspectMultiplier,
+                    "Look X (Pan)" => playerMovementData.lookSensitivity.x * aspectMultiplier,
+                    "Look Y (Tilt)" => -playerMovementData.lookSensitivity.y * aspectMultiplier,
                     _ => controller.Input.Gain
                 };
             }

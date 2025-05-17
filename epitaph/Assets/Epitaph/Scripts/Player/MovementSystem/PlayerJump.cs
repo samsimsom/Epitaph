@@ -1,13 +1,17 @@
-#if false
+#if true
+using System;
+using Epitaph.Scripts.Player.PlayerSO;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player
 {
     public class PlayerJump : MonoBehaviour
     {
+        [Header("Data")]
+        [SerializeField] private PlayerMovementData playerMovementData;
+        
         [Header("References")]
         [SerializeField] private CharacterController characterController;
-        [SerializeField] private PlayerGravity playerGravity;
         
         [Header("Jump Settings")]
         [SerializeField] private float jumpHeight = 2f;
@@ -32,18 +36,15 @@ namespace Epitaph.Scripts.Player
         {
             InitializeComponents();
         }
-        
-        private void InitializeComponents()
+
+        private void OnEnable()
         {
-            if (characterController == null)
-            {
-                characterController = GetComponent<CharacterController>();
-            }
-            
-            if (playerGravity == null)
-            {
-                playerGravity = GetComponent<PlayerGravity>();
-            }
+            PlayerInput.OnJumpPerformed += ProcessJump;
+        }
+
+        private void OnDisable()
+        {
+            PlayerInput.OnJumpPerformed -= ProcessJump;
         }
         
         private void Update()
@@ -51,6 +52,14 @@ namespace Epitaph.Scripts.Player
             HandleJumpCooldown();
             HandleCoyoteTime();
             HandleJumpBuffer();
+        }
+
+        private void InitializeComponents()
+        {
+            if (characterController == null)
+            {
+                characterController = GetComponent<CharacterController>();
+            }
         }
         
         private void HandleJumpCooldown()
@@ -68,7 +77,7 @@ namespace Epitaph.Scripts.Player
         {
             if (!useCoyoteTime) return;
             
-            var isGrounded = playerGravity.IsGrounded();
+            var isGrounded = playerMovementData.isGrounded;
             
             // Yerdeyken coyote sayacını max değerine ayarla
             if (isGrounded)
@@ -113,7 +122,7 @@ namespace Epitaph.Scripts.Player
                 ceilingLayers);
             var isInCoyoteTime = useCoyoteTime && _coyoteTimeCounter > 0;
             
-            return _canJump && (playerGravity.IsGrounded() || isInCoyoteTime) && cannotHitCeiling;
+            return _canJump && (playerMovementData.isGrounded || isInCoyoteTime) && cannotHitCeiling;
         }
         
         public void ProcessJump()
@@ -132,7 +141,7 @@ namespace Epitaph.Scripts.Player
         private void ExecuteJump()
         {
             var jumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(Physics.gravity.y) * jumpHeight);
-            playerGravity.SetVerticalVelocity(jumpVelocity);
+            // playerGravity.SetVerticalVelocity(jumpVelocity);
             
             _canJump = false;
             _jumpCooldownTimer = jumpCooldown;

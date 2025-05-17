@@ -4035,7 +4035,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94f2775523f8460c8525e3905967363f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
+  playerMovementData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
   playerInput: {fileID: 6390491648624272535}
   characterController: {fileID: 335799411769818269}
   playerLook: {fileID: 7323356727692593243}
@@ -4051,7 +4051,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39451c3a2dea4c9e8e6b8c66cfde8875, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
+  playerMovementData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
   currentStamina: 0
   canSprint: 1
 --- !u!224 &3226486215370971569
@@ -4114,7 +4114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec96afb5fce84a039f9cfd80cf174e80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
+  playerMovementData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
   playerInput: {fileID: 6390491648624272535}
   playerCamera: {fileID: 1463293868324311596}
   amount: 0.01
@@ -4483,9 +4483,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b92ce255878c941e3816523fa0945852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
+  playerMovementData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
   characterController: {fileID: 335799411769818269}
-  verticalVelocity: 0
 --- !u!114 &6390491648624272535
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4536,7 +4535,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2832e89053ca41dd9eafd44d2de2a8f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
+  playerMovementData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
   characterController: {fileID: 335799411769818269}
   playerCamera: {fileID: 1463293868324311596}
 --- !u!114 &7323356727692593243
@@ -4551,7 +4550,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8a3dd1770e24bf9a6da043421cb5369, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
+  playerMovementData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
   playerCamera: {fileID: 97344946005274002}
   fpCamera: {fileID: 9060440602867519774}
 --- !u!4 &7480203030733785489
@@ -4585,6 +4584,7 @@ GameObject:
   - component: {fileID: 6106646556129341395}
   - component: {fileID: 7151643761687988784}
   - component: {fileID: 2926566270333866035}
+  - component: {fileID: 7711096113604129950}
   - component: {fileID: 3358832380518755616}
   - component: {fileID: 5072531415765229892}
   m_Layer: 3
@@ -4594,6 +4594,29 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &7711096113604129950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7711096113604129949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e17c27b55bc4801a1f27e23e95b9738, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerMovementData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
+  characterController: {fileID: 335799411769818269}
+  jumpHeight: 2
+  jumpCooldown: 0.1
+  jumpBufferTime: 0.2
+  coyoteTime: 0.2
+  useCoyoteTime: 1
+  ceilingLayers:
+    serializedVersion: 2
+    m_Bits: 1
+  ceilingCheckDistance: 0.5
 --- !u!114 &8013291525098416263
 MonoBehaviour:
   m_ObjectHideFlags: 0

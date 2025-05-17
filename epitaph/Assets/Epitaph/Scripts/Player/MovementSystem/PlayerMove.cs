@@ -1,12 +1,14 @@
 using Epitaph.Scripts.Player.PlayerSO;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Epitaph.Scripts.Player
 {
     public class PlayerMove : MonoBehaviour
     {
+        [FormerlySerializedAs("playerData")]
         [Header("Data")]
-        [SerializeField] private PlayerData playerData;
+        [SerializeField] private PlayerMovementData playerMovementData;
         
         [Header("References")]
         [SerializeField] private PlayerInput playerInput;
@@ -51,7 +53,7 @@ namespace Epitaph.Scripts.Player
                 characterController = GetComponent<CharacterController>();
             }
             
-            _speed = playerData.walkSpeed;
+            _speed = playerMovementData.walkSpeed;
         }
         
         private void AdjustPlayerPosition()
@@ -92,8 +94,8 @@ namespace Epitaph.Scripts.Player
             var direction = CalculateMoveDirection(input);
             var movement = direction * (_speed * Time.deltaTime);
             characterController.Move(movement);
-            playerData.currentVelocity.x = characterController.velocity.x;
-            playerData.currentVelocity.z = characterController.velocity.z;
+            playerMovementData.currentVelocity.x = characterController.velocity.x;
+            playerMovementData.currentVelocity.z = characterController.velocity.z;
         }
         #endregion
         

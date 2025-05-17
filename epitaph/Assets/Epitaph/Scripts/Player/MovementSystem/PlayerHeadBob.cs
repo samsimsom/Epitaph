@@ -1,12 +1,13 @@
 using System;
 using Epitaph.Scripts.Player.PlayerSO;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Epitaph.Scripts.Player
 {
     public class PlayerHeadBob : MonoBehaviour
     {
-        [SerializeField] private PlayerData playerData;
+        [FormerlySerializedAs("playerData")] [SerializeField] private PlayerMovementData playerMovementData;
         [SerializeField] private PlayerInput playerInput;
         [SerializeField] private Transform playerCamera;
 
@@ -24,7 +25,7 @@ namespace Epitaph.Scripts.Player
 
         private void Update()
         {
-            if (playerData.currentVelocity.sqrMagnitude > treshold)
+            if (playerMovementData.currentVelocity.sqrMagnitude > treshold)
             {
                 StartHeadBob();
             }
