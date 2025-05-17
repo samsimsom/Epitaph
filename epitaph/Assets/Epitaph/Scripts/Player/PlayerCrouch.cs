@@ -37,6 +37,17 @@ namespace Epitaph.Scripts.Player
             PlayerInput.OnCrouchDeactivated -= OnCrouchDeactivated;
         }
         
+        private void Update()
+        {
+            // Eğer crouch durumunda ve isFalling true olduysa, otomatik Stand'a dönüş
+            if (playerData.isCrouching && playerData.isFalling)
+            {
+                Stand();
+                // İsteğe bağlı: Hızlıca transition uygula veya animasyon tetikle
+                SmoothCrouchTransition();
+            }
+        }
+        
         private void Initialize()
         {
             if (characterController == null)
@@ -133,7 +144,7 @@ namespace Epitaph.Scripts.Player
             return !Physics.Raycast(origin, Vector3.up, rayDistance,
                 playerData.ceilingLayers);
         }
-
+        
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
