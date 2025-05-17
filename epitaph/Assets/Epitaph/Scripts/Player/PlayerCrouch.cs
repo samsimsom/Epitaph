@@ -55,6 +55,8 @@ namespace Epitaph.Scripts.Player
 
             _initialCameraYLocalPosition = playerCamera != null ? 
                 playerCamera.localPosition.y : 0f;
+            
+            playerData.standingHeight = characterController.height;
         }
         
         private void OnCrouchActivated()

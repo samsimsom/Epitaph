@@ -92,6 +92,8 @@ namespace Epitaph.Scripts.Player
             var direction = CalculateMoveDirection(input);
             var movement = direction * (_speed * Time.deltaTime);
             characterController.Move(movement);
+            playerData.currentVelocity.x = characterController.velocity.x;
+            playerData.currentVelocity.z = characterController.velocity.z;
         }
         #endregion
         

@@ -124,6 +124,8 @@ namespace Epitaph.Scripts.Player
             HandleSlope(ref movement);
             
             characterController.Move(movement);
+            playerData.currentVelocity.y = characterController.velocity.y;
+            
         }
 
         private void HandleSlope(ref Vector3 moveDirection)

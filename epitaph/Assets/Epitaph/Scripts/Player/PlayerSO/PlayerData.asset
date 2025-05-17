@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb77bc1e450c413693c5950d22a7d722, type: 3}
   m_Name: PlayerData
   m_EditorClassIdentifier: 
-  walkSpeed: 3
+  walkSpeed: 2.5
+  currentVelocity: {x: 0, y: 0, z: 0}
   lookSensitivity: {x: 15, y: 15}
   referanceAspect: 1.777778
   isGrounded: 1
@@ -32,7 +33,7 @@ MonoBehaviour:
   isCrouching: 0
   crouchHeight: 0.75
   standingHeight: 1.8
-  crouchSpeed: 2
+  crouchSpeed: 1.5
   crouchCameraYOffset: 0.1
   standingCameraYOffset: 0
   crouchTransitionTime: 0.45
@@ -42,7 +43,7 @@ MonoBehaviour:
     m_Bits: 1
   ceilingCheckDistance: 0.5
   isSprinting: 0
-  sprintSpeed: 5
+  sprintSpeed: 4
   sprintStaminaUsage: 10
   maxStamina: 50
   staminaRecoveryRate: 10

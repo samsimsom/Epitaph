@@ -7,6 +7,7 @@ namespace Epitaph.Scripts.Player.PlayerSO
     {
         [Header("Movement Data")]
         public float walkSpeed;
+        public Vector3 currentVelocity;
         
         [Header("Look Data")]
         public Vector2 lookSensitivity;
