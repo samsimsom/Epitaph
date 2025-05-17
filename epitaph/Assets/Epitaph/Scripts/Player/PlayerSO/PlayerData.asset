@@ -39,7 +39,7 @@ MonoBehaviour:
   ceilingLayers:
     serializedVersion: 2
     m_Bits: 1
-  ceilingCheckDistance: 0.3
+  ceilingCheckDistance: 0.6
   isSprinting: 0
   sprintSpeed: 5
   sprintStaminaUsage: 10
