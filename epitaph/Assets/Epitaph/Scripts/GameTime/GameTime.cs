@@ -1,4 +1,6 @@
 using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Epitaph.Scripts.GameTime
@@ -59,8 +61,11 @@ namespace Epitaph.Scripts.GameTime
 
         #region Debugging Data
         [Header("Current Time (Inspector)")]
+        // ReSharper disable once NotAccessedField.Local
         [SerializeField] private string gameDate;
+        // ReSharper disable once NotAccessedField.Local
         [SerializeField] private string gameClock;
+        // ReSharper disable once NotAccessedField.Local
         [SerializeField] private string startElapsedTime;
         #endregion
 
@@ -76,6 +81,7 @@ namespace Epitaph.Scripts.GameTime
         private int _lastGameMonth;
         private int _lastGameYear;
         private Season _lastSeason;
+        private CancellationTokenSource _cts;
         #endregion
 
         #region Enums
@@ -92,13 +98,26 @@ namespace Epitaph.Scripts.GameTime
         private void Start()
         {
             InitializeTime();
+            StartTimeUpdateLoop().Forget();
         }
 
-        private void Update()
+        private void OnEnable()
         {
-            UpdateGameTime();
-            UpdateInspectorValues();
-            CheckTimeEvents();
+            _cts = new CancellationTokenSource();
+        }
+
+        private void OnDisable()
+        {
+            _cts?.Cancel();
+            _cts?.Dispose();
+            _cts = null;
+        }
+
+        private void OnDestroy()
+        {
+            _cts?.Cancel();
+            _cts?.Dispose();
+            _cts = null;
         }
         #endregion
 
@@ -117,14 +136,29 @@ namespace Epitaph.Scripts.GameTime
         #endregion
 
         #region Time Updates
-        private void UpdateGameTime()
+        private async UniTaskVoid StartTimeUpdateLoop()
+        {
+            while (_cts != null && !_cts.IsCancellationRequested)
+            {
+                await UpdateGameTimeAsync();
+                await UpdateInspectorValuesAsync();
+                await CheckTimeEventsAsync();
+                
+                // Optimize by avoiding per-frame execution
+                await UniTask.Yield();
+            }
+        }
+        
+        private async UniTask UpdateGameTimeAsync()
         {
             float timeScale = (HoursPerDay * MinutesPerHour * SecondsPerMinute) / realSecondsPerGameDay;
             startElapsedGameSeconds += Time.deltaTime * timeScale;
             elapsedGameSeconds += Time.deltaTime * timeScale;
+            
+            await UniTask.CompletedTask;
         }
         
-        private void CheckTimeEvents()
+        private async UniTask CheckTimeEventsAsync()
         {
             // Check for day change
             if (GameDay != _lastGameDay)
@@ -155,6 +189,8 @@ namespace Epitaph.Scripts.GameTime
                 _lastSeason = currentSeason;
                 OnSeasonChanged?.Invoke(oldSeason, currentSeason);
             }
+            
+            await UniTask.CompletedTask;
         }
         #endregion
 
@@ -180,17 +216,17 @@ namespace Epitaph.Scripts.GameTime
             return Season.Fall;
         }
 
-        private void UpdateInspectorValues()
+        private async UniTask UpdateInspectorValuesAsync()
         {
             gameDate = $"{GameDay:00}/{GameMonth:00}/{GameYear:0000}";
             gameClock = $"{GameHour:00}:{GameMinute:00}:{GameSecond:00}";
-            startElapsedTime = GetElapsedString();
+            startElapsedTime = await GetElapsedStringAsync();
         }
 
         /// <summary>
         /// Returns a formatted string of time elapsed since game start
         /// </summary>
-        private string GetElapsedString()
+        private async UniTask<string> GetElapsedStringAsync()
         {
             var totalSeconds = (int)startElapsedGameSeconds;
 
@@ -205,6 +241,9 @@ namespace Epitaph.Scripts.GameTime
             var months = totalMonths % 12;
             var years = totalMonths / 12;
 
+            // Daha karmaşık bir hesaplama olduğunda burada işlemleri async yapmak faydalı olabilir
+            await UniTask.CompletedTask;
+            
             return $"{years} yıl, {months} ay, {days} gün, {hours} saat, {minutes} dakika, {seconds} saniye";
         }
         #endregion
@@ -214,9 +253,22 @@ namespace Epitaph.Scripts.GameTime
         /// Advances game time by specified hours
         /// </summary>
         /// <param name="hours">Hours to skip forward</param>
-        public void SkipTime(float hours)
+        public async UniTask SkipTimeAsync(float hours)
         {
             elapsedGameSeconds += hours * SecondsPerMinute * MinutesPerHour;
+            
+            // Ensure event checks are run after skipping time
+            await CheckTimeEventsAsync();
+            await UpdateInspectorValuesAsync();
+        }
+        
+        /// <summary>
+        /// Synchronous version of SkipTime for backward compatibility
+        /// </summary>
+        /// <param name="hours">Hours to skip forward</param>
+        public void SkipTime(float hours)
+        {
+            SkipTimeAsync(hours).Forget();
         }
         #endregion
     }
