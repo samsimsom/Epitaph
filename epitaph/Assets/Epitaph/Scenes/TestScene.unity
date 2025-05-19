@@ -5462,10 +5462,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   realSecondsPerGameDay: 7200
   elapsedGameSeconds: 0
-  inspectorGameSeconds: 0
-  inspectorGameDay: 0
-  inspectorGameHour: 0
-  inspectorGameMinute: 0
+  startYear: 1984
+  startMonth: 12
+  startDay: 15
+  gameDate: 
+  gameClock: 
 --- !u!1 &1366090432
 GameObject:
   m_ObjectHideFlags: 0
