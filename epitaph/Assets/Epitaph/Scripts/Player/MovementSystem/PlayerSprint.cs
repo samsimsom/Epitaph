@@ -13,6 +13,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         [SerializeField] private PlayerMovementData playerMovementData;
         [SerializeField] private PlayerCondition playerCondition;
         
+        private bool _canSprint;
         private bool _isSprintKeyHeld;
         
         private void Awake()
@@ -35,16 +36,16 @@ namespace Epitaph.Scripts.Player.MovementSystem
             PlayerInput.OnSprintDeactivated -= OnSprintDeactivated;
             PlayerCrouch.OnCrouchStateChanged -= HandleCrouchStateChanged;
             
-            playerCondition.Stamina.OnStaminaDepleted -= StopSprint;
-            playerCondition.Stamina.OnStaminaRecoveryStarted -= TryStartSprint;
-            playerCondition.Stamina.OnStaminaRecoveryFinished -= TryStartSprint;
+            playerCondition.Stamina.OnStaminaDepleted -= OnStaminaDepleted;
+            playerCondition.Stamina.OnStaminaRecoveryStarted -= OnRecoveryStarted;
+            playerCondition.Stamina.OnStaminaRecoveryFinished -= OnRecoveryFinished;
         }
 
         private void Start()
         {
-            playerCondition.Stamina.OnStaminaDepleted += StopSprint;
-            playerCondition.Stamina.OnStaminaRecoveryStarted += TryStartSprint;
-            playerCondition.Stamina.OnStaminaRecoveryFinished += TryStartSprint;
+            playerCondition.Stamina.OnStaminaDepleted += OnStaminaDepleted;
+            playerCondition.Stamina.OnStaminaRecoveryStarted += OnRecoveryStarted;
+            playerCondition.Stamina.OnStaminaRecoveryFinished += OnRecoveryFinished;
         }
 
         private void Update()
@@ -75,11 +76,30 @@ namespace Epitaph.Scripts.Player.MovementSystem
             StopSprint();
         }
         
+        private void OnStaminaDepleted()
+        {
+            _canSprint = false;
+            StopSprint();
+            Debug.Log("Sprint recovery depleted");
+        }
+        
+        private void OnRecoveryStarted()
+        {
+            Debug.Log("Sprint recovery started");
+        }
+        
+        private void OnRecoveryFinished()
+        {
+            _canSprint = true;
+            Debug.Log("Sprint recovery finished");
+        }
+        
         private void TryStartSprint()
         {
             if (!playerMovementData.isGrounded || 
                 playerCondition?.Stamina == null ||
-                playerCondition.Stamina.Value <= 0) return;
+                playerCondition.Stamina.Value <= 0 ||
+                !_canSprint) return;
             
             if (playerMovementData.isCrouching) return;
 

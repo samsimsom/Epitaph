@@ -52,24 +52,60 @@ namespace Epitaph.Scripts.Player.HealthSystem
                 
             StartTimeBasedUpdates().Forget();
         }
+        
+        private void Update()
+        {
+            // Her frame'de sadece Health ve Stamina güncellensin!
+            var delta = Time.deltaTime;
+            Health.UpdateStat(delta);
+            Stamina.UpdateStat(delta);
+
+            // Debug ve Event update için her frame güncelle
+            health = Health.Value;
+            stamina = Stamina.Value;
+            OnHealthChanged?.Invoke(Health.Value, Health.MaxValue);
+
+            // Gerekirse stamina eventleri de burada eklenebilir
+        }
 
         private async UniTaskVoid StartTimeBasedUpdates()
         {
             while (this != null && gameObject.activeInHierarchy)
             {
                 var currentMinute = GameTime.Instance.GameMinute;
-                
-                // Check if a minute has passed in game time
+
                 if (currentMinute != _lastMinute)
                 {
                     _lastMinute = currentMinute;
-                    await UpdateStatsAsync();
+                    
+                    // Sadece Health ve Stamina hariç diğerlerini güncelle
+                    foreach (var stat in _allStats)
+                    {
+                        if (stat != Health && stat != Stamina)
+                            stat.UpdateStat(1.0f); // Dakika başı 1 birimlik ilerleme
+                    }
+
+                    // Debug
+                    hunger = Hunger.Value;
+                    thirst = Thirst.Value;
+                    fatigue = Fatigue.Value;
+
+                    OnHungerChanged?.Invoke(Hunger.Value, Hunger.MaxValue);
+                    OnThirstChanged?.Invoke(Thirst.Value, Thirst.MaxValue);
+                    OnFatigueChanged?.Invoke(Fatigue.Value, Fatigue.MaxValue);
+
+                    // Açlık/susuzluk tavan yaparsa sağlık azalsın
+                    if (Hunger.Value >= Hunger.MaxValue || Thirst.Value >= Thirst.MaxValue)
+                        Health.Decrease(5f);
+
+                    if (Health.Value <= 0)
+                        Die();
                 }
-                
-                // Wait a short time before next check to be efficient
+
                 await UniTask.Delay(100);
             }
         }
+
         
         private async UniTask UpdateStatsAsync()
         {

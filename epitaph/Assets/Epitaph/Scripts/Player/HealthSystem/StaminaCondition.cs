@@ -19,7 +19,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
         public float EffectiveIncreaseRate => BaseIncreaseRate * Modifier;
         public float EffectiveDecreaseRate => BaseDecreaseRate * Modifier;
         
-        public float RecoveryDelay { get; set; } = 1.0f; // Koşma sonrası gecikme
+        public float RecoveryDelay { get; set; } = 3.0f; // Koşma sonrası gecikme
         public float EnoughPercentage { get; set; } = 0.25f;
 
         private bool _isConsuming;
@@ -63,15 +63,13 @@ namespace Epitaph.Scripts.Player.HealthSystem
 
         public void UpdateStat(float deltaTime)
         {
-            Debug.Log($"Stamina: {Value}");
             if (_isConsuming)
             {
                 Value = Mathf.Clamp(Value - EffectiveDecreaseRate * deltaTime, 0, MaxValue);
                 if (Value <= 0)
                 {
-                    OnStaminaDepleted?.Invoke();
                     _isConsuming = false; // Otomatik durdur
-                    return;
+                    OnStaminaDepleted?.Invoke();
                 }
                 _recoveryTimer = 0f;
             }
