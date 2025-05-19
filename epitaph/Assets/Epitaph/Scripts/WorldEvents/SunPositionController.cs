@@ -164,12 +164,17 @@ namespace Epitaph.Scripts.WorldEvents
             {
                 // Daytime
                 targetColor = daytimeColor;
-                targetIntensity = 2.0f;
+                targetIntensity = 1.0f;
             }
             
             // Apply color and intensity
             sunLight.color = targetColor;
             sunLight.intensity = targetIntensity;
+            
+            // ENVIRONMENT LIGHTING INTENSITY DEĞİŞİMİ
+            var targetAmbient = (timeOfDay < sunrise || timeOfDay > sunset) ? 0.1f : 1f;
+            RenderSettings.ambientIntensity = Mathf.Lerp(RenderSettings.ambientIntensity, targetAmbient, Time.deltaTime * 2f);
+
         }
     }
 }

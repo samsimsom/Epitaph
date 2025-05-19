@@ -26,14 +26,14 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 2100000, guid: d4454f71d85928744be7771e2143dab7, type: 2}
+  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
   m_HaloTexture: {fileID: 0}
   m_SpotCookie: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
   m_DefaultReflectionMode: 0
-  m_DefaultReflectionResolution: 128
+  m_DefaultReflectionResolution: 16
   m_ReflectionBounces: 1
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
@@ -1315,6 +1315,60 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -4753976898039024662, guid: dff5985811459423bb4c2302a815226c, type: 3}
+--- !u!1 &223005151
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 223005152}
+  - component: {fileID: 223005153}
+  m_Layer: 0
+  m_Name: WorldEventsManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &223005152
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 223005151}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 410087041}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &223005153
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 223005151}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b9da9e3f24440429e7e5e63a49694ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sunTransform: {fileID: 410087041}
+  maxHeight: 80
+  minHeight: -20
+  sunLight: {fileID: 410087040}
+  daytimeColor: {r: 1, g: 1, b: 1, a: 1}
+  sunriseColor: {r: 1, g: 0.5, b: 0.3, a: 1}
+  sunsetColor: {r: 1, g: 0.3, b: 0.2, a: 1}
+  nightColor: {r: 0.2, g: 0.2, b: 0.4, a: 1}
+  colorTransitionTime: 0.5
 --- !u!1001 &268333139
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1950,8 +2004,6 @@ GameObject:
   - component: {fileID: 410087041}
   - component: {fileID: 410087040}
   - component: {fileID: 410087042}
-  - component: {fileID: 410087043}
-  - component: {fileID: 410087044}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -2037,7 +2089,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 223005152}
   m_LocalEulerAnglesHint: {x: 60, y: 60, z: 0}
 --- !u!114 &410087042
 MonoBehaviour:
@@ -2062,45 +2114,6 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
---- !u!114 &410087043
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 410087039}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b9da9e3f24440429e7e5e63a49694ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sunTransform: {fileID: 410087041}
-  maxHeight: 60
-  minHeight: -20
-  sunLight: {fileID: 410087040}
-  daytimeColor: {r: 1, g: 1, b: 1, a: 1}
-  sunriseColor: {r: 1, g: 0.5, b: 0.3, a: 1}
-  sunsetColor: {r: 1, g: 0.3, b: 0.2, a: 1}
-  nightColor: {r: 0.2, g: 0.2, b: 0.4, a: 1}
-  colorTransitionTime: 0.5
---- !u!114 &410087044
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 410087039}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce135673e83949d896192dfcce5c0d2d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dayCubemap: {fileID: 8900000, guid: 3e80b688af9b1d84ea52c5d36bb1cbbd, type: 3}
-  nightCubemap: {fileID: 8900000, guid: 354036e57ae357148aed267204ce73a7, type: 3}
-  blendedCubemapShader: {fileID: 4800000, guid: 3032f2eb6fada4430b0629ebd24199f9, type: 3}
-  transitionDuration: 1.5
-  skyboxRotationSpeed: 0.5
-  sunPositionController: {fileID: 410087043}
 --- !u!1001 &412526097
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10686,7 +10699,7 @@ MonoBehaviour:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 410087041}
+  - {fileID: 223005152}
   - {fileID: 832575519}
   - {fileID: 1299462938}
   - {fileID: 379394606}
