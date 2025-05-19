@@ -5,102 +5,80 @@ namespace Epitaph.Scripts.GameTime
 {
     public class GameTime : MonoBehaviour
     {
-        // 120 dakika = 1 oyun günü
-        public float realSecondsPerGameDay = 60f * 120f;
-        public float elapsedGameSeconds;
-        public float startElapsedGameSeconds;
-
-        // Zaman başlangıcı: 9:30
-        private const int StartHour = 9;
-        private const int StartMinute = 30;
-        
+        #region Time Constants
         // Real World Time Constants
         private const int SecondsPerMinute = 60;
         private const int MinutesPerHour = 60;
         private const int HoursPerDay = 24;
         private const int DaysPerMonth = 30;
         private const int MonthsPerYear = 12;
+        
+        // Game time start values
+        private const int StartHour = 9;
+        private const int StartMinute = 30;
+        #endregion
 
-        [Space]
-        // Oyun takvimi başlangıcı
+        #region Public Properties
+        [Header("Game Speed")]
+        [Tooltip("Real seconds needed for one game day to pass")]
+        public float realSecondsPerGameDay = 60f * 120f; // 120 minutes = 1 game day
+        
+        [Header("Elapsed Time")]
+        public float elapsedGameSeconds;
+        public float startElapsedGameSeconds;
+        
+        [Header("Starting Calendar Date")]
+        [Tooltip("Year the game calendar starts")]
         public int startYear = 1984;
+        
+        [Tooltip("Month the game calendar starts (1-12)")]
+        [Range(1, 12)]
         public int startMonth = 12;
+        
+        [Tooltip("Day the game calendar starts (1-30)")]
+        [Range(1, 30)]
         public int startDay = 15;
+        #endregion
 
+        #region Time Properties
         private int StartTotalDays => GetStartTotalDays();
-
-        // Toplam geçen oyun günü
         private int TotalGameDays => (int)(elapsedGameSeconds / (HoursPerDay * MinutesPerHour * SecondsPerMinute));
+        
+        public int GameYear => (StartTotalDays + TotalGameDays) / (MonthsPerYear * DaysPerMonth);
+        
+        public int GameMonth => ((StartTotalDays + TotalGameDays) / DaysPerMonth) % MonthsPerYear + 1;
+        
+        public int GameDay => ((StartTotalDays + TotalGameDays) % DaysPerMonth) + 1;
+        
+        public int GameHour => (GetTotalSecondsToday() / (MinutesPerHour * SecondsPerMinute)) % HoursPerDay;
+        
+        public int GameMinute => (GetTotalSecondsToday() / SecondsPerMinute) % MinutesPerHour;
+        
+        public int GameSecond => GetTotalSecondsToday() % SecondsPerMinute;
+        #endregion
 
-        public int GameYear
-        {
-            get
-            {
-                var days = StartTotalDays + TotalGameDays;
-                return days / (MonthsPerYear * DaysPerMonth);
-            }
-        }
-        public int GameMonth
-        {
-            get
-            {
-                var days = StartTotalDays + TotalGameDays;
-                return (days / DaysPerMonth) % MonthsPerYear + 1;
-            }
-        }
-        public int GameDay
-        {
-            get
-            {
-                var days = StartTotalDays + TotalGameDays;
-                return (days % DaysPerMonth) + 1;
-            }
-        }
-        
-        public int GameHour
-        {
-            get
-            {
-                var totalSecondsToday = (int)(elapsedGameSeconds % (HoursPerDay * MinutesPerHour * SecondsPerMinute));
-                return (totalSecondsToday / (MinutesPerHour * SecondsPerMinute)) % HoursPerDay;
-            }
-        }
-        public int GameMinute
-        {
-            get
-            {
-                var totalSecondsToday = (int)(elapsedGameSeconds % (HoursPerDay * MinutesPerHour * SecondsPerMinute));
-                var minutes = (totalSecondsToday / SecondsPerMinute) % MinutesPerHour;
-                return minutes;
-            }
-        }
-        
-        public int GameSecond
-        {
-            get
-            {
-                var totalSecondsToday = (int)(elapsedGameSeconds % (HoursPerDay * MinutesPerHour * SecondsPerMinute));
-                return totalSecondsToday % SecondsPerMinute;
-            }
-        }
-        
+        #region Debugging Data
         [Header("Current Time (Inspector)")]
-        // ReSharper disable once NotAccessedField.Local
         [SerializeField] private string gameDate;
-        // ReSharper disable once NotAccessedField.Local
         [SerializeField] private string gameClock;
-        // ReSharper disable once NotAccessedField.Local
-        [SerializeField] private string totalElapsedString;
-        
-        // Olaylar (event) ekleniyor
+        [SerializeField] private string startElapsedTime;
+        #endregion
+
+        #region Events
         public event Action OnDayPassed;
         public event Action OnMonthPassed;
         public event Action OnYearPassed;
+        public event Action<Season, Season> OnSeasonChanged;
+        #endregion
 
+        #region Private Fields
         private int _lastGameDay;
         private int _lastGameMonth;
         private int _lastGameYear;
+        private Season _lastSeason;
+        #endregion
 
+        #region Enums
         public enum Season
         {
             Winter,
@@ -108,49 +86,68 @@ namespace Epitaph.Scripts.GameTime
             Summer,
             Fall
         }
+        #endregion
 
-        public event Action<Season, Season> OnSeasonChanged;
-
-        private Season _lastSeason;
-
+        #region Unity Lifecycle
         private void Start()
         {
-            startElapsedGameSeconds = 0f;
-            elapsedGameSeconds = StartHour * MinutesPerHour * SecondsPerMinute + StartMinute * SecondsPerMinute;
-            
-            // Başlangıç değerlerini al
-            _lastGameDay = GameDay;
-            _lastGameMonth = GameMonth;
-            _lastGameYear = GameYear;
-            
-            _lastSeason = GetSeasonFromMonth(GameMonth);
+            InitializeTime();
         }
 
         private void Update()
         {
-            startElapsedGameSeconds += Time.deltaTime * (HoursPerDay * MinutesPerHour * SecondsPerMinute) / realSecondsPerGameDay;
-            elapsedGameSeconds += Time.deltaTime * (HoursPerDay * MinutesPerHour * SecondsPerMinute) / realSecondsPerGameDay;
+            UpdateGameTime();
             UpdateInspectorValues();
+            CheckTimeEvents();
+        }
+        #endregion
+
+        #region Time Initialization
+        private void InitializeTime()
+        {
+            startElapsedGameSeconds = 0f;
+            elapsedGameSeconds = StartHour * MinutesPerHour * SecondsPerMinute + StartMinute * SecondsPerMinute;
             
-            // Geçişleri kontrol et
+            // Initialize tracking values
+            _lastGameDay = GameDay;
+            _lastGameMonth = GameMonth;
+            _lastGameYear = GameYear;
+            _lastSeason = GetSeasonFromMonth(GameMonth);
+        }
+        #endregion
+
+        #region Time Updates
+        private void UpdateGameTime()
+        {
+            float timeScale = (HoursPerDay * MinutesPerHour * SecondsPerMinute) / realSecondsPerGameDay;
+            startElapsedGameSeconds += Time.deltaTime * timeScale;
+            elapsedGameSeconds += Time.deltaTime * timeScale;
+        }
+        
+        private void CheckTimeEvents()
+        {
+            // Check for day change
             if (GameDay != _lastGameDay)
             {
                 _lastGameDay = GameDay;
                 OnDayPassed?.Invoke();
             }
 
+            // Check for month change
             if (GameMonth != _lastGameMonth)
             {
                 _lastGameMonth = GameMonth;
                 OnMonthPassed?.Invoke();
             }
 
+            // Check for year change
             if (GameYear != _lastGameYear)
             {
                 _lastGameYear = GameYear;
                 OnYearPassed?.Invoke();
             }
             
+            // Check for season change
             var currentSeason = GetSeasonFromMonth(GameMonth);
             if (currentSeason != _lastSeason)
             {
@@ -158,6 +155,13 @@ namespace Epitaph.Scripts.GameTime
                 _lastSeason = currentSeason;
                 OnSeasonChanged?.Invoke(oldSeason, currentSeason);
             }
+        }
+        #endregion
+
+        #region Helper Methods
+        private int GetTotalSecondsToday()
+        {
+            return (int)(elapsedGameSeconds % (HoursPerDay * MinutesPerHour * SecondsPerMinute));
         }
         
         private int GetStartTotalDays()
@@ -180,11 +184,11 @@ namespace Epitaph.Scripts.GameTime
         {
             gameDate = $"{GameDay:00}/{GameMonth:00}/{GameYear:0000}";
             gameClock = $"{GameHour:00}:{GameMinute:00}:{GameSecond:00}";
-            totalElapsedString = GetElapsedString();
+            startElapsedTime = GetElapsedString();
         }
 
         /// <summary>
-        /// Oyun başladığından bu yana geçen süreyi yıl, ay, gün, saat, dakika, saniye cinsinden string olarak döner.
+        /// Returns a formatted string of time elapsed since game start
         /// </summary>
         private string GetElapsedString()
         {
@@ -203,14 +207,17 @@ namespace Epitaph.Scripts.GameTime
 
             return $"{years} yıl, {months} ay, {days} gün, {hours} saat, {minutes} dakika, {seconds} saniye";
         }
+        #endregion
 
+        #region Public Methods
         /// <summary>
-        /// Oyunda zaman atlatır.
+        /// Advances game time by specified hours
         /// </summary>
-        /// <param name="hours">İleri atlanacak saat miktarı</param>
+        /// <param name="hours">Hours to skip forward</param>
         public void SkipTime(float hours)
         {
             elapsedGameSeconds += hours * SecondsPerMinute * MinutesPerHour;
         }
+        #endregion
     }
 }
