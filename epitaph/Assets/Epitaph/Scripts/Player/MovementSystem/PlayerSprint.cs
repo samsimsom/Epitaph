@@ -12,16 +12,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
         [Header("Data")]
         [SerializeField] private PlayerMovementData playerMovementData;
         [SerializeField] private PlayerCondition playerCondition;
-
-        [Header("Debug")]
-        // [SerializeField] private float currentStamina;
-        [SerializeField] private bool canSprint = true;
         
-        private float _timeSinceLastSprint;
         private bool _isSprintKeyHeld;
         
-        private StaminaCondition Stamina => playerCondition ? playerCondition.Stamina : null;
-
         private void Awake()
         {
             Initialize();
@@ -32,6 +25,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             PlayerInput.OnSprintActivated += OnSprintActivated;
             PlayerInput.OnSprintDeactivated += OnSprintDeactivated;
             PlayerCrouch.OnCrouchStateChanged += HandleCrouchStateChanged;
+            
+
         }
 
         private void OnDisable()
@@ -39,16 +34,26 @@ namespace Epitaph.Scripts.Player.MovementSystem
             PlayerInput.OnSprintActivated -= OnSprintActivated;
             PlayerInput.OnSprintDeactivated -= OnSprintDeactivated;
             PlayerCrouch.OnCrouchStateChanged -= HandleCrouchStateChanged;
+            
+            playerCondition.Stamina.OnStaminaDepleted -= StopSprint;
+            playerCondition.Stamina.OnStaminaRecoveryStarted -= TryStartSprint;
+            playerCondition.Stamina.OnStaminaRecoveryFinished -= TryStartSprint;
+        }
+
+        private void Start()
+        {
+            playerCondition.Stamina.OnStaminaDepleted += StopSprint;
+            playerCondition.Stamina.OnStaminaRecoveryStarted += TryStartSprint;
+            playerCondition.Stamina.OnStaminaRecoveryFinished += TryStartSprint;
         }
 
         private void Update()
         {
+            // Başlat işlemi hâlâ burada (Kısayol desteği için)
             if (_isSprintKeyHeld && !playerMovementData.isSprinting)
             {
                 TryStartSprint();
             }
-            
-            UpdateStamina();
         }
 
         private void Initialize()
@@ -72,11 +77,15 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         private void TryStartSprint()
         {
-            if (!playerMovementData.isGrounded || !canSprint || !(Stamina?.Value > 0)) return;
+            if (!playerMovementData.isGrounded || 
+                playerCondition?.Stamina == null ||
+                playerCondition.Stamina.Value <= 0) return;
+            
             if (playerMovementData.isCrouching) return;
 
             playerMovementData.isSprinting = true;
-            playerCondition.SetRunning(true); // hunger, thirst modifikasyonu için
+            playerCondition.SetRunning(true); // hunger, thirst modifikasyon için
+            playerCondition.Stamina.StartConsumingSprint();
             OnChangeSprintSpeed?.Invoke(playerMovementData.sprintSpeed);
         }
 
@@ -85,39 +94,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
             if (!playerMovementData.isSprinting) return;
             
             playerMovementData.isSprinting = false;
+            playerCondition.SetRunning(false); // hunger, thirst eski haline döner
+            playerCondition.Stamina.StopConsumingSprint();
             OnChangeSprintSpeed?.Invoke(playerMovementData.walkSpeed);
-        }
-
-        private void UpdateStamina()
-        {
-            if (Stamina == null) return;
-
-            // Sprint sırasında stamina harca
-            if (playerMovementData.isSprinting)
-            {
-                Stamina.Decrease(playerMovementData.sprintStaminaUsage * Time.deltaTime);
-                _timeSinceLastSprint = 0f;
-
-                if (Stamina.Value <= 0)
-                {
-                    canSprint = false;
-                    StopSprint();
-                }
-            }
-            else
-            {
-                _timeSinceLastSprint += Time.deltaTime;
-
-                if (_timeSinceLastSprint >= playerMovementData.staminaRecoveryDelay)
-                {
-                    Stamina.Increase(playerMovementData.staminaRecoveryRate * Time.deltaTime);
-
-                    if (Stamina.Value > Stamina.MaxValue * playerMovementData.staminaEnoughPercentage)
-                    {
-                        canSprint = true;
-                    }
-                }
-            }
         }
         
         private void HandleCrouchStateChanged(bool isCrouching)

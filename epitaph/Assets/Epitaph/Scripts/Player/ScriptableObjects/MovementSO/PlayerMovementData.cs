@@ -56,10 +56,5 @@ namespace Epitaph.Scripts.Player.ScriptableObjects.MovementSO
         [Header("Sprint Settings")]
         public bool isSprinting;
         public float sprintSpeed = 10f;
-        public float sprintStaminaUsage = 10f;
-        public float maxStamina = 100f;
-        public float staminaRecoveryRate = 20f;
-        public float staminaRecoveryDelay = 1f;
-        public float staminaEnoughPercentage= 0.30f;
     }
 }

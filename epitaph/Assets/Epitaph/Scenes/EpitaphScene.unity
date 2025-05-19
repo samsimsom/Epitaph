@@ -10001,7 +10001,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerMovementData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
   playerCondition: {fileID: 7711096113604129951}
-  canSprint: 1
 --- !u!1001 &3094138679956396498
 PrefabInstance:
   m_ObjectHideFlags: 0

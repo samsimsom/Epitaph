@@ -43,12 +43,12 @@ namespace Epitaph.Scripts.Player.HealthSystem
         private void Awake()
         {
             Health = new HealthCondition(100f, 1f);
-            Stamina = new StaminaCondition(100f, 1f);
+            Stamina = new StaminaCondition(100f, 10f, 20f);
             Hunger = new HungerCondition(100f, 0.5f);
             Thirst = new ThirstCondition(100f, 0.8f);
             Fatigue = new FatigueCondition(100f, 0.3f);
             
-            _allStats = new List<ICondition> { Health, Hunger, Thirst, Fatigue };
+            _allStats = new List<ICondition> { Health, Stamina, Hunger, Thirst, Fatigue };
                 
             StartTimeBasedUpdates().Forget();
         }
