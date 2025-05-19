@@ -47,5 +47,27 @@ namespace Epitaph.Scripts.Player.HealthSystem
         {
             Debug.Log("Player died!");
         }
+        
+        public void SetRunning(bool isRunning)
+        {
+            // Koşarken açlık %20, susuzluk %60 daha hızlı artsın
+            Hunger.Modifier = isRunning ? 1.2f : 1f;
+            Thirst.Modifier = isRunning ? 1.6f : 1f;
+        }
+
+        public void SetOutsideTemperature(float temperature)
+        {
+            // 35 derecenin üstü susuzluk artışını artırır, örnek
+            Thirst.Modifier = temperature > 35f ? 1.5f : 1f;
+        }
+
+        public void OnTimeChanged(int gameHour)
+        {
+            if (gameHour >= 22 || gameHour <= 6) // Gece yorgunluk daha hızlı artabilir
+                Fatigue.Modifier = 1.4f;
+            else
+                Fatigue.Modifier = 1f;
+        }
+        
     }
 }

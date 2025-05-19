@@ -37,7 +37,6 @@ namespace Epitaph.Scripts.GameTime
         /// Oyunda zaman atlatır.
         /// </summary>
         /// <param name="hours">İleri atlanacak saat miktarı</param>
-
         public void SkipTime(float hours)
         {
             elapsedGameSeconds += hours * 3600f;
