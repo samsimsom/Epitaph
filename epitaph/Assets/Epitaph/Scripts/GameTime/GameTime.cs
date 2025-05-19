@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Epitaph.Scripts.GameTime
@@ -5,8 +6,8 @@ namespace Epitaph.Scripts.GameTime
     public class GameTime : MonoBehaviour
     {
         // 120 dakika = 1 oyun günü
-        [HideInInspector] public float realSecondsPerGameDay = 60f * 120f;
-        [HideInInspector] public float elapsedGameSeconds;
+        public float realSecondsPerGameDay = 60f * 120f;
+        public float elapsedGameSeconds;
 
         // Zaman başlangıcı: 9:30
         private const int StartHour = 9;
@@ -18,9 +19,9 @@ namespace Epitaph.Scripts.GameTime
         private const int MonthsPerYear = 12;
 
         // Oyun takvimi başlangıcı
-        [HideInInspector] public int startYear = 1984;
-        [HideInInspector] public int startMonth = 12;
-        [HideInInspector] public int startDay = 15;
+        public int startYear = 1984;
+        public int startMonth = 12;
+        public int startDay = 15;
 
         private int StartTotalDays => GetStartTotalDays();
 
@@ -84,21 +85,87 @@ namespace Epitaph.Scripts.GameTime
         [SerializeField] private string gameDate;
         // ReSharper disable once NotAccessedField.Local
         [SerializeField] private string gameClock;
+        
+        // Olaylar (event) ekleniyor
+        public event Action OnDayPassed;
+        public event Action OnMonthPassed;
+        public event Action OnYearPassed;
+
+        private int _lastGameDay;
+        private int _lastGameMonth;
+        private int _lastGameYear;
+
+        public enum Season
+        {
+            Winter,
+            Spring,
+            Summer,
+            Fall
+        }
+
+        public event Action<Season, Season> OnSeasonChanged;
+
+        private Season _lastSeason;
 
         private void Start()
         {
             elapsedGameSeconds = StartHour * MinutesPerHour * SecondsPerMinute + StartMinute * SecondsPerMinute;
+            
+            // Başlangıç değerlerini al
+            _lastGameDay = GameDay;
+            _lastGameMonth = GameMonth;
+            _lastGameYear = GameYear;
+            
+            _lastSeason = GetSeasonFromMonth(GameMonth);
         }
 
         private void Update()
         {
             elapsedGameSeconds += Time.deltaTime * (HoursPerDay * MinutesPerHour * SecondsPerMinute) / realSecondsPerGameDay;
             UpdateInspectorValues();
+            
+            // Geçişleri kontrol et
+            if (GameDay != _lastGameDay)
+            {
+                _lastGameDay = GameDay;
+                OnDayPassed?.Invoke();
+            }
+
+            if (GameMonth != _lastGameMonth)
+            {
+                _lastGameMonth = GameMonth;
+                OnMonthPassed?.Invoke();
+            }
+
+            if (GameYear != _lastGameYear)
+            {
+                _lastGameYear = GameYear;
+                OnYearPassed?.Invoke();
+            }
+            
+            var currentSeason = GetSeasonFromMonth(GameMonth);
+            if (currentSeason != _lastSeason)
+            {
+                var oldSeason = _lastSeason;
+                _lastSeason = currentSeason;
+                OnSeasonChanged?.Invoke(oldSeason, currentSeason);
+            }
         }
         
         private int GetStartTotalDays()
         {
             return (startYear * MonthsPerYear * DaysPerMonth) + ((startMonth - 1) * DaysPerMonth) + (startDay - 1);
+        }
+        
+        public Season GetSeasonFromMonth(int month)
+        {
+            if (month == 12 || month == 1 || month == 2)
+                return Season.Winter;
+            if (month >= 3 && month <= 5)
+                return Season.Spring;
+            if (month >= 6 && month <= 8)
+                return Season.Summer;
+            return Season.Fall;
         }
 
         private void UpdateInspectorValues()

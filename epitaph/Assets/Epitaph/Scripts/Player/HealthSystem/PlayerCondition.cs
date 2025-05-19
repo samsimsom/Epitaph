@@ -45,7 +45,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
 
         private void Die()
         {
-            Debug.Log("Player died!");
+            // Debug.Log("Player died!");
         }
         
         public void SetRunning(bool isRunning)
