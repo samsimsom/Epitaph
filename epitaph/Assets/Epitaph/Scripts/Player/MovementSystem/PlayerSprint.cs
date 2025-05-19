@@ -13,7 +13,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         [SerializeField] private PlayerMovementData playerMovementData;
         [SerializeField] private PlayerCondition playerCondition;
         
-        private bool _canSprint;
         private bool _isSprintKeyHeld;
         
         private void Awake()
@@ -78,7 +77,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         private void OnStaminaDepleted()
         {
-            _canSprint = false;
             StopSprint();
             Debug.Log("Sprint recovery depleted");
         }
@@ -90,7 +88,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         private void OnRecoveryFinished()
         {
-            _canSprint = true;
             Debug.Log("Sprint recovery finished");
         }
         
@@ -104,7 +101,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
             playerMovementData.isSprinting = true;
             playerCondition.SetRunning(true); // hunger, thirst modifikasyon için
-            playerCondition.Stamina.StartConsumingSprint();
+            playerCondition.Stamina.StartStaminaConsuming();
             OnChangeSprintSpeed?.Invoke(playerMovementData.sprintSpeed);
         }
 
@@ -114,7 +111,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             
             playerMovementData.isSprinting = false;
             playerCondition.SetRunning(false); // hunger, thirst eski haline döner
-            playerCondition.Stamina.StopConsumingSprint();
+            playerCondition.Stamina.StopStaminaConsuming();
             OnChangeSprintSpeed?.Invoke(playerMovementData.walkSpeed);
         }
         

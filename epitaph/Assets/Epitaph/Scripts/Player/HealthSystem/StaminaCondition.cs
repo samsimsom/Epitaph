@@ -25,7 +25,9 @@ namespace Epitaph.Scripts.Player.HealthSystem
         public float EnoughPercentage { get; set; } = 0.25f;
 
         private bool _isConsuming;
+#pragma warning disable CS0414 // Field is assigned but its value is never used
         private bool _hasStartedRecovery;
+#pragma warning restore CS0414 // Field is assigned but its value is never used
         private bool _hasFinishedRecovery;
 
         private CancellationTokenSource _sprintCts;
@@ -45,7 +47,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
             BaseDecreaseRate = decreaseRate;
         }
 
-        public void StartConsumingSprint()
+        public void StartStaminaConsuming()
         {
             // Sprint başlatıldı, önce varsa toparlanmayı ve eski sprinti iptal et
             if (_recoveryCts != null && !_recoveryCts.IsCancellationRequested)
@@ -57,11 +59,11 @@ namespace Epitaph.Scripts.Player.HealthSystem
             if (_sprintCts == null || _sprintCts.IsCancellationRequested)
             {
                 _sprintCts = new CancellationTokenSource();
-                SprintConsumeAsync(_sprintCts.Token).Forget();
+                StaminaConsumeAsync(_sprintCts.Token).Forget();
             }
         }
 
-        public void StopConsumingSprint()
+        public void StopStaminaConsuming()
         {
             // Sprint bırakıldı, hemen stamina doldurma başlatma! Önce delay başlat.
             if (_sprintCts != null && !_sprintCts.IsCancellationRequested)
@@ -73,11 +75,11 @@ namespace Epitaph.Scripts.Player.HealthSystem
             if (_recoveryCts == null || _recoveryCts.IsCancellationRequested)
             {
                 _recoveryCts = new CancellationTokenSource();
-                StartRecoveryWithDelay(_recoveryCts.Token).Forget();
+                StaminaRecoveryWithDelay(_recoveryCts.Token).Forget();
             }
         }
 
-        private async UniTaskVoid SprintConsumeAsync(CancellationToken token)
+        private async UniTaskVoid StaminaConsumeAsync(CancellationToken token)
         {
             _isConsuming = true;
             _hasStartedRecovery = false;
@@ -97,7 +99,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
             _isConsuming = false;
         }
 
-        private async UniTaskVoid StartRecoveryWithDelay(CancellationToken token)
+        private async UniTaskVoid StaminaRecoveryWithDelay(CancellationToken token)
         {
             // Staminanın tekrar dolmaya başlaması için delay
             await UniTask.Delay(TimeSpan.FromSeconds(RecoveryDelay), cancellationToken: token);
@@ -108,7 +110,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
             _hasStartedRecovery = true;
             _hasFinishedRecovery = false;
 
-            await SprintIncreaseAsync(token);
+            await StaminaIncreaseAsync(token);
 
             if (Mathf.Approximately(Value, MaxValue))
             {
@@ -121,7 +123,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
             }
         }
 
-        private async UniTask SprintIncreaseAsync(CancellationToken token)
+        private async UniTask StaminaIncreaseAsync(CancellationToken token)
         {
             while (!token.IsCancellationRequested && Value < MaxValue)
             {

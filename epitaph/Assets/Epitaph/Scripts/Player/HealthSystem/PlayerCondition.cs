@@ -44,9 +44,9 @@ namespace Epitaph.Scripts.Player.HealthSystem
         {
             Health = new HealthCondition(100f, 1f);
             Stamina = new StaminaCondition(100f, 10f, 20f);
-            Hunger = new HungerCondition(100f, 0.5f);
-            Thirst = new ThirstCondition(100f, 0.8f);
-            Fatigue = new FatigueCondition(100f, 0.3f);
+            Hunger = new HungerCondition(100f, 0.25f);
+            Thirst = new ThirstCondition(100f, 0.5f);
+            Fatigue = new FatigueCondition(100f, 0.1f);
             
             _allStats = new List<ICondition> { Health, Stamina, Hunger, Thirst, Fatigue };
                 
@@ -96,7 +96,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
 
                     // Açlık/susuzluk tavan yaparsa sağlık azalsın
                     if (Hunger.Value >= Hunger.MaxValue || Thirst.Value >= Thirst.MaxValue)
-                        Health.Decrease(5f);
+                        Health.Decrease(1f);
 
                     if (Health.Value <= 0)
                         Die();
