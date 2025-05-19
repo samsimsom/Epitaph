@@ -24,6 +24,8 @@ namespace Epitaph.Scripts.Player.HealthSystem
 
         private bool _isConsuming;
         private float _recoveryTimer;
+        private bool _hasStartedRecovery;
+        private bool _hasFinishedRecovery;
 
         public bool IsSprinting
         {
@@ -43,12 +45,17 @@ namespace Epitaph.Scripts.Player.HealthSystem
         {
             _isConsuming = true;
             _recoveryTimer = 0f;
+            _hasStartedRecovery = false;
+            _hasFinishedRecovery = false;
         }
 
         public void StopConsumingSprint()
         {
             _isConsuming = false;
-            _recoveryTimer = 0f; // Recovery'yi başlat
+            _recoveryTimer = 0f;
+            // Recovery başladığında event tetiklenebilmesi için flag'leri sıfırla
+            _hasStartedRecovery = false;
+            _hasFinishedRecovery = false;
         }
         
         public void Increase(float amount)
@@ -72,6 +79,8 @@ namespace Epitaph.Scripts.Player.HealthSystem
                     OnStaminaDepleted?.Invoke();
                 }
                 _recoveryTimer = 0f;
+                _hasStartedRecovery = false;
+                _hasFinishedRecovery = false;
             }
             else
             {
@@ -79,15 +88,41 @@ namespace Epitaph.Scripts.Player.HealthSystem
                 if (_recoveryTimer >= RecoveryDelay)
                 {
                     Value = Mathf.Clamp(Value + EffectiveIncreaseRate * deltaTime, 0, MaxValue);
-                    if (Value >= MaxValue * EnoughPercentage)
+
+                    // 'Value == MaxValue' durumunda recovery tamamlandı:
+                    if (Mathf.Approximately(Value, MaxValue))
                     {
-                        OnStaminaRecoveryFinished?.Invoke();
-                        return;
+                        if (!_hasFinishedRecovery)
+                        {
+                            OnStaminaRecoveryFinished?.Invoke();
+                            _hasFinishedRecovery = true;
+                            _hasStartedRecovery = false;
+                        }
                     }
-                    OnStaminaRecoveryStarted?.Invoke();
+                    // 'Value >= MaxValue * EnoughPercentage' (ama henüz MaxValue olmadı!) recovery başladı:
+                    else if (Value >= MaxValue * EnoughPercentage)
+                    {
+                        if (!_hasStartedRecovery)
+                        {
+                            OnStaminaRecoveryStarted?.Invoke();
+                            _hasStartedRecovery = true;
+                            _hasFinishedRecovery = false;
+                        }
+                    }
+                    else
+                    {
+                        // Recovery yeterli seviyede başlamadıysa flagleri sıfırla
+                        _hasStartedRecovery = false;
+                        _hasFinishedRecovery = false;
+                    }
+                }
+                else
+                {
+                    // Recovery daha başlamadıysa flag'leri sıfırla
+                    _hasStartedRecovery = false;
+                    _hasFinishedRecovery = false;
                 }
             }
         }
-
     }
 }
