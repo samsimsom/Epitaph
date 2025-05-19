@@ -17,6 +17,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
         #endregion
         
         public HealthCondition Health { get; private set; }
+        public StaminaCondition Stamina { get; private set; }
         public HungerCondition Hunger { get; private set; }
         public ThirstCondition Thirst { get; private set; }
         public FatigueCondition Fatigue { get; private set; }
@@ -26,6 +27,9 @@ namespace Epitaph.Scripts.Player.HealthSystem
         #region Debug
         // ReSharper disable once NotAccessedField.Local
         [SerializeField] private float health;
+        // ReSharper disable once NotAccessedField.Local
+        [SerializeField] private float stamina;
+        [Space]
         // ReSharper disable once NotAccessedField.Local
         [SerializeField] private float hunger;
         // ReSharper disable once NotAccessedField.Local
@@ -38,7 +42,8 @@ namespace Epitaph.Scripts.Player.HealthSystem
 
         private void Awake()
         {
-            Health = new HealthCondition(100f);
+            Health = new HealthCondition(100f, 1f);
+            Stamina = new StaminaCondition(100f, 1f);
             Hunger = new HungerCondition(100f, 0.5f);
             Thirst = new ThirstCondition(100f, 0.8f);
             Fatigue = new FatigueCondition(100f, 0.3f);
@@ -76,6 +81,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
 
             #region Debug
             health = Health.Value;
+            stamina = Stamina.Value;
             hunger = Hunger.Value;
             thirst = Thirst.Value;
             fatigue = Fatigue.Value;
@@ -88,7 +94,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
             
             // Açlık/susuzluk tepeye çıkarsa sağlık azalır:
             if (Hunger.Value >= Hunger.MaxValue || Thirst.Value >= Thirst.MaxValue)
-                Health.Decrease(10f * timeDelta);
+                Health.Decrease(5f * timeDelta);
 
             if (Health.Value <= 0)
                 Die();
