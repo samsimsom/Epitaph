@@ -106,38 +106,6 @@ namespace Epitaph.Scripts.Player.HealthSystem
             }
         }
 
-        
-        private async UniTask UpdateStatsAsync()
-        {
-            // Use a fixed time delta for per-minute updates
-            var timeDelta = 1.0f;
-            
-            foreach (var stat in _allStats)
-                stat.UpdateStat(timeDelta);
-
-            #region Debug
-            health = Health.Value;
-            stamina = Stamina.Value;
-            hunger = Hunger.Value;
-            thirst = Thirst.Value;
-            fatigue = Fatigue.Value;
-            #endregion
-            
-            OnHealthChanged?.Invoke(Health.Value, Health.MaxValue);
-            OnHungerChanged?.Invoke(Hunger.Value, Hunger.MaxValue);
-            OnThirstChanged?.Invoke(Thirst.Value, Thirst.MaxValue);
-            OnFatigueChanged?.Invoke(Fatigue.Value, Fatigue.MaxValue);
-            
-            // Açlık/susuzluk tepeye çıkarsa sağlık azalır:
-            if (Hunger.Value >= Hunger.MaxValue || Thirst.Value >= Thirst.MaxValue)
-                Health.Decrease(5f * timeDelta);
-
-            if (Health.Value <= 0)
-                Die();
-                
-            await UniTask.CompletedTask;
-        }
-
         public void Eat(float amount) => Hunger.Decrease(amount);
         public void Drink(float amount) => Thirst.Decrease(amount);
         public void Sleep(float hours) => Fatigue.Decrease(hours * 20f);
