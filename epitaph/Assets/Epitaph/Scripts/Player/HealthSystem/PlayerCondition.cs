@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Epitaph.Scripts.GameTimeManager;
@@ -7,13 +8,22 @@ namespace Epitaph.Scripts.Player.HealthSystem
 {
     public class PlayerCondition : MonoBehaviour
     {
+        #region Events
+        public static event Action<float, float> OnHealthChanged;
+        public static event Action<float, float> OnHungerChanged;
+        public static event Action<float, float> OnThirstChanged;
+        public static event Action<float, float> OnFatigueChanged;
+        public static event Action OnDie;
+        #endregion
+        
         public HealthCondition Health { get; private set; }
         public HungerCondition Hunger { get; private set; }
         public ThirstCondition Thirst { get; private set; }
         public FatigueCondition Fatigue { get; private set; }
 
         private List<ICondition> _allStats;
-        
+
+        #region Debug
         // ReSharper disable once NotAccessedField.Local
         [SerializeField] private float health;
         // ReSharper disable once NotAccessedField.Local
@@ -22,6 +32,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
         [SerializeField] private float thirst;
         // ReSharper disable once NotAccessedField.Local
         [SerializeField] private float fatigue;
+        #endregion
         
         private int _lastMinute = -1;
 
@@ -62,11 +73,18 @@ namespace Epitaph.Scripts.Player.HealthSystem
             
             foreach (var stat in _allStats)
                 stat.UpdateStat(timeDelta);
-            
+
+            #region Debug
             health = Health.Value;
             hunger = Hunger.Value;
             thirst = Thirst.Value;
             fatigue = Fatigue.Value;
+            #endregion
+            
+            OnHealthChanged?.Invoke(Health.Value, Health.MaxValue);
+            OnHungerChanged?.Invoke(Hunger.Value, Hunger.MaxValue);
+            OnThirstChanged?.Invoke(Thirst.Value, Thirst.MaxValue);
+            OnFatigueChanged?.Invoke(Fatigue.Value, Fatigue.MaxValue);
             
             // Açlık/susuzluk tepeye çıkarsa sağlık azalır:
             if (Hunger.Value >= Hunger.MaxValue || Thirst.Value >= Thirst.MaxValue)
@@ -84,7 +102,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
 
         private void Die()
         {
-            // Debug.Log("Player died!");
+            OnDie?.Invoke();
         }
         
         public void SetRunning(bool isRunning)
@@ -107,5 +125,6 @@ namespace Epitaph.Scripts.Player.HealthSystem
             else
                 Fatigue.Modifier = 1f;
         }
+        
     }
 }

@@ -32,9 +32,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private Vector3 _rayOrigin;
         private CancellationTokenSource _cts;
         private IInteractable _currentInteractable;
-
-        private void Awake() { }
-
+        
         private void OnEnable()
         {
             _cts = new CancellationTokenSource();
