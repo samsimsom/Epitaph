@@ -1,4 +1,6 @@
 using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.HealthSystem
@@ -27,6 +29,10 @@ namespace Epitaph.Scripts.Player.HealthSystem
         private bool _hasStartedRecovery;
         private bool _hasFinishedRecovery;
 
+        // Sınıfa ekleyiniz:
+        private CancellationTokenSource _sprintCts;
+
+        
         public bool IsSprinting
         {
             get => _isConsuming;
@@ -43,19 +49,44 @@ namespace Epitaph.Scripts.Player.HealthSystem
         
         public void StartConsumingSprint()
         {
-            _isConsuming = true;
-            _recoveryTimer = 0f;
-            _hasStartedRecovery = false;
-            _hasFinishedRecovery = false;
+            // _isConsuming = true;
+            // _recoveryTimer = 0f;
+            // _hasStartedRecovery = false;
+            // _hasFinishedRecovery = false;
+            
+            if (_sprintCts == null || _sprintCts.IsCancellationRequested)
+            {
+                _sprintCts = new CancellationTokenSource();
+                SprintConsumeAsync(_sprintCts.Token).Forget();
+            }
+
         }
 
         public void StopConsumingSprint()
         {
-            _isConsuming = false;
-            _recoveryTimer = 0f;
-            // Recovery başladığında event tetiklenebilmesi için flag'leri sıfırla
-            _hasStartedRecovery = false;
-            _hasFinishedRecovery = false;
+            // _isConsuming = false;
+            // _recoveryTimer = 0f;
+            // _hasStartedRecovery = false;
+            // _hasFinishedRecovery = false;
+            
+            if (_sprintCts != null && !_sprintCts.IsCancellationRequested)
+            {
+                _sprintCts.Cancel();
+                _sprintCts.Dispose();
+                _sprintCts = null;
+            }
+
+        }
+        
+        private async UniTaskVoid SprintConsumeAsync(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
+            {
+                // Zaman bazlı stamina azaltma, coroutine ile eşdeğer!
+                Decrease(EffectiveDecreaseRate * Time.deltaTime);
+                Debug.Log("AZALT");
+                await UniTask.Yield(PlayerLoopTiming.Update, token);
+            }
         }
         
         public void Increase(float amount)
@@ -68,6 +99,12 @@ namespace Epitaph.Scripts.Player.HealthSystem
             Value = Mathf.Clamp(Value - amount, 0, MaxValue);
         }
 
+        public void UpdateStat(float deltaTime)
+        {
+            
+        }
+
+#if false
         public void UpdateStat(float deltaTime)
         {
             if (_isConsuming)
@@ -124,5 +161,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
                 }
             }
         }
+#endif
+        
     }
 }

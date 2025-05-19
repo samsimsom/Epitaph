@@ -98,8 +98,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             if (!playerMovementData.isGrounded || 
                 playerCondition?.Stamina == null ||
-                playerCondition.Stamina.Value <= 0 ||
-                !_canSprint) return;
+                playerCondition.Stamina.Value <= 0) return;
             
             if (playerMovementData.isCrouching) return;
 
