@@ -10000,7 +10000,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerMovementData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
-  currentStamina: 0
+  playerCondition: {fileID: 7711096113604129951}
   canSprint: 1
 --- !u!1001 &3094138679956396498
 PrefabInstance:
@@ -10637,6 +10637,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 0
+  stamina: 0
   hunger: 0
   thirst: 0
   fatigue: 0
