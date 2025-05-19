@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Epitaph.Scripts.GameTime
+namespace Epitaph.Scripts.GameTimeManager
 {
     public class GameTimeEventListener : MonoBehaviour
     {

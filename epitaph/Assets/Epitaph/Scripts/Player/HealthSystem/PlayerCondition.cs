@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using Epitaph.Scripts.GameTimeManager;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.HealthSystem
@@ -11,8 +13,17 @@ namespace Epitaph.Scripts.Player.HealthSystem
         public FatigueCondition Fatigue { get; private set; }
 
         private List<ICondition> _allStats;
-
-        [SerializeField] private Vector4 stats; 
+        
+        // ReSharper disable once NotAccessedField.Local
+        [SerializeField] private float health;
+        // ReSharper disable once NotAccessedField.Local
+        [SerializeField] private float hunger;
+        // ReSharper disable once NotAccessedField.Local
+        [SerializeField] private float thirst;
+        // ReSharper disable once NotAccessedField.Local
+        [SerializeField] private float fatigue;
+        
+        private int _lastMinute = -1;
 
         private void Awake()
         {
@@ -22,21 +33,49 @@ namespace Epitaph.Scripts.Player.HealthSystem
             Fatigue = new FatigueCondition(100f, 0.3f);
             
             _allStats = new List<ICondition> { Health, Hunger, Thirst, Fatigue };
+                
+            StartTimeBasedUpdates().Forget();
         }
 
-        private void Update()
+        private async UniTaskVoid StartTimeBasedUpdates()
         {
+            while (this != null && gameObject.activeInHierarchy)
+            {
+                int currentMinute = GameTime.Instance.GameMinute;
+                
+                // Check if a minute has passed in game time
+                if (currentMinute != _lastMinute)
+                {
+                    _lastMinute = currentMinute;
+                    await UpdateStatsAsync();
+                }
+                
+                // Wait a short time before next check to be efficient
+                await UniTask.Delay(100);
+            }
+        }
+        
+        private async UniTask UpdateStatsAsync()
+        {
+            // Use a fixed time delta for per-minute updates
+            var timeDelta = 1.0f;
+            
             foreach (var stat in _allStats)
-                stat.UpdateStat(Time.deltaTime);
-
-            stats = new Vector4(Health.Value, Hunger.Value, Thirst.Value, Fatigue.Value);
+                stat.UpdateStat(timeDelta);
+            
+            health = Health.Value;
+            hunger = Hunger.Value;
+            thirst = Thirst.Value;
+            fatigue = Fatigue.Value;
             
             // Açlık/susuzluk tepeye çıkarsa sağlık azalır:
             if (Hunger.Value >= Hunger.MaxValue || Thirst.Value >= Thirst.MaxValue)
-                Health.Decrease(10f * Time.deltaTime);
+                Health.Decrease(10f * timeDelta);
 
             if (Health.Value <= 0)
                 Die();
+                
+            await UniTask.CompletedTask;
         }
 
         public void Eat(float amount) => Hunger.Decrease(amount);
@@ -45,7 +84,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
 
         private void Die()
         {
-            // Debug.Log("Player died!");
+            Debug.Log("Player died!");
         }
         
         public void SetRunning(bool isRunning)
@@ -68,6 +107,5 @@ namespace Epitaph.Scripts.Player.HealthSystem
             else
                 Fatigue.Modifier = 1f;
         }
-        
     }
 }

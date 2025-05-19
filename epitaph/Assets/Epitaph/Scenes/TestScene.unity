@@ -5428,7 +5428,7 @@ GameObject:
   - component: {fileID: 1353341263}
   - component: {fileID: 1353341264}
   m_Layer: 0
-  m_Name: GameTime
+  m_Name: GameTimeManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5463,11 +5463,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   realSecondsPerGameDay: 7200
   elapsedGameSeconds: 0
+  startElapsedGameSeconds: 0
   startYear: 1984
   startMonth: 12
   startDay: 15
   gameDate: 
   gameClock: 
+  startElapsedTime: 
 --- !u!114 &1353341264
 MonoBehaviour:
   m_ObjectHideFlags: 0

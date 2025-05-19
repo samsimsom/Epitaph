@@ -3,10 +3,13 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace Epitaph.Scripts.GameTime
+namespace Epitaph.Scripts.GameTimeManager
 {
     public class GameTime : MonoBehaviour
     {
+        // Singleton instance
+        public static GameTime Instance { get; private set; }
+        
         #region Time Constants
         // Real World Time Constants
         private const int SecondsPerMinute = 60;
@@ -95,9 +98,27 @@ namespace Epitaph.Scripts.GameTime
         #endregion
 
         #region Unity Lifecycle
+        private void Awake()
+        {
+            // Singleton pattern implementation
+            if (Instance != null && Instance != this)
+            {
+                Debug.LogWarning("Found more than one GameTime instance in the scene. " +
+                                 "Destroying this one.");
+                Destroy(gameObject);
+                return;
+            }
+        
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        
+            // Original initialization code
+            InitializeTime();
+        }
+
         private void Start()
         {
-            InitializeTime();
+            // InitializeTime();
             StartTimeUpdateLoop().Forget();
         }
 
