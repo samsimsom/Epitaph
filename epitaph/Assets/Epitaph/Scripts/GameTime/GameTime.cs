@@ -18,6 +18,7 @@ namespace Epitaph.Scripts.GameTime
         private const int DaysPerMonth = 30;
         private const int MonthsPerYear = 12;
 
+        [Space]
         // Oyun takvimi başlangıcı
         public int startYear = 1984;
         public int startMonth = 12;
