@@ -32,22 +32,22 @@ namespace Epitaph.Scripts.GameTime
 
         private void HandleDayPassed()
         {
-            // Debug.Log("[GameTimeEventListener] Yeni bir gün başladı!");
+            Debug.LogWarning("[GameTimeEventListener] Yeni bir gün başladı!");
         }
 
         private void HandleMonthPassed()
         {
-            Debug.Log("[GameTimeEventListener] Yeni bir ay başladı!");
+            Debug.LogWarning("[GameTimeEventListener] Yeni bir ay başladı!");
         }
 
         private void HandleYearPassed()
         {
-            Debug.Log("[GameTimeEventListener] Yeni bir yıl başladı!");
+            Debug.LogWarning("[GameTimeEventListener] Yeni bir yıl başladı!");
         }
 
         private void HandleSeasonChanged(GameTime.Season oldSeason, GameTime.Season newSeason)
         {
-            Debug.Log($"[GameTimeEventListener] Mevsim değişti! {oldSeason} -> {newSeason}");
+            Debug.LogWarning($"[GameTimeEventListener] Mevsim değişti! {oldSeason} -> {newSeason}");
         }
     }
 }
