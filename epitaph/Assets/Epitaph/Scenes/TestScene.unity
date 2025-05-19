@@ -17,7 +17,7 @@ RenderSettings:
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.01
+  m_FogDensity: 0
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0, g: 0, b: 0, a: 1}
@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: d4454f71d85928744be7771e2143dab7, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -1950,6 +1950,8 @@ GameObject:
   - component: {fileID: 410087041}
   - component: {fileID: 410087040}
   - component: {fileID: 410087042}
+  - component: {fileID: 410087043}
+  - component: {fileID: 410087044}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -1968,7 +1970,7 @@ Light:
   serializedVersion: 11
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 5
+  m_Intensity: 2
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -2030,13 +2032,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 410087039}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.5517252, y: 0.33528563, z: -0.25727367, w: 0.7190224}
-  m_LocalPosition: {x: 0, y: 7.02, z: 0}
+  m_LocalRotation: {x: 0.4330127, y: 0.4330127, z: -0.25, w: 0.75}
+  m_LocalPosition: {x: 0, y: 10, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 75, y: 50, z: 0}
+  m_LocalEulerAnglesHint: {x: 60, y: 60, z: 0}
 --- !u!114 &410087042
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2060,6 +2062,45 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
+--- !u!114 &410087043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 410087039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b9da9e3f24440429e7e5e63a49694ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sunTransform: {fileID: 410087041}
+  maxHeight: 60
+  minHeight: -20
+  sunLight: {fileID: 410087040}
+  daytimeColor: {r: 1, g: 1, b: 1, a: 1}
+  sunriseColor: {r: 1, g: 0.5, b: 0.3, a: 1}
+  sunsetColor: {r: 1, g: 0.3, b: 0.2, a: 1}
+  nightColor: {r: 0.2, g: 0.2, b: 0.4, a: 1}
+  colorTransitionTime: 0.5
+--- !u!114 &410087044
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 410087039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce135673e83949d896192dfcce5c0d2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dayCubemap: {fileID: 8900000, guid: 3e80b688af9b1d84ea52c5d36bb1cbbd, type: 3}
+  nightCubemap: {fileID: 8900000, guid: 354036e57ae357148aed267204ce73a7, type: 3}
+  blendedCubemapShader: {fileID: 4800000, guid: 3032f2eb6fada4430b0629ebd24199f9, type: 3}
+  transitionDuration: 1.5
+  skyboxRotationSpeed: 0.5
+  sunPositionController: {fileID: 410087043}
 --- !u!1001 &412526097
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5482,7 +5523,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40de01e1ddea40d39c0f5ca30ba1ce1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameTime: {fileID: 1353341263}
 --- !u!1 &1366090432
 GameObject:
   m_ObjectHideFlags: 0
@@ -10431,7 +10471,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac39213d8d03e4c3a9f29755276afe4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stats: {x: 0, y: 0, z: 0, w: 0}
+  health: 0
+  hunger: 0
+  thirst: 0
+  fatigue: 0
 --- !u!114 &8013291525098416263
 MonoBehaviour:
   m_ObjectHideFlags: 0

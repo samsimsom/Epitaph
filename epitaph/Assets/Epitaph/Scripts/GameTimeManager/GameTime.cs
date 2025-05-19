@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.GameTimeManager
 {
+    [DefaultExecutionOrder(-100)]
     public class GameTime : MonoBehaviour
     {
         // Singleton instance

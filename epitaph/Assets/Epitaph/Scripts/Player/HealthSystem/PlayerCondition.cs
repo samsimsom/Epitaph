@@ -41,7 +41,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
         {
             while (this != null && gameObject.activeInHierarchy)
             {
-                int currentMinute = GameTime.Instance.GameMinute;
+                var currentMinute = GameTime.Instance.GameMinute;
                 
                 // Check if a minute has passed in game time
                 if (currentMinute != _lastMinute)
@@ -84,7 +84,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
 
         private void Die()
         {
-            Debug.Log("Player died!");
+            // Debug.Log("Player died!");
         }
         
         public void SetRunning(bool isRunning)

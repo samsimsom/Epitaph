@@ -4,30 +4,20 @@ namespace Epitaph.Scripts.GameTimeManager
 {
     public class GameTimeEventListener : MonoBehaviour
     {
-        [SerializeField] private GameTime gameTime;
-
         private void OnEnable()
         {
-            if (gameTime == null)
-            {
-                Debug.LogError("GameTime reference not set!", this);
-                return;
-            }
-
-            gameTime.OnDayPassed += HandleDayPassed;
-            gameTime.OnMonthPassed += HandleMonthPassed;
-            gameTime.OnYearPassed += HandleYearPassed;
-            gameTime.OnSeasonChanged += HandleSeasonChanged;
+            GameTime.Instance.OnDayPassed += HandleDayPassed;
+            GameTime.Instance.OnMonthPassed += HandleMonthPassed;
+            GameTime.Instance.OnYearPassed += HandleYearPassed;
+            GameTime.Instance.OnSeasonChanged += HandleSeasonChanged;
         }
 
         private void OnDisable()
         {
-            if (gameTime == null) return;
-
-            gameTime.OnDayPassed -= HandleDayPassed;
-            gameTime.OnMonthPassed -= HandleMonthPassed;
-            gameTime.OnYearPassed -= HandleYearPassed;
-            gameTime.OnSeasonChanged -= HandleSeasonChanged;
+            GameTime.Instance.OnDayPassed -= HandleDayPassed;
+            GameTime.Instance.OnMonthPassed -= HandleMonthPassed;
+            GameTime.Instance.OnYearPassed -= HandleYearPassed;
+            GameTime.Instance.OnSeasonChanged -= HandleSeasonChanged;
         }
 
         private void HandleDayPassed()
