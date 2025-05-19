@@ -8,10 +8,13 @@ namespace Epitaph.Scripts.GameTime
         // 120 dakika = 1 oyun günü
         public float realSecondsPerGameDay = 60f * 120f;
         public float elapsedGameSeconds;
+        public float startElapsedGameSeconds;
 
         // Zaman başlangıcı: 9:30
         private const int StartHour = 9;
         private const int StartMinute = 30;
+        
+        // Real World Time Constants
         private const int SecondsPerMinute = 60;
         private const int MinutesPerHour = 60;
         private const int HoursPerDay = 24;
@@ -86,6 +89,8 @@ namespace Epitaph.Scripts.GameTime
         [SerializeField] private string gameDate;
         // ReSharper disable once NotAccessedField.Local
         [SerializeField] private string gameClock;
+        // ReSharper disable once NotAccessedField.Local
+        [SerializeField] private string totalElapsedString;
         
         // Olaylar (event) ekleniyor
         public event Action OnDayPassed;
@@ -110,6 +115,7 @@ namespace Epitaph.Scripts.GameTime
 
         private void Start()
         {
+            startElapsedGameSeconds = 0f;
             elapsedGameSeconds = StartHour * MinutesPerHour * SecondsPerMinute + StartMinute * SecondsPerMinute;
             
             // Başlangıç değerlerini al
@@ -122,6 +128,7 @@ namespace Epitaph.Scripts.GameTime
 
         private void Update()
         {
+            startElapsedGameSeconds += Time.deltaTime * (HoursPerDay * MinutesPerHour * SecondsPerMinute) / realSecondsPerGameDay;
             elapsedGameSeconds += Time.deltaTime * (HoursPerDay * MinutesPerHour * SecondsPerMinute) / realSecondsPerGameDay;
             UpdateInspectorValues();
             
@@ -173,6 +180,28 @@ namespace Epitaph.Scripts.GameTime
         {
             gameDate = $"{GameDay:00}/{GameMonth:00}/{GameYear:0000}";
             gameClock = $"{GameHour:00}:{GameMinute:00}:{GameSecond:00}";
+            totalElapsedString = GetElapsedString();
+        }
+
+        /// <summary>
+        /// Oyun başladığından bu yana geçen süreyi yıl, ay, gün, saat, dakika, saniye cinsinden string olarak döner.
+        /// </summary>
+        private string GetElapsedString()
+        {
+            var totalSeconds = (int)startElapsedGameSeconds;
+
+            var seconds = totalSeconds % 60;
+            var totalMinutes = totalSeconds / 60;
+            var minutes = totalMinutes % 60;
+            var totalHours = totalMinutes / 60;
+            var hours = totalHours % 24;
+            var totalDays = totalHours / 24;
+            var days = totalDays % 30;
+            var totalMonths = totalDays / 30;
+            var months = totalMonths % 12;
+            var years = totalMonths / 12;
+
+            return $"{years} yıl, {months} ay, {days} gün, {hours} saat, {minutes} dakika, {seconds} saniye";
         }
 
         /// <summary>
