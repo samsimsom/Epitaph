@@ -44,11 +44,11 @@ namespace Epitaph.Scripts.Player.HealthSystem
 
         private void Awake()
         {
-            Health = new Health(100f, 1f);
+            Health = new Health(100f, 10f);
             Stamina = new Stamina(100f, 10f, 20f);
-            Hunger = new Hunger(100f, 1f);
-            Thirst = new Thirst(100f, 1f);
-            Fatigue = new Fatigue(100f, 1f);
+            Hunger = new Hunger(100f, 10f);
+            Thirst = new Thirst(100f, 10f);
+            Fatigue = new Fatigue(100f, 10f);
             
             _allStats = new List<ICondition> { Health, Stamina, Hunger, Thirst, Fatigue };
 
@@ -56,41 +56,6 @@ namespace Epitaph.Scripts.Player.HealthSystem
             // SecondBasedUpdates().Forget();
             MinuteBasedUpdates().Forget();
         }
-
-#if false
-        private async UniTaskVoid StartTimeBasedUpdates()
-        {
-            while (this != null && gameObject.activeInHierarchy)
-            {
-                var currentMinute = GameTime.Instance.GameMinute;
-
-                if (currentMinute != _lastMinute)
-                {
-                    _lastMinute = currentMinute;
-                    
-                    foreach (var stat in _allStats)
-                    {
-                        if (stat != Health && stat != Stamina)
-                            stat.UpdateStat(1.0f);
-                    }
-
-                    // OnHungerChanged?.Invoke(Hunger.Value, Hunger.MaxValue);
-                    // OnThirstChanged?.Invoke(Thirst.Value, Thirst.MaxValue);
-                    // OnFatigueChanged?.Invoke(Fatigue.Value, Fatigue.MaxValue);
-                    //
-                    // // Açlık/susuzluk tavan yaparsa sağlık azalsın
-                    // if (Hunger.Value >= Hunger.MaxValue || Thirst.Value >= Thirst.MaxValue)
-                    //     Health.Decrease(1f);
-                    //
-                    // if (Health.Value <= 0)
-                    //     Die();
-                }
-
-                // await UniTask.Delay(100);
-                await UniTask.Yield(PlayerLoopTiming.Update); // Bir sonraki frame’e kadar bekle
-            }
-        }
-#endif
 
         #region Updates
         private async UniTaskVoid FrameBasedUpdates()
@@ -158,18 +123,6 @@ namespace Epitaph.Scripts.Player.HealthSystem
         public void Drink(float amount) => Thirst.Decrease(amount);
         public void Sleep(float hours) => Fatigue.Decrease(hours * 20f);
 
-        private void UpdateInspectorData()
-        {
-            hunger = Hunger.Value;
-            thirst = Thirst.Value;
-            fatigue = Fatigue.Value;
-        }
-        
-        // private void Die()
-        // {
-        //     OnDie?.Invoke();
-        // }
-
         #region Condition Modifiers
         public void SetRunning(bool isRunning)
         {
@@ -190,6 +143,15 @@ namespace Epitaph.Scripts.Player.HealthSystem
                 Fatigue.Modifier = 1.4f;
             else
                 Fatigue.Modifier = 1f;
+        }
+        #endregion
+
+        #region DEBUG
+        private void UpdateInspectorData()
+        {
+            hunger = Hunger.Value;
+            thirst = Thirst.Value;
+            fatigue = Fatigue.Value;
         }
         #endregion
         
