@@ -1,4 +1,6 @@
 using System;
+using Cysharp.Threading.Tasks;
+using Epitaph.Scripts.GameTimeManager;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -104,7 +106,13 @@ namespace Epitaph.Scripts
 
         public void OnPrevious(InputAction.CallbackContext context)
         {
-            
+            if (context.performed)
+            {
+                Debug.LogWarning($"CurrentTime (before) : {GameTime.Instance.GameHour}");
+                GameTime.Instance.SkipTimeAsync(1).Forget();
+                Debug.LogWarning($"CurrentTime (after) : {GameTime.Instance.GameHour}");
+            }
+
         }
 
         public void OnNext(InputAction.CallbackContext context)

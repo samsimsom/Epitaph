@@ -283,15 +283,6 @@ namespace Epitaph.Scripts.GameTimeManager
             await CheckTimeEventsAsync();
             await UpdateInspectorValuesAsync();
         }
-        
-        /// <summary>
-        /// Synchronous version of SkipTime for backward compatibility
-        /// </summary>
-        /// <param name="hours">Hours to skip forward</param>
-        public void SkipTime(float hours)
-        {
-            SkipTimeAsync(hours).Forget();
-        }
         #endregion
     }
 }

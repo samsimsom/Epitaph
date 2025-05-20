@@ -123,7 +123,7 @@ Material:
     - _Emission: 0
     - _Emission_Map_Multiplier: 1
     - _Emission_Tiling: 1
-    - _Metallic: 0.5
+    - _Metallic: 0
     - _Metallic_Map_Multiplier: 1
     - _Metallic_Tiling: 1
     - _Offset1: 0

@@ -78,17 +78,17 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private void OnStaminaDepleted()
         {
             StopSprint();
-            Debug.Log("Sprint recovery depleted");
+            // Debug.Log("Sprint recovery depleted");
         }
         
         private void OnRecoveryStarted()
         {
-            Debug.Log("Sprint recovery started");
+            // Debug.Log("Sprint recovery started");
         }
         
         private void OnRecoveryFinished()
         {
-            Debug.Log("Sprint recovery finished");
+            // Debug.Log("Sprint recovery finished");
         }
         
         private void TryStartSprint()
