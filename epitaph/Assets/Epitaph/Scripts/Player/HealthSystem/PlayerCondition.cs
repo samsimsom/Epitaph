@@ -95,6 +95,12 @@ namespace Epitaph.Scripts.Player.HealthSystem
         {
             
         }
+
+        public override void OnDrawGizmos()
+        {
+            
+        }
+
         #endregion
         
         private void InitializeConditions()

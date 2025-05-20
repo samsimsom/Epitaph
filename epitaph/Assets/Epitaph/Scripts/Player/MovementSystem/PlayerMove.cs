@@ -44,6 +44,12 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             ProcessMove(PlayerController.GetPlayerInput().moveInput);
         }
+
+        public override void OnDrawGizmos()
+        {
+            
+        }
+
         #endregion
         
         private void OnChangeCrouchSpeed(float obj)
@@ -103,6 +109,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             _playerMovementData.currentVelocity.z = _characterController.velocity.z;
         }
         #endregion
+        
         
     }
 }

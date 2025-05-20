@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Epitaph.Scripts.Player.HealthSystem;
 using Epitaph.Scripts.Player.MovementSystem;
@@ -133,6 +134,16 @@ namespace Epitaph.Scripts.Player
         public bool IsSprinting() => playerMovementData.isSprinting;
         public bool IsCrouching() => playerMovementData.isCrouching;
         public bool IsGrounded() => playerMovementData.isGrounded;
+
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            for (var i = 0; i < _playerBehaviours.Count; i++)
+            {
+                _playerBehaviours[i].OnDrawGizmos();
+            }
+        }
+#endif
         
     }
 }

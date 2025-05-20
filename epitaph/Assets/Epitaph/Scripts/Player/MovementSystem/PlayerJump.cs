@@ -43,7 +43,12 @@ namespace Epitaph.Scripts.Player.MovementSystem
             HandleCoyoteTime();
             HandleJumpBuffer();
         }
-        
+
+        public override void OnDrawGizmos()
+        {
+            
+        }
+
         private void HandleJumpCooldown()
         {
             if (_canJump) return;

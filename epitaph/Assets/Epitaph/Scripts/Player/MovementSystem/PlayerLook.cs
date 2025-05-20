@@ -40,6 +40,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
             
         }
 
+        public override void OnDrawGizmos()
+        {
+            
+        }
+
         private static void LockCursor()
         {
             Cursor.lockState = CursorLockMode.Locked;

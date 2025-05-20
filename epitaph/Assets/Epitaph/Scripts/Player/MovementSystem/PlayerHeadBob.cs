@@ -39,6 +39,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
             StopHeadBob();
         }
 
+        public override void OnDrawGizmos()
+        {
+            
+        }
+
         private void CheckForHeadBobTrigger()
         {
             if (_playerMovementData.currentVelocity.sqrMagnitude > _playerMovementData.treshold)

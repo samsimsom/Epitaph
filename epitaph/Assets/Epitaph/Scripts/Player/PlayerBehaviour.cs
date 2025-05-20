@@ -12,5 +12,9 @@ namespace Epitaph.Scripts.Player
         public abstract void OnEnable();
         public abstract void OnDisable();
         public abstract void Update();
+
+#if UNITY_EDITOR
+        public abstract void OnDrawGizmos();
+#endif
     }
 }

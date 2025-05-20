@@ -103,6 +103,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
             DebugDrawLine();
         }
 
+        public override void OnDrawGizmos()
+        {
+            
+        }
+
         private void DebugDrawLine()
         {
             if (!ShowDebugGizmos) return;

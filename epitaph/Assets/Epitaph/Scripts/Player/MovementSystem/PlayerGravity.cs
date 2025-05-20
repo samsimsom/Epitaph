@@ -162,8 +162,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             }
         }
 
-        #if false
-        private void OnDrawGizmos()
+#if UNITY_EDITOR
+        public override void OnDrawGizmos()
         {
             if (_characterController == null) return;
             
@@ -173,6 +173,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             Gizmos.color = color;
             Gizmos.DrawWireSphere(origin, radius);
         }
-        #endif
+#endif
     }
 }

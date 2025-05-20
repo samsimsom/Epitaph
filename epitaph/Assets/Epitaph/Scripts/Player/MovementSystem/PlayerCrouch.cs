@@ -170,7 +170,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         }
 
 #if UNITY_EDITOR
-        private void OnDrawGizmos()
+        public override void OnDrawGizmos()
         {
             if (_characterController == null) return;
             

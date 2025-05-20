@@ -48,7 +48,12 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             
         }
-        
+
+        public override void OnDrawGizmos()
+        {
+            
+        }
+
         private void OnStaminaDepleted()
         {
             StopSprint();
