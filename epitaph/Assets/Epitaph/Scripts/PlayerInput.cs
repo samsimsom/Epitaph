@@ -56,7 +56,7 @@ namespace Epitaph.Scripts
         {
             if (context.performed)
             {
-                _playerController.HandleInteract();
+                _playerController.GetPlayerInteraction().TryInteract();
             }
         }
 

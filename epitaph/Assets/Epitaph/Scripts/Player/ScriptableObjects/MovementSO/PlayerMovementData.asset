@@ -12,10 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb77bc1e450c413693c5950d22a7d722, type: 3}
   m_Name: PlayerMovementData
   m_EditorClassIdentifier: 
+  health: 100
+  hunger: 0
+  thirst: 1.3800001
+  fatigue: 0.4
+  stamina: 98.34903
   walkSpeed: 2.5
   currentVelocity: {x: 0, y: 0, z: 0}
   lookSensitivity: {x: 20, y: 15}
   referanceAspect: 1.777778
+  amount: 0.025
+  frequenct: 10
+  smooth: 10
+  treshold: 2
   isGrounded: 1
   gravityMultiplier: 2.5
   groundedGravity: -5
@@ -50,8 +59,3 @@ MonoBehaviour:
   ceilingCheckDistance: 0.5
   isSprinting: 0
   sprintSpeed: 4.5
-  sprintStaminaUsage: 10
-  maxStamina: 50
-  staminaRecoveryRate: 10
-  staminaRecoveryDelay: 3
-  staminaEnoughPercentage: 0.3

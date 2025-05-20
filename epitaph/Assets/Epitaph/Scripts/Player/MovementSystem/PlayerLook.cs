@@ -8,11 +8,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
     {
         private PlayerMovementData _playerMovementData;
         private PlayerController _playerController;
-        private Camera _playerCamera;
         private CinemachineCamera _fpCamera;
-        
-        public Camera PlayerCamera => _playerCamera;
-        public CinemachineCamera FpCamera => _fpCamera;
         
         public PlayerLook(PlayerController playerController, 
             PlayerMovementData playerMovementData,
@@ -20,7 +16,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             CinemachineCamera fpCamera) : base(playerController)
         {
             _playerMovementData = playerMovementData;
-            _playerCamera = playerCamera;
             _fpCamera = fpCamera;
         }
 

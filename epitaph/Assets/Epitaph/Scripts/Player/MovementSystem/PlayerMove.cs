@@ -5,19 +5,22 @@ namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class PlayerMove : PlayerBehaviour
     {
-        private PlayerMovementData _playerMovementData;
-        private CharacterController _characterController;
-        private float _speed;
-        
         public PlayerMove(PlayerController playerController, 
             PlayerMovementData playerMovementData,
-            CharacterController characterController) : base(playerController)
+            CharacterController characterController,
+            Camera playerCamera) : base(playerController)
         {
             _playerMovementData = playerMovementData;
             _characterController = characterController;
+            _playerCamera = playerCamera;
             
             Initialize();
         }
+        
+        private PlayerMovementData _playerMovementData;
+        private CharacterController _characterController;
+        private Camera _playerCamera;
+        private float _speed;
         
         #region MonoBehaviour Methots
         public override void OnEnable()
@@ -69,7 +72,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private Vector3 CalculateMoveDirection(Vector2 input)
         {
             // Kamera referansını al
-            var cameraTransform = PlayerController.GetPlayerLook().PlayerCamera.transform;
+            var cameraTransform = _playerCamera.transform;
     
             // Kameranın ileri ve sağ vektörlerini al
             var forward = cameraTransform.forward;

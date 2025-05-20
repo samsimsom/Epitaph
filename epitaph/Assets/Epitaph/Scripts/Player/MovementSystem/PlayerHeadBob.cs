@@ -3,27 +3,37 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
 {
-    public class PlayerHeadBob : MonoBehaviour
+    public class PlayerHeadBob : PlayerBehaviour
     {
-        [Header("Data")]
-        [SerializeField] private PlayerMovementData playerMovementData;
-        
-        [Header("References")]
-        [SerializeField] private Transform playerCamera;
-
-        public float amount = 0.05f;
-        public float frequenct = 10.0f;
-        public float smooth = 10.0f;
-        public float treshold = 2.0f;
+        private PlayerMovementData _playerMovementData;
+        private Transform _playerCameraTransform;
         
         private Vector3 _startPosition;
 
-        private void Start()
+        public PlayerHeadBob(PlayerController playerController, 
+            PlayerMovementData playerMovementData, 
+            Transform playerCameraTransform) : base(playerController)
         {
-            _startPosition = playerCamera.transform.localPosition;
+            _playerMovementData = playerMovementData;
+            _playerCameraTransform = playerCameraTransform;
         }
 
-        private void Update()
+        public override void Start()
+        {
+            _startPosition = _playerCameraTransform.transform.localPosition;
+        }
+
+        public override void OnEnable()
+        {
+            
+        }
+
+        public override void OnDisable()
+        {
+            
+        }
+
+        public override void Update()
         {
             CheckForHeadBobTrigger();
             StopHeadBob();
@@ -31,7 +41,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         private void CheckForHeadBobTrigger()
         {
-            if (playerMovementData.currentVelocity.sqrMagnitude > treshold)
+            if (_playerMovementData.currentVelocity.sqrMagnitude > _playerMovementData.treshold)
             {
                 StartHeadBob();
             }
@@ -40,22 +50,22 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private void StartHeadBob()
         {
             var pos = Vector3.zero;
-            pos.y += Mathf.Lerp(pos.y, Mathf.Sin(Time.time * frequenct) 
-                                       * amount * 1.4f, smooth * Time.deltaTime);
-            pos.x += Mathf.Lerp(pos.x, Mathf.Cos(Time.time * frequenct / 2f) 
-                                       * amount * 1.6f, smooth * Time.deltaTime);
-            playerCamera.transform.localPosition += pos;
+            pos.y += Mathf.Lerp(pos.y, Mathf.Sin(Time.time * _playerMovementData.frequenct) 
+                                       * _playerMovementData.amount * 1.4f, _playerMovementData.smooth * Time.deltaTime);
+            pos.x += Mathf.Lerp(pos.x, Mathf.Cos(Time.time * _playerMovementData.frequenct / 2f) 
+                                       * _playerMovementData.amount * 1.6f, _playerMovementData.smooth * Time.deltaTime);
+            _playerCameraTransform.localPosition += pos;
 
             // return pos;
         }
 
         private void StopHeadBob()
         {
-            if (playerCamera.transform.localPosition == _startPosition) return;
+            if (_playerCameraTransform.localPosition == _startPosition) return;
             
-            playerCamera.transform.localPosition = Vector3.Lerp(
-                playerCamera.transform.localPosition, _startPosition,
-                smooth * Time.deltaTime);
+            _playerCameraTransform.localPosition = Vector3.Lerp(
+                _playerCameraTransform.localPosition, _startPosition,
+                _playerMovementData.smooth * Time.deltaTime);
         }
     }
 }

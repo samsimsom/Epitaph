@@ -24,6 +24,12 @@ namespace Epitaph.Scripts.Player.ScriptableObjects.MovementSO
         [Header("Look Data")]
         public Vector2 lookSensitivity;
         public float referanceAspect;
+        
+        [Header("Headbob Data")]
+        public float amount = 0.02f;
+        public float frequenct = 10.0f;
+        public float smooth = 10.0f;
+        public float treshold = 2.0f;
 
         [Header("Gravity Data")] 
         public bool isGrounded;

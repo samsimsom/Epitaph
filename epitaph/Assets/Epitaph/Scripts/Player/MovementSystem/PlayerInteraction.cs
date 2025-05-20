@@ -6,22 +6,27 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
 {
-    public class PlayerInteraction : MonoBehaviour
+    public class PlayerInteraction : PlayerBehaviour
     {
-        [Header("References")]
-        [SerializeField] private PlayerInput playerInput;
-        [SerializeField] private PlayerLook playerLook;
+     
+        public PlayerInteraction(PlayerController playerController, 
+            Camera playerCamera) : base(playerController)
+        {
+            _playerCamera = playerCamera;
+        }
         
         [Header("Raycast Settings")]
-        public float interactionDistance = 3f;
-        public LayerMask interactableLayer;
-        [SerializeField] private float raycastInterval = 0.05f;
+        public float InteractionDistance = 3f;
+        public LayerMask InteractableLayer = LayerMask.GetMask("Interactable");
+        private float _raycastInterval = 0.05f;
         
         [Header("Debug Settings")]
-        public bool showDebugGizmos = true;
-        public Color hitGizmoColor = Color.yellow;
-        public Color gizmoColor = Color.red;
+        public bool ShowDebugGizmos = true;
+        public Color HitGizmoColor = Color.yellow;
+        public Color GizmoColor = Color.red;
 
+        private Camera _playerCamera;
+        
         // Events
         public event Action<IInteractable> OnInteractableFound;
         public event Action OnInteractableLost;
@@ -32,21 +37,19 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private Vector3 _rayOrigin;
         private CancellationTokenSource _cts;
         private IInteractable _currentInteractable;
-        
-        private void OnEnable()
+
+        public override void Start()
+        {
+            
+        }
+
+        public override void OnEnable()
         {
             _cts = new CancellationTokenSource();
             StartRaycastLoop(_cts.Token).Forget();
         }
 
-        private void OnDisable()
-        {
-            _cts?.Cancel();
-            _cts?.Dispose();
-            _cts = null;
-        }
-
-        private void OnDestroy()
+        public override void OnDisable()
         {
             _cts?.Cancel();
             _cts?.Dispose();
@@ -58,13 +61,13 @@ namespace Epitaph.Scripts.Player.MovementSystem
             while (!cancellationToken.IsCancellationRequested)
             {
                 // Calculate ray parameters
-                _rayOrigin = playerLook.PlayerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0)).origin;
-                _rayDirection = playerLook.PlayerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0)).direction;
+                _rayOrigin = _playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0)).origin;
+                _rayDirection = _playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0)).direction;
 
                 // Perform raycast
                 var previousHitState = _didHit; 
                 _didHit = Physics.Raycast(_rayOrigin, _rayDirection, out _lastHit, 
-                    interactionDistance, interactableLayer);
+                    InteractionDistance, InteractableLayer);
 
                 switch (_didHit)
                 {
@@ -79,7 +82,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 }
                 
                 // Run at intervals to reduce CPU usage
-                await UniTask.Delay(TimeSpan.FromSeconds(raycastInterval), 
+                await UniTask.Delay(TimeSpan.FromSeconds(_raycastInterval), 
                     cancellationToken: cancellationToken);
             }
         }
@@ -95,23 +98,23 @@ namespace Epitaph.Scripts.Player.MovementSystem
             OnInteractableFound?.Invoke(interactable);
         }
 
-        private void Update()
+        public override void Update()
         {
             DebugDrawLine();
         }
 
         private void DebugDrawLine()
         {
-            if (!showDebugGizmos) return;
+            if (!ShowDebugGizmos) return;
             
             // Debug visualization
             if (_didHit)
             {
-                Debug.DrawLine(_rayOrigin, _lastHit.point, hitGizmoColor);
+                Debug.DrawLine(_rayOrigin, _lastHit.point, HitGizmoColor);
             }
             else
             {
-                Debug.DrawLine(_rayOrigin, _rayOrigin + _rayDirection * interactionDistance, gizmoColor);
+                Debug.DrawLine(_rayOrigin, _rayOrigin + _rayDirection * InteractionDistance, GizmoColor);
             }
         }
 
