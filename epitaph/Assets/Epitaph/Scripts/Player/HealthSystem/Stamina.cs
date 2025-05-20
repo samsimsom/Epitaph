@@ -25,9 +25,6 @@ namespace Epitaph.Scripts.Player.HealthSystem
         public float EnoughPercentage { get; set; } = 0.25f;
 
         private bool _isConsuming;
-#pragma warning disable CS0414 // Field is assigned but its value is never used
-        private bool _hasStartedRecovery;
-#pragma warning restore CS0414 // Field is assigned but its value is never used
         private bool _hasFinishedRecovery;
 
         private CancellationTokenSource _sprintCts;
@@ -82,7 +79,6 @@ namespace Epitaph.Scripts.Player.HealthSystem
         private async UniTaskVoid StaminaConsumeAsync(CancellationToken token)
         {
             _isConsuming = true;
-            _hasStartedRecovery = false;
             _hasFinishedRecovery = false;
 
             while (!token.IsCancellationRequested)
@@ -107,7 +103,6 @@ namespace Epitaph.Scripts.Player.HealthSystem
             if (token.IsCancellationRequested) return;
 
             OnStaminaRecoveryStarted?.Invoke();
-            _hasStartedRecovery = true;
             _hasFinishedRecovery = false;
 
             await StaminaIncreaseAsync(token);
@@ -118,7 +113,6 @@ namespace Epitaph.Scripts.Player.HealthSystem
                 {
                     OnStaminaRecoveryFinished?.Invoke();
                     _hasFinishedRecovery = true;
-                    _hasStartedRecovery = false;
                 }
             }
         }
