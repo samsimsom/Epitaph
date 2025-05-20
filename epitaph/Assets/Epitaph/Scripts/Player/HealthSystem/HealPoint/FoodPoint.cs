@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.HealthSystem.HealPoint
@@ -13,10 +12,10 @@ namespace Epitaph.Scripts.Player.HealthSystem.HealPoint
         private void OnTriggerEnter(Collider other)
         {
             Debug.Log("Food Point Triggered!");
-            if (other.gameObject.TryGetComponent<PlayerCondition>(out var playerCondition))
+            if (other.gameObject.TryGetComponent<PlayerController>(out var playerController))
             {
                 foodMaterial.color = Color.white;
-                playerCondition.Eat(foodAmount);
+                playerController.GetPlayerCondition().Eat(foodAmount);
             }
         }
 

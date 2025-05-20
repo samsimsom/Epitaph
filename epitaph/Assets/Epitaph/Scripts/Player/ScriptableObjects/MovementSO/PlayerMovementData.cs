@@ -5,6 +5,18 @@ namespace Epitaph.Scripts.Player.ScriptableObjects.MovementSO
     [CreateAssetMenu(fileName = "PlayerMovementData", menuName = "Systems/Movement System", order = 0)]
     public class PlayerMovementData : ScriptableObject
     {
+        [Header("Condition")]
+        public float health;
+        // public float maxHealth;
+        public float hunger;
+        // public float maxHunger;
+        public float thirst;
+        // public float maxThirst;
+        public float fatigue;
+        // public float maxFatigue;
+        public float stamina;
+        // public float maxStamina;
+        
         [Header("Movement Data")]
         public float walkSpeed;
         public Vector3 currentVelocity;

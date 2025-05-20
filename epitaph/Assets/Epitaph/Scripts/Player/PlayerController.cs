@@ -80,7 +80,7 @@ namespace Epitaph.Scripts.Player
             if (playerInput == null) 
                 playerInput = GetComponent<PlayerInput>();
 
-            _playerCondition = new PlayerCondition(this);
+            _playerCondition = new PlayerCondition(this, playerMovementData);
             
             _playerLook = new PlayerLook(this, 
                 playerMovementData, playerCamera, fpCamera);
@@ -105,7 +105,6 @@ namespace Epitaph.Scripts.Player
             _playerBehaviours.Add(_playerGravity);
             _playerBehaviours.Add(_playerSprint);
             _playerBehaviours.Add(_playerCrouch);
-            _playerBehaviours.Add(_playerLook);
             _playerBehaviours.Add(_playerJump);
         }
         
@@ -128,12 +127,15 @@ namespace Epitaph.Scripts.Player
         public CharacterController GetCharacterController() => characterController;
         public PlayerMovementData GetMovementData() => playerMovementData;
         public PlayerInput GetPlayerInput() => playerInput;
+        
         public PlayerLook GetPlayerLook() => _playerLook;
         public PlayerSprint GetPlayerSprint() => _playerSprint;
         public PlayerCondition GetPlayerCondition() => _playerCondition;
         public PlayerGravity GetPlayerGravity() => _playerGravity;
         public PlayerCrouch GetPlayerCrouch() => _playerCrouch;
         public PlayerJump GetPlayerJump() => _playerJump;
+        public PlayerMove GetPlayerMove() => _playerMove;
+        
         
         // Methods for coordinating between systems
         public void SetMovementEnabled(bool enabled)

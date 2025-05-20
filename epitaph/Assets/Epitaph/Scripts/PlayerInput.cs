@@ -8,32 +8,6 @@ namespace Epitaph.Scripts
 {
     public class PlayerInput : MonoBehaviour, PlayerInputActions.IPlayerActions
     {
-        #region Actions
-        // public event Action OnAimActivated;
-        // public event Action OnAimDeactivated;
-
-        // public static event Action OnCrouchActivated;
-        // public static event Action OnCrouchDeactivated;
-        
-        // public static event Action OnJumpPerformed;
-
-        // public event Action OnLockOnToggled;
-
-        // public static event Action OnSprintActivated;
-        // public static event Action OnSprintDeactivated;
-        
-        // public event Action OnPreviousActivated;
-        // public event Action OnPreviousDeactivated;
-        
-        // public event Action OnNextActivated;
-        // public event Action OnNextDeactivated;
-        
-        // public event Action OnWalkToggled;
-
-        // public event Action OnAttackPerformed;
-        // public event Action OnInteractPerformed;
-        #endregion
-        
         public Vector2 mouseDelta;
         public Vector2 moveInput;
         public bool isMoveInput;

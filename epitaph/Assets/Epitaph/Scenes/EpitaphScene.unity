@@ -12262,21 +12262,6 @@ Transform:
   - {fileID: 2126002729}
   m_Father: {fileID: 5661707239149685294}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6390491648624272535
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7711096113604129949}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38a1e6b8c0d334a5495d8bec20071d28, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mouseDelta: {x: 0, y: 0}
-  moveInput: {x: 0, y: 0}
-  isMoveInput: 0
 --- !u!223 &6448017018607562812
 Canvas:
   m_ObjectHideFlags: 0
@@ -12325,8 +12310,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1858777798685317456}
   - component: {fileID: 335799411769818269}
-  - component: {fileID: 6390491648624272535}
   - component: {fileID: 7711096113604129952}
+  - component: {fileID: 7711096113604129953}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -12348,9 +12333,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerMovementData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
   characterController: {fileID: 335799411769818269}
-  playerInput: {fileID: 6390491648624272535}
+  playerInput: {fileID: 0}
   playerCamera: {fileID: 97344946005274002}
   fpCamera: {fileID: 9060440602867519774}
+--- !u!114 &7711096113604129953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7711096113604129949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38a1e6b8c0d334a5495d8bec20071d28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mouseDelta: {x: 0, y: 0}
+  moveInput: {x: 0, y: 0}
+  isMoveInput: 0
 --- !u!114 &8013291525098416263
 MonoBehaviour:
   m_ObjectHideFlags: 0

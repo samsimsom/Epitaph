@@ -1,16 +1,18 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Epitaph.Scripts.GameTimeManager;
+using Epitaph.Scripts.Player.ScriptableObjects.MovementSO;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.HealthSystem
 {
     public class PlayerCondition : PlayerBehaviour
     {
-        public PlayerCondition(PlayerController playerController) : base(playerController)
+        public PlayerCondition(PlayerController playerController, 
+            PlayerMovementData playerMovementData) : base(playerController)
         {
+            _playerMovementData = playerMovementData;
             InitializeConditions();
-            StartUpdates();
         }
         
         #region Public Properties
@@ -42,6 +44,9 @@ namespace Epitaph.Scripts.Player.HealthSystem
         #endregion
 
         #region Private Fields
+
+        private PlayerMovementData _playerMovementData;
+        
         private Health _health;
         private Stamina _stamina;
         private Hunger _hunger;
@@ -58,7 +63,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
         #region Lifecycle Methods
         public override void Start()
         {
-            
+            StartUpdates();
         }
 
         public override void OnEnable()
@@ -119,6 +124,17 @@ namespace Epitaph.Scripts.Player.HealthSystem
                 var delta = Time.deltaTime;
                 Health.UpdateStat(delta);
                 Stamina.UpdateStat(delta);
+                
+                _playerMovementData.health = Health.Value;
+                // _playerMovementData.maxHealth = Health.MaxValue;
+                _playerMovementData.stamina = Stamina.Value;
+                // _playerMovementData.maxStamina = Stamina.MaxValue;
+                _playerMovementData.hunger = Hunger.Value;
+                // _playerMovementData.maxHunger = Hunger.MaxValue;
+                _playerMovementData.thirst = Thirst.Value;
+                // _playerMovementData.maxThirst = Thirst.MaxValue;
+                _playerMovementData.fatigue = Fatigue.Value;
+                // _playerMovementData.maxFatigue = Fatigue.MaxValue;
                 
                 await UniTask.Yield(PlayerLoopTiming.Update);
             }
@@ -218,7 +234,6 @@ namespace Epitaph.Scripts.Player.HealthSystem
             }
         }
         #endregion
-
-
+        
     }
 }
