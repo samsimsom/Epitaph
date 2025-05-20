@@ -25,8 +25,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             PlayerInput.OnSprintActivated += OnSprintActivated;
             PlayerInput.OnSprintDeactivated += OnSprintDeactivated;
             PlayerCrouch.OnCrouchStateChanged += HandleCrouchStateChanged;
-            
-
         }
 
         private void OnDisable()
