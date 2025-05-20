@@ -47,14 +47,36 @@ namespace Epitaph.Scripts.Player.HealthSystem
             InitializeConditions();
             StartUpdates();
         }
-        
+
+        private void OnEnable()
+        {
+            if (GameTime.Instance != null)
+            {
+                GameTime.Instance.OnTimeSkipped += OnTimeSkipped;
+            }
+            else
+            {
+                Debug.LogWarning("GameTime instance not found. Player conditions will not update on time skip.");
+            }
+
+        }
+
+        private void OnDisable()
+        {
+            if (GameTime.Instance != null)
+            {
+                GameTime.Instance.OnTimeSkipped -= OnTimeSkipped;
+            }
+
+        }
+
         private void InitializeConditions()
         {
-            Health = new Health(100f, 10f);
-            Stamina = new Stamina(100f, 10f, 20f);
-            Hunger = new Hunger(100f, 10f);
-            Thirst = new Thirst(100f, 10f);
-            Fatigue = new Fatigue(100f, 10f);
+            Health = new Health(100f, 1.0f);
+            Stamina = new Stamina(100f, 1f, 1f);
+            Hunger = new Hunger(100f, 0.1f);
+            Thirst = new Thirst(100f, 0.3f);
+            Fatigue = new Fatigue(100f, 0.1f);
             
             _allStats = new List<ICondition> { Health, Stamina, Hunger, Thirst, Fatigue };
         }
@@ -157,6 +179,33 @@ namespace Epitaph.Scripts.Player.HealthSystem
         {
             // Fatigue increases faster at night
             Fatigue.Modifier = (gameHour >= 22 || gameHour <= 6) ? 1.4f : 1f;
+        }
+        #endregion
+        
+        #region Time Skip Handler
+        private void OnTimeSkipped(float hoursSkipped)
+        {
+            Debug.Log($"Time skipped: {hoursSkipped} hours. Updating player conditions...");
+    
+            // Atlanılan dakikaları hesapla (şu anki mantığa göre her dakika için 1.0f etki uygulanıyor)
+            var minutesSkipped = hoursSkipped * 60f;
+    
+            // Her non-vital koşul için atlanılan dakikalara göre güncelleme yap
+            foreach (var stat in _allStats)
+            {
+                // Health ve Stamina dışındaki koşulları güncelle (açlık, susuzluk, yorgunluk)
+                if (stat != Health && stat != Stamina)
+                {
+                    // Her dakika için 1.0f değerinde bir etki ekleniyor (MinuteBasedUpdates ile aynı mantık)
+                    stat.UpdateStat(minutesSkipped);
+            
+                    // Güncellenmiş her koşul için debug log ekleyebilirsiniz
+                    Debug.Log($"Updated {stat.GetType().Name} after time skip. New value: {stat.Value}");
+                }
+            }
+    
+            // Debug değerlerini güncelle
+            UpdateInspectorData();
         }
         #endregion
 

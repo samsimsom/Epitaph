@@ -108,7 +108,7 @@ namespace Epitaph.Scripts
         {
             if (context.performed)
             {
-                GameTime.Instance.SkipTimeAsync(1).Forget();
+                GameTime.Instance.SkipTimeAsync(1f).Forget();
             }
 
         }

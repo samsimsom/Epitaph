@@ -78,6 +78,7 @@ namespace Epitaph.Scripts.GameTimeManager
         public event Action OnMonthPassed;
         public event Action OnYearPassed;
         public event Action<Season, Season> OnSeasonChanged;
+        public event Action<float> OnTimeSkipped;
         #endregion
 
         #region Private Fields
@@ -277,8 +278,12 @@ namespace Epitaph.Scripts.GameTimeManager
         /// <param name="hours">Hours to skip forward</param>
         public async UniTask SkipTimeAsync(float hours)
         {
+            var oldSeconds = elapsedGameSeconds;
             elapsedGameSeconds += hours * SecondsPerMinute * MinutesPerHour;
             
+            // Zaman atlamayı olaylar aracılığıyla bildir
+            OnTimeSkipped?.Invoke(hours);
+
             // Ensure event checks are run after skipping time
             await CheckTimeEventsAsync();
             await UpdateInspectorValuesAsync();
