@@ -40,36 +40,24 @@ namespace Epitaph.Scripts.Player.HealthSystem
         #endregion
         
         private int _lastMinute = -1;
+        private int _lastSecond = -1;
 
         private void Awake()
         {
             Health = new Health(100f, 1f);
             Stamina = new Stamina(100f, 10f, 20f);
-            Hunger = new Hunger(100f, 0.25f);
-            Thirst = new Thirst(100f, 0.5f);
-            Fatigue = new Fatigue(100f, 0.1f);
+            Hunger = new Hunger(100f, 1f);
+            Thirst = new Thirst(100f, 1f);
+            Fatigue = new Fatigue(100f, 1f);
             
             _allStats = new List<ICondition> { Health, Stamina, Hunger, Thirst, Fatigue };
-                
-            StartTimeBasedUpdates().Forget();
-        }
-        
-        private void Update()
-        {
-            // Her frame'de sadece Health ve Stamina güncellensin!
-            var delta = Time.deltaTime;
-            Health.UpdateStat(delta);
-            Stamina.UpdateStat(delta);
 
-            // Debug ve Event update için her frame güncelle
-            health = Health.Value;
-            stamina = Stamina.Value;
-            
-            // OnHealthChanged?.Invoke(Health.Value, Health.MaxValue);
-            // OnStaminaChanged?.Invoke(Stamina.Value, Stamina.MaxValue);
-            // Gerekirse stamina eventleri de burada eklenebilir
+            FrameBasedUpdates().Forget();
+            // SecondBasedUpdates().Forget();
+            MinuteBasedUpdates().Forget();
         }
 
+#if false
         private async UniTaskVoid StartTimeBasedUpdates()
         {
             while (this != null && gameObject.activeInHierarchy)
@@ -80,17 +68,11 @@ namespace Epitaph.Scripts.Player.HealthSystem
                 {
                     _lastMinute = currentMinute;
                     
-                    // Sadece Health ve Stamina hariç diğerlerini güncelle
                     foreach (var stat in _allStats)
                     {
                         if (stat != Health && stat != Stamina)
-                            stat.UpdateStat(1.0f); // Dakika başı 1 birimlik ilerleme
+                            stat.UpdateStat(1.0f);
                     }
-
-                    // Debug
-                    hunger = Hunger.Value;
-                    thirst = Thirst.Value;
-                    fatigue = Fatigue.Value;
 
                     // OnHungerChanged?.Invoke(Hunger.Value, Hunger.MaxValue);
                     // OnThirstChanged?.Invoke(Thirst.Value, Thirst.MaxValue);
@@ -104,14 +86,85 @@ namespace Epitaph.Scripts.Player.HealthSystem
                     //     Die();
                 }
 
-                await UniTask.Delay(100);
+                // await UniTask.Delay(100);
+                await UniTask.Yield(PlayerLoopTiming.Update); // Bir sonraki frame’e kadar bekle
             }
         }
+#endif
 
+        #region Updates
+        private async UniTaskVoid FrameBasedUpdates()
+        {
+            while (this != null && gameObject.activeInHierarchy)
+            {
+                // Her frame'de sadece Health ve Stamina güncellensin!
+                var delta = Time.deltaTime;
+                Health.UpdateStat(delta);
+                Stamina.UpdateStat(delta);
+
+                // Debug ve Event update için her frame güncelle
+                health = Health.Value;
+                stamina = Stamina.Value;
+                
+                await UniTask.Yield(PlayerLoopTiming.Update);
+            }
+        }
+        
+        private async UniTaskVoid SecondBasedUpdates()
+        {
+            while (this != null && gameObject.activeInHierarchy)
+            {
+                var currentSecond = GameTime.Instance.GameSecond;
+                if (currentSecond != _lastSecond)
+                {
+                    _lastSecond = currentSecond;
+                    foreach (var stat in _allStats)
+                    {
+                        if (stat != Health && stat != Stamina)
+                            stat.UpdateStat(1.0f);
+                    }
+                }
+                
+                UpdateInspectorData();
+
+                await GameTime.Instance.WaitForGameSecond();
+            }
+        }
+        
+        private async UniTaskVoid MinuteBasedUpdates()
+        {
+            while (this != null && gameObject.activeInHierarchy)
+            {
+                var currentMinute = GameTime.Instance.GameMinute;
+                if (currentMinute != _lastMinute)
+                {
+                    _lastMinute = currentMinute;
+                    foreach (var stat in _allStats)
+                    {
+                        if (stat != Health && stat != Stamina)
+                            stat.UpdateStat(1.0f);
+                    }
+                }
+                
+                UpdateInspectorData();
+                
+                await GameTime.Instance.WaitForGameSecond();
+            }
+        }
+        #endregion
+
+        
         public void Eat(float amount) => Hunger.Decrease(amount);
         public void Drink(float amount) => Thirst.Decrease(amount);
         public void Sleep(float hours) => Fatigue.Decrease(hours * 20f);
 
+        private void UpdateInspectorData()
+        {
+            hunger = Hunger.Value;
+            thirst = Thirst.Value;
+            fatigue = Fatigue.Value;
+        }
+        
         // private void Die()
         // {
         //     OnDie?.Invoke();

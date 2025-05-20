@@ -7,10 +7,11 @@ namespace Epitaph.Scripts.Player.HealthSystem
         public float Value { get; private set; }
         public float MaxValue { get; private set; }
         public float BaseIncreaseRate { get; set; }
+        public float BaseDecreaseRate { get; set; }
         public float Modifier { get; set; } = 1f;
 
         public float EffectiveIncreaseRate => BaseIncreaseRate * Modifier;
-
+        public float EffectiveDecreaseRate => BaseDecreaseRate * Modifier;
 
         public Thirst(float max, float rate)
         {

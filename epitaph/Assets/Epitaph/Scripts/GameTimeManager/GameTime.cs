@@ -283,6 +283,36 @@ namespace Epitaph.Scripts.GameTimeManager
             await CheckTimeEventsAsync();
             await UpdateInspectorValuesAsync();
         }
+        
+        /// <summary>
+        /// Aktif oyun saniyesinin bitmesini bekler. 
+        /// Bu metot çağrıldığında, mevcut GameSecond değeri değişene kadar bekler.
+        /// Genellikle bir işlemi oyun zamanına göre, tam saniye aralıklarında başlatmak için kullanılır.
+        /// </summary>
+        /// <returns>Bir "game second" tamamlandığında tamamlanan bir UniTask.</returns>
+        public async UniTask WaitForGameSecond()
+        {
+            var startSecond = GameSecond;
+            while (GameSecond == startSecond)
+            {
+                await UniTask.Yield(PlayerLoopTiming.Update);
+            }
+        }
+        
+        /// <summary>
+        /// Aktif oyun dakikasinin bitmesini bekler. 
+        /// Bu metot çağrıldığında, mevcut GameMinute değeri değişene kadar bekler.
+        /// Genellikle bir işlemi oyun zamanına göre, tam dakika aralıklarında başlatmak için kullanılır.
+        /// </summary>
+        /// <returns>Bir "game minute" tamamlandığında tamamlanan bir UniTask.</returns>
+        public async UniTask WaitForGameMinutes()
+        {
+            var startSecond = GameMinute;
+            while (GameMinute == startSecond)
+            {
+                await UniTask.Yield(PlayerLoopTiming.Update);
+            }
+        }
         #endregion
     }
 }
