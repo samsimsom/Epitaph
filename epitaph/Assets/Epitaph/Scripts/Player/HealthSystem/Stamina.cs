@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.HealthSystem
 {
-    public class StaminaCondition : ICondition
+    public class Stamina : ICondition
     {
         public event Action OnStaminaDepleted;
         public event Action OnStaminaRecoveryStarted;
@@ -39,7 +39,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
             set => _isConsuming = value;
         }
 
-        public StaminaCondition(float max, float increaseRate, float decreaseRate)
+        public Stamina(float max, float increaseRate, float decreaseRate)
         {
             MaxValue = max;
             Value = max;

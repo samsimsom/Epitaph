@@ -17,7 +17,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
         #endregion
         
         public Health Health { get; private set; }
-        public StaminaCondition Stamina { get; private set; }
+        public Stamina Stamina { get; private set; }
         public Hunger Hunger { get; private set; }
         public Thirst Thirst { get; private set; }
         public Fatigue Fatigue { get; private set; }
@@ -43,7 +43,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
         private void Awake()
         {
             Health = new Health(100f, 1f);
-            Stamina = new StaminaCondition(100f, 10f, 20f);
+            Stamina = new Stamina(100f, 10f, 20f);
             Hunger = new Hunger(100f, 0.25f);
             Thirst = new Thirst(100f, 0.5f);
             Fatigue = new Fatigue(100f, 0.1f);
