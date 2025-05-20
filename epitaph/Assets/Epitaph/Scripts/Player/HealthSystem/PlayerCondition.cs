@@ -9,11 +9,12 @@ namespace Epitaph.Scripts.Player.HealthSystem
     public class PlayerCondition : MonoBehaviour
     {
         #region Events
-        public static event Action<float, float> OnHealthChanged;
-        public static event Action<float, float> OnHungerChanged;
-        public static event Action<float, float> OnThirstChanged;
-        public static event Action<float, float> OnFatigueChanged;
-        public static event Action OnDie;
+        // public static event Action<float, float> OnHealthChanged;
+        // public static event Action<float, float> OnStaminaChanged;
+        // public static event Action<float, float> OnHungerChanged;
+        // public static event Action<float, float> OnThirstChanged;
+        // public static event Action<float, float> OnFatigueChanged;
+        // public static event Action OnDie;
         #endregion
         
         public Health Health { get; private set; }
@@ -63,8 +64,9 @@ namespace Epitaph.Scripts.Player.HealthSystem
             // Debug ve Event update için her frame güncelle
             health = Health.Value;
             stamina = Stamina.Value;
-            OnHealthChanged?.Invoke(Health.Value, Health.MaxValue);
-
+            
+            // OnHealthChanged?.Invoke(Health.Value, Health.MaxValue);
+            // OnStaminaChanged?.Invoke(Stamina.Value, Stamina.MaxValue);
             // Gerekirse stamina eventleri de burada eklenebilir
         }
 
@@ -90,16 +92,16 @@ namespace Epitaph.Scripts.Player.HealthSystem
                     thirst = Thirst.Value;
                     fatigue = Fatigue.Value;
 
-                    OnHungerChanged?.Invoke(Hunger.Value, Hunger.MaxValue);
-                    OnThirstChanged?.Invoke(Thirst.Value, Thirst.MaxValue);
-                    OnFatigueChanged?.Invoke(Fatigue.Value, Fatigue.MaxValue);
-
-                    // Açlık/susuzluk tavan yaparsa sağlık azalsın
-                    if (Hunger.Value >= Hunger.MaxValue || Thirst.Value >= Thirst.MaxValue)
-                        Health.Decrease(1f);
-
-                    if (Health.Value <= 0)
-                        Die();
+                    // OnHungerChanged?.Invoke(Hunger.Value, Hunger.MaxValue);
+                    // OnThirstChanged?.Invoke(Thirst.Value, Thirst.MaxValue);
+                    // OnFatigueChanged?.Invoke(Fatigue.Value, Fatigue.MaxValue);
+                    //
+                    // // Açlık/susuzluk tavan yaparsa sağlık azalsın
+                    // if (Hunger.Value >= Hunger.MaxValue || Thirst.Value >= Thirst.MaxValue)
+                    //     Health.Decrease(1f);
+                    //
+                    // if (Health.Value <= 0)
+                    //     Die();
                 }
 
                 await UniTask.Delay(100);
@@ -110,11 +112,12 @@ namespace Epitaph.Scripts.Player.HealthSystem
         public void Drink(float amount) => Thirst.Decrease(amount);
         public void Sleep(float hours) => Fatigue.Decrease(hours * 20f);
 
-        private void Die()
-        {
-            OnDie?.Invoke();
-        }
-        
+        // private void Die()
+        // {
+        //     OnDie?.Invoke();
+        // }
+
+        #region Condition Modifiers
         public void SetRunning(bool isRunning)
         {
             // Koşarken açlık %20, susuzluk %60 daha hızlı artsın
@@ -135,6 +138,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
             else
                 Fatigue.Modifier = 1f;
         }
+        #endregion
         
     }
 }

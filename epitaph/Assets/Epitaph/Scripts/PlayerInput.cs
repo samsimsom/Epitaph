@@ -108,9 +108,7 @@ namespace Epitaph.Scripts
         {
             if (context.performed)
             {
-                Debug.LogWarning($"CurrentTime (before) : {GameTime.Instance.GameHour}");
                 GameTime.Instance.SkipTimeAsync(1).Forget();
-                Debug.LogWarning($"CurrentTime (after) : {GameTime.Instance.GameHour}");
             }
 
         }
