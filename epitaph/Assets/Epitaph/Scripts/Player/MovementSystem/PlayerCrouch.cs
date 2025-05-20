@@ -27,14 +27,14 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         private void OnEnable()
         {
-            PlayerInput.OnCrouchActivated += OnCrouchActivated;
-            PlayerInput.OnCrouchDeactivated += OnCrouchDeactivated;
+            // PlayerInput.OnCrouchActivated += OnCrouchActivated;
+            // PlayerInput.OnCrouchDeactivated += OnCrouchDeactivated;
         }
         
         private void OnDisable()
         {
-            PlayerInput.OnCrouchActivated -= OnCrouchActivated;
-            PlayerInput.OnCrouchDeactivated -= OnCrouchDeactivated;
+            // PlayerInput.OnCrouchActivated -= OnCrouchActivated;
+            // PlayerInput.OnCrouchDeactivated -= OnCrouchDeactivated;
         }
         
         private void Update()
@@ -57,6 +57,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 playerCamera.localPosition.y : 0f;
             
             playerMovementData.standingHeight = characterController.height;
+        }
+
+        public void ToggleCrouch()
+        {
+            OnCrouchActivated();
         }
         
         private void OnCrouchActivated()

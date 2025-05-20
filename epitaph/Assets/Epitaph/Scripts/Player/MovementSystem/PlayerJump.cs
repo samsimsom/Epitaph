@@ -1,3 +1,4 @@
+using System;
 using Epitaph.Scripts.Player.ScriptableObjects.MovementSO;
 using UnityEngine;
 
@@ -5,46 +6,24 @@ namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class PlayerJump : MonoBehaviour
     {
-        [Header("Data")]
-        [SerializeField] private PlayerMovementData playerMovementData;
-        
-        [Header("References")]
-        [SerializeField] private CharacterController characterController;
+        private PlayerController _playerController;
         
         private bool _canJump = true;
         private float _jumpCooldownTimer;
         private float _coyoteTimeCounter;
         private float _jumpBufferCounter;
         private bool _wasGroundedLastFrame;
-        
+
         private void Awake()
         {
-            InitializeComponents();
+            _playerController = GetComponent<PlayerController>();
         }
 
-        private void OnEnable()
-        {
-            PlayerInput.OnJumpPerformed += ProcessJump;
-        }
-
-        private void OnDisable()
-        {
-            PlayerInput.OnJumpPerformed -= ProcessJump;
-        }
-        
         private void Update()
         {
             HandleJumpCooldown();
             HandleCoyoteTime();
             HandleJumpBuffer();
-        }
-
-        private void InitializeComponents()
-        {
-            if (characterController == null)
-            {
-                characterController = GetComponent<CharacterController>();
-            }
         }
         
         private void HandleJumpCooldown()
@@ -60,14 +39,14 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         private void HandleCoyoteTime()
         {
-            if (!playerMovementData.useCoyoteTime) return;
+            if (!_playerController.GetMovementData().useCoyoteTime) return;
             
-            var isGrounded = playerMovementData.isGrounded;
+            var isGrounded = _playerController.GetMovementData().isGrounded;
             
             // Yerdeyken coyote sayacını max değerine ayarla
             if (isGrounded)
             {
-                _coyoteTimeCounter = playerMovementData.coyoteTime;
+                _coyoteTimeCounter = _playerController.GetMovementData().coyoteTime;
             }
             else
             {
@@ -104,24 +83,24 @@ namespace Epitaph.Scripts.Player.MovementSystem
             ComputeCeilingRayOrigin(out var radius, out var rayDistance, 
                 out var originTip, out var originRoot);
             var cannotHitCeiling = !Physics.Raycast(originRoot, Vector3.up, rayDistance,
-                playerMovementData.ceilingLayers);
-            var isInCoyoteTime = playerMovementData.useCoyoteTime && _coyoteTimeCounter > 0;
+                _playerController.GetMovementData().ceilingLayers);
+            var isInCoyoteTime = _playerController.GetMovementData().useCoyoteTime && _coyoteTimeCounter > 0;
             
-            return !playerMovementData.isCrouching && _canJump && (playerMovementData.isGrounded || isInCoyoteTime) && cannotHitCeiling;
+            return !_playerController.GetMovementData().isCrouching && _canJump && (_playerController.GetMovementData().isGrounded || isInCoyoteTime) && cannotHitCeiling;
         }
         
         private void ComputeCeilingRayOrigin(out float radius, 
             out float rayDistance, out Vector3 originTip, out Vector3 originRoot)
         {
-            radius = characterController.radius;
-            rayDistance = playerMovementData.ceilingCheckDistance;
-            originTip = characterController.transform.position
-                        + characterController.center
-                        + Vector3.up * (characterController.height / 2f)
+            radius = _playerController.GetCharacterController().radius;
+            rayDistance = _playerController.GetMovementData().ceilingCheckDistance;
+            originTip = _playerController.GetCharacterController().transform.position
+                        + _playerController.GetCharacterController().center
+                        + Vector3.up * (_playerController.GetCharacterController().height / 2f)
                         + Vector3.up * rayDistance;
-            originRoot = characterController.transform.position
-                         + characterController.center
-                         + Vector3.up * (characterController.height / 2f);
+            originRoot = _playerController.GetCharacterController().transform.position
+                         + _playerController.GetCharacterController().center
+                         + Vector3.up * (_playerController.GetCharacterController().height / 2f);
         }
         
         public void ProcessJump()
@@ -133,26 +112,26 @@ namespace Epitaph.Scripts.Player.MovementSystem
             else
             {
                 // Zıplayamasa bile jump buffer'ı başlat
-                _jumpBufferCounter = playerMovementData.jumpBufferTime;
+                _jumpBufferCounter = _playerController.GetMovementData().jumpBufferTime;
             }
         }
         
         private void ExecuteJump()
         {
             var jumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(Physics.gravity.y) * 
-                                          playerMovementData.jumpHeight);
-            playerMovementData.verticalVelocity = jumpVelocity;
+                                          _playerController.GetMovementData().jumpHeight);
+            _playerController.GetMovementData().verticalVelocity = jumpVelocity;
     
             _canJump = false;
-            _jumpCooldownTimer = playerMovementData.jumpCooldown;
+            _jumpCooldownTimer = _playerController.GetMovementData().jumpCooldown;
             _coyoteTimeCounter = 0; // Zıpladıktan sonra coyote time'ı sıfırla
         }
 
         
-#if UNITY_EDITOR
+#if false
         private void OnDrawGizmos()
         {
-            if (characterController == null) return;
+            if (_playerController.GetCharacterController() == null) return;
             
             ComputeCeilingRayOrigin(out var radius, out var rayDistance, 
                 out var originTip, out var originRoot);

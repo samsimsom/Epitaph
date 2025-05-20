@@ -1,6 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Epitaph.Scripts.GameTimeManager;
+using Epitaph.Scripts.Player;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,15 +13,15 @@ namespace Epitaph.Scripts
         // public event Action OnAimActivated;
         // public event Action OnAimDeactivated;
 
-        public static event Action OnCrouchActivated;
-        public static event Action OnCrouchDeactivated;
+        // public static event Action OnCrouchActivated;
+        // public static event Action OnCrouchDeactivated;
         
-        public static event Action OnJumpPerformed;
+        // public static event Action OnJumpPerformed;
 
         // public event Action OnLockOnToggled;
 
-        public static event Action OnSprintActivated;
-        public static event Action OnSprintDeactivated;
+        // public static event Action OnSprintActivated;
+        // public static event Action OnSprintDeactivated;
         
         // public event Action OnPreviousActivated;
         // public event Action OnPreviousDeactivated;
@@ -31,7 +32,7 @@ namespace Epitaph.Scripts
         // public event Action OnWalkToggled;
 
         // public event Action OnAttackPerformed;
-        public event Action OnInteractPerformed;
+        // public event Action OnInteractPerformed;
         #endregion
         
         public Vector2 mouseDelta;
@@ -40,10 +41,13 @@ namespace Epitaph.Scripts
         
         private PlayerInputActions _playerInputActions;
         
+        private PlayerController _playerController;
+        
         private void Awake()
         {
             if (_playerInputActions != null) return;
             
+            _playerController = GetComponent<PlayerController>();
             _playerInputActions = new PlayerInputActions();
             _playerInputActions.Player.SetCallbacks(this);
         }
@@ -80,7 +84,8 @@ namespace Epitaph.Scripts
         {
             if (context.performed)
             {
-                OnInteractPerformed?.Invoke();
+                // OnInteractPerformed?.Invoke();
+                _playerController.HandleInteract();
             }
         }
 
@@ -88,11 +93,12 @@ namespace Epitaph.Scripts
         {
             if (context.started)
             {
-                OnCrouchActivated?.Invoke();
+                _playerController.ToggleCrouch();
+                // OnCrouchActivated?.Invoke();
             }
             else if (context.canceled)
             {
-                OnCrouchDeactivated?.Invoke();
+                // OnCrouchDeactivated?.Invoke();
             }
         }
 
@@ -100,7 +106,8 @@ namespace Epitaph.Scripts
         {
             if (context.performed)
             {
-                OnJumpPerformed?.Invoke();
+                _playerController.Jump();
+                // OnJumpPerformed?.Invoke();
             }
         }
 
@@ -122,11 +129,13 @@ namespace Epitaph.Scripts
         {
             if (context.performed)
             {
-                OnSprintActivated?.Invoke();
+                _playerController.StartSprint();
+                // OnSprintActivated?.Invoke();
             }
             else if (context.canceled)
             {
-                OnSprintDeactivated?.Invoke();
+                _playerController.StopSprint();
+                // OnSprintDeactivated?.Invoke();
             }
         }
         #endregion

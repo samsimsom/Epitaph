@@ -3,44 +3,50 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
 {
-    public class PlayerMove : MonoBehaviour
+    public class PlayerMove : PlayerBehaviour
     {
-        [Header("Data")]
-        [SerializeField] private PlayerMovementData playerMovementData;
-        
-        [Header("References")]
-        [SerializeField] private PlayerInput playerInput;
-        [SerializeField] private CharacterController characterController;
-        [SerializeField] private PlayerLook playerLook;
+        private PlayerMovementData _playerMovementData;
+        private PlayerInput _playerInput;
+        private CharacterController _characterController;
+        private PlayerLook _playerLook;
         
         private float _speed;
-
-        #region MonoBehaviour Methots
-        private void Awake()
+        
+        public PlayerMove(PlayerController playerController, 
+            PlayerMovementData playerMovementData, 
+            PlayerInput playerInput, 
+            CharacterController characterController, 
+            PlayerLook playerLook) : base(playerController)
         {
+            _playerMovementData = playerMovementData;
+            _playerInput = playerInput;
+            _characterController = characterController;
+            _playerLook = playerLook;
+            
             Initialize();
         }
-
-        private void OnEnable()
+        
+        #region MonoBehaviour Methots
+        public override void OnEnable()
         {
             PlayerSprint.OnChangeSprintSpeed += OnChangeSprintSpeed;
             PlayerCrouch.OnChangeCrouchSpeed += OnChangeCrouchSpeed;
         }
 
-        private void OnDisable()
+        public override void OnDisable()
         {
             PlayerSprint.OnChangeSprintSpeed -= OnChangeSprintSpeed;
             PlayerCrouch.OnChangeCrouchSpeed -= OnChangeCrouchSpeed;
         }
 
-        private void Start()
+        public override void Start()
         {
             AdjustPlayerPosition();
         }
         
-        private void Update()
+        public override void Update()
         {
-            ProcessMove(playerInput.moveInput);
+            ProcessMove(_playerInput.moveInput);
         }
         #endregion
         
@@ -56,26 +62,21 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         private void Initialize()
         {
-            if (characterController == null)
-            {
-                characterController = GetComponent<CharacterController>();
-            }
-            
-            _speed = playerMovementData.walkSpeed;
+            _speed = _playerMovementData.walkSpeed;
         }
         
         private void AdjustPlayerPosition()
         {
             // CharacterControllerdan gelen skinWidth offseti pozisyona ekleniyor.
-            var playerHeight = characterController.skinWidth;
-            transform.position += new Vector3(0, playerHeight, 0);
+            var playerHeight = _characterController.skinWidth;
+            // transform.position += new Vector3(0, playerHeight, 0);
         }
         
         #region Move Methods
         private Vector3 CalculateMoveDirection(Vector2 input)
         {
             // Kamera referansını al
-            var cameraTransform = playerLook.CameraTransform;
+            var cameraTransform = _playerLook.CameraTransform;
     
             // Kameranın ileri ve sağ vektörlerini al
             var forward = cameraTransform.forward;
@@ -101,9 +102,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             var direction = CalculateMoveDirection(input);
             var movement = direction * (_speed * Time.deltaTime);
-            characterController.Move(movement);
-            playerMovementData.currentVelocity.x = characterController.velocity.x;
-            playerMovementData.currentVelocity.z = characterController.velocity.z;
+            _characterController.Move(movement);
+            _playerMovementData.currentVelocity.x = _characterController.velocity.x;
+            _playerMovementData.currentVelocity.z = _characterController.velocity.z;
         }
         #endregion
         

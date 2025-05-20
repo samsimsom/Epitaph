@@ -37,9 +37,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             _cts = new CancellationTokenSource();
             StartRaycastLoop(_cts.Token).Forget();
-            
-            if (playerInput != null)
-                playerInput.OnInteractPerformed += ProcessInteraction;
         }
 
         private void OnDisable()
@@ -47,9 +44,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             _cts?.Cancel();
             _cts?.Dispose();
             _cts = null;
-            
-            if (playerInput != null)
-                playerInput.OnInteractPerformed -= ProcessInteraction;
         }
 
         private void OnDestroy()
@@ -83,7 +77,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
                         OnInteractableLost?.Invoke();
                         break;
                 }
-
+                
                 // Run at intervals to reduce CPU usage
                 await UniTask.Delay(TimeSpan.FromSeconds(raycastInterval), 
                     cancellationToken: cancellationToken);
@@ -103,6 +97,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         private void Update()
         {
+            DebugDrawLine();
+        }
+
+        private void DebugDrawLine()
+        {
             if (!showDebugGizmos) return;
             
             // Debug visualization
@@ -118,6 +117,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         #region Public Methods
         // Public method to handle interaction input
+        public void TryInteract()
+        {
+            _currentInteractable?.Interact();
+        }
+        
         public void ProcessInteraction()
         {
             _currentInteractable?.Interact();

@@ -5,58 +5,52 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
 {
-    public class PlayerSprint : MonoBehaviour
+    public class PlayerSprint : PlayerBehaviour
     {
-        public static event Action<float> OnChangeSprintSpeed;
-        
-        [Header("Data")]
-        [SerializeField] private PlayerMovementData playerMovementData;
-        [SerializeField] private PlayerCondition playerCondition;
-        
-        private bool _isSprintKeyHeld;
-        
-        private void Awake()
+        public PlayerSprint(PlayerController playerController, 
+            PlayerMovementData playerMovementData, 
+            PlayerCondition playerCondition) : base(playerController)
         {
-            Initialize();
+            _playerMovementData = playerMovementData;
+            _playerCondition = playerCondition;
         }
 
-        private void OnEnable()
+        public static event Action<float> OnChangeSprintSpeed;
+        
+        private PlayerMovementData _playerMovementData;
+        private PlayerCondition _playerCondition;
+        
+        
+        private bool _isSprintKeyHeld;
+
+        public override void OnEnable()
         {
-            PlayerInput.OnSprintActivated += OnSprintActivated;
-            PlayerInput.OnSprintDeactivated += OnSprintDeactivated;
             PlayerCrouch.OnCrouchStateChanged += HandleCrouchStateChanged;
         }
 
-        private void OnDisable()
+        public override void OnDisable()
         {
-            PlayerInput.OnSprintActivated -= OnSprintActivated;
-            PlayerInput.OnSprintDeactivated -= OnSprintDeactivated;
             PlayerCrouch.OnCrouchStateChanged -= HandleCrouchStateChanged;
             
-            playerCondition.Stamina.OnStaminaDepleted -= OnStaminaDepleted;
-            playerCondition.Stamina.OnStaminaRecoveryStarted -= OnRecoveryStarted;
-            playerCondition.Stamina.OnStaminaRecoveryFinished -= OnRecoveryFinished;
+            _playerCondition.Stamina.OnStaminaDepleted -= OnStaminaDepleted;
+            _playerCondition.Stamina.OnStaminaRecoveryStarted -= OnRecoveryStarted;
+            _playerCondition.Stamina.OnStaminaRecoveryFinished -= OnRecoveryFinished;
         }
 
-        private void Start()
+        public override void Start()
         {
-            playerCondition.Stamina.OnStaminaDepleted += OnStaminaDepleted;
-            playerCondition.Stamina.OnStaminaRecoveryStarted += OnRecoveryStarted;
-            playerCondition.Stamina.OnStaminaRecoveryFinished += OnRecoveryFinished;
+            _playerCondition.Stamina.OnStaminaDepleted += OnStaminaDepleted;
+            _playerCondition.Stamina.OnStaminaRecoveryStarted += OnRecoveryStarted;
+            _playerCondition.Stamina.OnStaminaRecoveryFinished += OnRecoveryFinished;
         }
 
-        private void Update()
+        public override void Update()
         {
             // Başlat işlemi hâlâ burada (Kısayol desteği için)
-            if (_isSprintKeyHeld && !playerMovementData.isSprinting)
+            if (_isSprintKeyHeld && !_playerMovementData.isSprinting)
             {
                 TryStartSprint();
             }
-        }
-
-        private void Initialize()
-        {
-            if (!playerCondition) playerCondition = GetComponent<PlayerCondition>();
         }
 
         private void OnSprintActivated()
@@ -89,36 +83,36 @@ namespace Epitaph.Scripts.Player.MovementSystem
             // Debug.Log("Sprint recovery finished");
         }
         
-        private void TryStartSprint()
+        public void TryStartSprint()
         {
-            if (!playerMovementData.isGrounded || 
-                playerCondition?.Stamina == null ||
-                playerCondition.Stamina.Value <= 0) return;
-            
-            if (playerMovementData.isCrouching) return;
-
-            playerMovementData.isSprinting = true;
-            playerCondition.SetRunning(true); // hunger, thirst modifikasyon için
-            playerCondition.Stamina.StartStaminaConsuming();
-            OnChangeSprintSpeed?.Invoke(playerMovementData.sprintSpeed);
+            // if (!_playerMovementData.isGrounded || 
+            //     PlayerController.GetPlayerCondition()?.Stamina == null ||
+            //     PlayerController.GetPlayerCondition().Stamina.Value <= 0) return;
+            //
+            // if (_playerMovementData.isCrouching) return;
+            //
+            // _playerMovementData.isSprinting = true;
+            // PlayerController.GetPlayerCondition().SetRunning(true); // hunger, thirst modifikasyon için
+            // PlayerController.GetPlayerCondition().Stamina.StartStaminaConsuming();
+            // OnChangeSprintSpeed?.Invoke(_playerMovementData.sprintSpeed);
         }
 
-        private void StopSprint()
+        public void StopSprint()
         {
-            if (!playerMovementData.isSprinting) return;
-            
-            playerMovementData.isSprinting = false;
-            playerCondition.SetRunning(false); // hunger, thirst eski haline döner
-            playerCondition.Stamina.StopStaminaConsuming();
-            OnChangeSprintSpeed?.Invoke(playerMovementData.walkSpeed);
+            // if (!_playerMovementData.isSprinting) return;
+            //
+            // _playerMovementData.isSprinting = false;
+            // PlayerController.GetPlayerCondition().SetRunning(false); // hunger, thirst eski haline döner
+            // PlayerController.GetPlayerCondition().Stamina.StopStaminaConsuming();
+            // OnChangeSprintSpeed?.Invoke(_playerMovementData.walkSpeed);
         }
         
         private void HandleCrouchStateChanged(bool isCrouching)
         {
-            if (!isCrouching || !playerMovementData.isSprinting) return;
+            if (!isCrouching || !_playerMovementData.isSprinting) return;
             
             StopSprint();
-            OnChangeSprintSpeed?.Invoke(playerMovementData.crouchSpeed);
+            OnChangeSprintSpeed?.Invoke(_playerMovementData.crouchSpeed);
         }
         
     }
