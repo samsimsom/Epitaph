@@ -6,22 +6,15 @@ namespace Epitaph.Scripts.Player.MovementSystem
     public class PlayerMove : PlayerBehaviour
     {
         private PlayerMovementData _playerMovementData;
-        private PlayerInput _playerInput;
         private CharacterController _characterController;
-        private PlayerLook _playerLook;
-        
         private float _speed;
         
         public PlayerMove(PlayerController playerController, 
-            PlayerMovementData playerMovementData, 
-            PlayerInput playerInput, 
-            CharacterController characterController, 
-            PlayerLook playerLook) : base(playerController)
+            PlayerMovementData playerMovementData,
+            CharacterController characterController) : base(playerController)
         {
             _playerMovementData = playerMovementData;
-            _playerInput = playerInput;
             _characterController = characterController;
-            _playerLook = playerLook;
             
             Initialize();
         }
@@ -46,7 +39,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         public override void Update()
         {
-            ProcessMove(_playerInput.moveInput);
+            ProcessMove(PlayerController.GetPlayerInput().moveInput);
         }
         #endregion
         
@@ -69,14 +62,14 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             // CharacterControllerdan gelen skinWidth offseti pozisyona ekleniyor.
             var playerHeight = _characterController.skinWidth;
-            // transform.position += new Vector3(0, playerHeight, 0);
+            PlayerController.transform.position += new Vector3(0, playerHeight, 0);
         }
         
         #region Move Methods
         private Vector3 CalculateMoveDirection(Vector2 input)
         {
             // Kamera referansını al
-            var cameraTransform = _playerLook.CameraTransform;
+            var cameraTransform = PlayerController.GetPlayerLook().PlayerCamera.transform;
     
             // Kameranın ileri ve sağ vektörlerini al
             var forward = cameraTransform.forward;

@@ -1,4 +1,3 @@
-using System;
 using Cysharp.Threading.Tasks;
 using Epitaph.Scripts.GameTimeManager;
 using Epitaph.Scripts.Player;
@@ -40,7 +39,6 @@ namespace Epitaph.Scripts
         public bool isMoveInput;
         
         private PlayerInputActions _playerInputActions;
-        
         private PlayerController _playerController;
         
         private void Awake()
@@ -129,12 +127,12 @@ namespace Epitaph.Scripts
         {
             if (context.performed)
             {
-                _playerController.StartSprint();
+                _playerController.GetPlayerSprint().TryStartSprint();
                 // OnSprintActivated?.Invoke();
             }
             else if (context.canceled)
             {
-                _playerController.StopSprint();
+                _playerController.GetPlayerSprint().StopSprint();
                 // OnSprintDeactivated?.Invoke();
             }
         }

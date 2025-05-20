@@ -4,36 +4,45 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
 {
-    public class PlayerLook : MonoBehaviour
+    public class PlayerLook : PlayerBehaviour
     {
-        [Header("Data")]
-        [SerializeField] private PlayerMovementData playerMovementData;
+        private PlayerMovementData _playerMovementData;
+        private PlayerController _playerController;
+        private Camera _playerCamera;
+        private CinemachineCamera _fpCamera;
         
-        [Header("References")]
-        [SerializeField] private Camera playerCamera;
-        [SerializeField] private CinemachineCamera fpCamera;
+        public Camera PlayerCamera => _playerCamera;
+        public CinemachineCamera FpCamera => _fpCamera;
         
-        public Camera PlayerCamera => playerCamera;
-        public Transform CameraTransform => fpCamera.transform;
-        
-        private CinemachineInputAxisController _inputAxisController;
-
-        private void Awake()
+        public PlayerLook(PlayerController playerController, 
+            PlayerMovementData playerMovementData,
+            Camera playerCamera,
+            CinemachineCamera fpCamera) : base(playerController)
         {
-            InitializeComponents();
+            _playerMovementData = playerMovementData;
+            _playerCamera = playerCamera;
+            _fpCamera = fpCamera;
         }
 
-        private void InitializeComponents()
-        {
-            _inputAxisController = fpCamera != null
-                ? fpCamera.GetComponent<CinemachineInputAxisController>()
-                : null;
-        }
-
-        private void Start()
+        public override void Start()
         {
             LockCursor();
             UpdateCameraSensitivity();
+        }
+
+        public override void OnEnable()
+        {
+            
+        }
+
+        public override void OnDisable()
+        {
+            
+        }
+
+        public override void Update()
+        {
+            
         }
 
         private static void LockCursor()
@@ -48,14 +57,14 @@ namespace Epitaph.Scripts.Player.MovementSystem
             var currentAspect = (float)Screen.width / Screen.height;
             
             // En-boy oranı çarpanı
-            var aspectMultiplier = playerMovementData.referanceAspect / currentAspect;
+            var aspectMultiplier = _playerMovementData.referanceAspect / currentAspect;
             
-            foreach (var controller in _inputAxisController.Controllers)
+            foreach (var controller in _fpCamera.GetComponent<CinemachineInputAxisController>().Controllers)
             {
                 controller.Input.Gain = controller.Name switch
                 {
-                    "Look X (Pan)" => playerMovementData.lookSensitivity.x * aspectMultiplier,
-                    "Look Y (Tilt)" => -playerMovementData.lookSensitivity.y * aspectMultiplier,
+                    "Look X (Pan)" => _playerMovementData.lookSensitivity.x * aspectMultiplier,
+                    "Look Y (Tilt)" => -_playerMovementData.lookSensitivity.y * aspectMultiplier,
                     _ => controller.Input.Gain
                 };
             }

@@ -12325,8 +12325,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1858777798685317456}
   - component: {fileID: 335799411769818269}
-  - component: {fileID: 7711096113604129952}
   - component: {fileID: 6390491648624272535}
+  - component: {fileID: 7711096113604129952}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -12347,8 +12347,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerMovementData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
-  playerInput: {fileID: 6390491648624272535}
   characterController: {fileID: 335799411769818269}
+  playerInput: {fileID: 6390491648624272535}
+  playerCamera: {fileID: 97344946005274002}
+  fpCamera: {fileID: 9060440602867519774}
 --- !u!114 &8013291525098416263
 MonoBehaviour:
   m_ObjectHideFlags: 0

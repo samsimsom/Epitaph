@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Epitaph.Scripts.GameTimeManager;
@@ -6,50 +5,66 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.HealthSystem
 {
-    public class PlayerCondition : MonoBehaviour
+    public class PlayerCondition : PlayerBehaviour
     {
-        #region Public Properties
-        public Health Health { get; private set; }
-        public Stamina Stamina { get; private set; }
-        public Hunger Hunger { get; private set; }
-        public Thirst Thirst { get; private set; }
-        public Fatigue Fatigue { get; private set; }
-        #endregion
-
-        #region Private Fields
-        private List<ICondition> _allStats;
-        private int _lastMinute = -1;
-        private int _lastSecond = -1;
-        #endregion
-
-        #region Debug Fields
-        [Header("Debug Values")]
-        [SerializeField] private float health;
-        [SerializeField] private float stamina;
-        [Space]
-        [SerializeField] private float hunger;
-        [SerializeField] private float thirst;
-        [SerializeField] private float fatigue;
-        #endregion
-
-        #region Event Definitions (Commented)
-        // public static event Action<float, float> OnHealthChanged;
-        // public static event Action<float, float> OnStaminaChanged;
-        // public static event Action<float, float> OnHungerChanged;
-        // public static event Action<float, float> OnThirstChanged;
-        // public static event Action<float, float> OnFatigueChanged;
-        // public static event Action OnDie;
-        #endregion
-
-        #region Lifecycle Methods
-        private void Awake()
+        public PlayerCondition(PlayerController playerController) : base(playerController)
         {
             InitializeConditions();
             StartUpdates();
         }
-
-        private void OnEnable()
+        
+        #region Public Properties
+        public Health Health
         {
+            get => _health;
+            private set => _health = value;
+        }
+        public Stamina Stamina
+        {
+            get => _stamina;
+            private set => _stamina = value;
+        }
+        public Hunger Hunger
+        {
+            get => _hunger;
+            private set => _hunger = value;
+        }
+        public Thirst Thirst
+        {
+            get => _thirst;
+            private set => _thirst = value;
+        }
+        public Fatigue Fatigue
+        {
+            get => _fatigue;
+            private set => _fatigue = value;
+        }
+        #endregion
+
+        #region Private Fields
+        private Health _health;
+        private Stamina _stamina;
+        private Hunger _hunger;
+        private Thirst _thirst;
+        private Fatigue _fatigue;
+        private List<ICondition> _allStats;
+        
+        private int _lastMinute = -1;
+        private int _lastSecond = -1;
+        
+        private bool _isUpdating;
+        #endregion
+
+        #region Lifecycle Methods
+        public override void Start()
+        {
+            
+        }
+
+        public override void OnEnable()
+        {
+            _isUpdating = true;
+            
             if (GameTime.Instance != null)
             {
                 GameTime.Instance.OnTimeSkipped += OnTimeSkipped;
@@ -61,14 +76,22 @@ namespace Epitaph.Scripts.Player.HealthSystem
 
         }
 
-        private void OnDisable()
+        public override void OnDisable()
         {
+            _isUpdating = false;
+            
             if (GameTime.Instance != null)
             {
                 GameTime.Instance.OnTimeSkipped -= OnTimeSkipped;
             }
         }
 
+        public override void Update()
+        {
+            
+        }
+        #endregion
+        
         private void InitializeConditions()
         {
             Health = new Health(100f, 1.0f);
@@ -86,21 +109,16 @@ namespace Epitaph.Scripts.Player.HealthSystem
             // SecondBasedUpdates().Forget();
             MinuteBasedUpdates().Forget();
         }
-        #endregion
-
+        
         #region Update Methods
         private async UniTaskVoid FrameBasedUpdates()
         {
-            while (this != null && gameObject.activeInHierarchy)
+            while (_isUpdating)
             {
                 // Update frame-sensitive stats
                 var delta = Time.deltaTime;
                 Health.UpdateStat(delta);
                 Stamina.UpdateStat(delta);
-
-                // Update debug values
-                health = Health.Value;
-                stamina = Stamina.Value;
                 
                 await UniTask.Yield(PlayerLoopTiming.Update);
             }
@@ -108,7 +126,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
         
         private async UniTaskVoid SecondBasedUpdates()
         {
-            while (this != null && gameObject.activeInHierarchy)
+            while (_isUpdating)
             {
                 // Check for second change
                 var currentSecond = GameTime.Instance.GameSecond;
@@ -117,9 +135,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
                     _lastSecond = currentSecond;
                     UpdateNonVitalStats(1.0f);
                 }
-                
-                UpdateInspectorData();
-                
+
                 // Wait for next game second to complete
                 await GameTime.Instance.WaitForGameSecond();
             }
@@ -127,7 +143,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
         
         private async UniTaskVoid MinuteBasedUpdates()
         {
-            while (this != null && gameObject.activeInHierarchy)
+            while (_isUpdating)
             {
                 // Check for minute change
                 var currentMinute = GameTime.Instance.GameMinute;
@@ -136,8 +152,6 @@ namespace Epitaph.Scripts.Player.HealthSystem
                     _lastMinute = currentMinute;
                     UpdateNonVitalStats(1.0f);
                 }
-                
-                UpdateInspectorData();
                 
                 // Wait for next game second to complete
                 await GameTime.Instance.WaitForGameSecond();
@@ -202,19 +216,9 @@ namespace Epitaph.Scripts.Player.HealthSystem
                     Debug.Log($"Updated {stat.GetType().Name} after time skip. New value: {stat.Value}");
                 }
             }
-    
-            // Debug değerlerini güncelle
-            UpdateInspectorData();
         }
         #endregion
 
-        #region Debug Methods
-        private void UpdateInspectorData()
-        {
-            hunger = Hunger.Value;
-            thirst = Thirst.Value;
-            fatigue = Fatigue.Value;
-        }
-        #endregion
+
     }
 }

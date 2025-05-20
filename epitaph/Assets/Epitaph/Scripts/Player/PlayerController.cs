@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Epitaph.Scripts.Player.HealthSystem;
 using Epitaph.Scripts.Player.MovementSystem;
 using Epitaph.Scripts.Player.ScriptableObjects.MovementSO;
+using Unity.Cinemachine;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player
@@ -12,23 +13,25 @@ namespace Epitaph.Scripts.Player
         [SerializeField] private PlayerMovementData playerMovementData;
         
         [Header("Components")]
-        [SerializeField] private PlayerInput playerInput;
         [SerializeField] private CharacterController characterController;
+        [SerializeField] private PlayerInput playerInput;
+        [SerializeField] private Camera playerCamera;
+        [SerializeField] private CinemachineCamera fpCamera;
         
         private List<PlayerBehaviour> _playerBehaviours = new();
         
         // // Movement Components
-        // private PlayerMove _playerMove;
+        private PlayerMove _playerMove;
         // private PlayerJump _playerJump;
         // private PlayerCrouch _playerCrouch;
-        // private PlayerSprint _playerSprint;
+        private PlayerSprint _playerSprint;
         // private PlayerGravity _playerGravity;
-        // private PlayerLook _playerLook;
+        private PlayerLook _playerLook;
         // private PlayerHeadBob _playerHeadBob;
         // private PlayerInteraction _playerInteraction;
         //
         // // Health System Components
-        // private PlayerCondition _playerCondition;
+        private PlayerCondition _playerCondition;
         
         private void Awake()
         {
@@ -71,23 +74,28 @@ namespace Epitaph.Scripts.Player
         private void InitializeComponents()
         {
             // Get required components if not already assigned
-            if (characterController == null) characterController = GetComponent<CharacterController>();
-            if (playerInput == null) playerInput = GetComponent<PlayerInput>();
+            if (characterController == null) 
+                characterController = GetComponent<CharacterController>();
+
+            if (playerInput == null) 
+                playerInput = GetComponent<PlayerInput>();
+
+            _playerCondition = new PlayerCondition(this);
             
-            // Get movement system components
-            // _playerMove = GetComponent<PlayerMove>();
-            // _playerJump = GetComponent<PlayerJump>();
-            // _playerCrouch = GetComponent<PlayerCrouch>();
-            // _playerGravity = GetComponent<PlayerGravity>();
-            // _playerLook = GetComponent<PlayerLook>();
-            // _playerHeadBob = GetComponent<PlayerHeadBob>();
-            // _playerInteraction = GetComponent<PlayerInteraction>();
+            _playerLook = new PlayerLook(this, 
+                playerMovementData, playerCamera, fpCamera);
             
-            // Get health system components
-            // _playerCondition = GetComponent<PlayerCondition>();
+            _playerMove = new PlayerMove(this,
+                playerMovementData, characterController);
+
+            _playerSprint = new PlayerSprint(this, playerMovementData, 
+                _playerCondition);
+
             
-            // _playerSprint = new PlayerSprint(this, playerMovementData, _playerCondition);
-            // _playerBehaviours.Add(_playerSprint);
+            _playerBehaviours.Add(_playerCondition);
+            _playerBehaviours.Add(_playerLook);
+            _playerBehaviours.Add(_playerMove);
+            _playerBehaviours.Add(_playerSprint);
         }
         
         private void RegisterEvents()
@@ -106,9 +114,12 @@ namespace Epitaph.Scripts.Player
         }
         
         // Public interfaces for external access
-        // public PlayerCondition GetPlayerCondition() => _playerCondition;
-        public PlayerMovementData GetMovementData() => playerMovementData;
         public CharacterController GetCharacterController() => characterController;
+        public PlayerMovementData GetMovementData() => playerMovementData;
+        public PlayerInput GetPlayerInput() => playerInput;
+        public PlayerLook GetPlayerLook() => _playerLook;
+        public PlayerSprint GetPlayerSprint() => _playerSprint;
+        public PlayerCondition GetPlayerCondition() => _playerCondition;
         
         // Methods for coordinating between systems
         public void SetMovementEnabled(bool enabled)
@@ -128,18 +139,18 @@ namespace Epitaph.Scripts.Player
         // Interact with specific components
         public void StartSprint()
         {
-            // if (_playerSprint != null && _playerCondition?.Stamina != null && _playerCondition.Stamina.Value > 0)
-            // {
-            //     _playerSprint.TryStartSprint();
-            // }
+            if (_playerSprint != null && _playerCondition?.Stamina != null && _playerCondition.Stamina.Value > 0)
+            {
+                _playerSprint.TryStartSprint();
+            }
         }
         
         public void StopSprint()
         {
-            // if (_playerSprint != null)
-            // {
-            //     _playerSprint.StopSprint();
-            // }
+            if (_playerSprint != null)
+            {
+                _playerSprint.StopSprint();
+            }
         }
         
         public void ToggleCrouch()
