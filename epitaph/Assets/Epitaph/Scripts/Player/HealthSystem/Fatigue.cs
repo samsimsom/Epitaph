@@ -2,18 +2,20 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.HealthSystem
 {
-    public class HealthCondition : ICondition
+    public class Fatigue : ICondition
     {
         public float Value { get; private set; }
         public float MaxValue { get; private set; }
         public float BaseIncreaseRate { get; set; }
         public float Modifier { get; set; } = 1f;
+
         public float EffectiveIncreaseRate => BaseIncreaseRate * Modifier;
 
-        public HealthCondition(float max, float rate)
+
+        public Fatigue(float max, float rate)
         {
             MaxValue = max;
-            Value = max;
+            Value = 0;
             BaseIncreaseRate = rate;
         }
 
@@ -29,7 +31,6 @@ namespace Epitaph.Scripts.Player.HealthSystem
 
         public void UpdateStat(float deltaTime)
         {
-            // Eğer pasif iyileşme olacaksa buraya yazılır
             Value = Mathf.Clamp(Value + EffectiveIncreaseRate * deltaTime, 0, MaxValue);
         }
     }

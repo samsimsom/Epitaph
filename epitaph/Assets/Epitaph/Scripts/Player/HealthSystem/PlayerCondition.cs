@@ -16,11 +16,11 @@ namespace Epitaph.Scripts.Player.HealthSystem
         public static event Action OnDie;
         #endregion
         
-        public HealthCondition Health { get; private set; }
+        public Health Health { get; private set; }
         public StaminaCondition Stamina { get; private set; }
-        public HungerCondition Hunger { get; private set; }
-        public ThirstCondition Thirst { get; private set; }
-        public FatigueCondition Fatigue { get; private set; }
+        public Hunger Hunger { get; private set; }
+        public Thirst Thirst { get; private set; }
+        public Fatigue Fatigue { get; private set; }
 
         private List<ICondition> _allStats;
 
@@ -42,11 +42,11 @@ namespace Epitaph.Scripts.Player.HealthSystem
 
         private void Awake()
         {
-            Health = new HealthCondition(100f, 1f);
+            Health = new Health(100f, 1f);
             Stamina = new StaminaCondition(100f, 10f, 20f);
-            Hunger = new HungerCondition(100f, 0.25f);
-            Thirst = new ThirstCondition(100f, 0.5f);
-            Fatigue = new FatigueCondition(100f, 0.1f);
+            Hunger = new Hunger(100f, 0.25f);
+            Thirst = new Thirst(100f, 0.5f);
+            Fatigue = new Fatigue(100f, 0.1f);
             
             _allStats = new List<ICondition> { Health, Stamina, Hunger, Thirst, Fatigue };
                 

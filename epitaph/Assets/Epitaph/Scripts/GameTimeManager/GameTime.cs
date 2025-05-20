@@ -111,7 +111,7 @@ namespace Epitaph.Scripts.GameTimeManager
             }
         
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            // DontDestroyOnLoad(gameObject);
         
             // Original initialization code
             InitializeTime();
