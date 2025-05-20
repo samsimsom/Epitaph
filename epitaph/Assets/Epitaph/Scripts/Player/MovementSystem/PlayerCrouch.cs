@@ -5,42 +5,48 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
 {
-    public class PlayerCrouch : MonoBehaviour
+    public class PlayerCrouch : PlayerBehaviour
     {
+        public PlayerCrouch(PlayerController playerController, 
+            PlayerMovementData playerMovementData, 
+            CharacterController characterController, 
+            Camera playerCamera) : base(playerController)
+        {
+            _playerMovementData = playerMovementData;
+            _characterController = characterController;
+            _playerCamera = playerCamera;
+            
+            Initialize();
+        }
+
         public static event Action<bool> OnCrouchStateChanged;
         public static event Action<float> OnChangeCrouchSpeed;
         public static event Action<float> OnChangeGroundedGravity;
         
-        [Header("Data")]
-        [SerializeField] private PlayerMovementData playerMovementData;
+        private PlayerMovementData _playerMovementData;
         
-        [Header("References")]
-        [SerializeField] private CharacterController characterController;
-        [SerializeField] private Transform playerCamera;
+        private CharacterController _characterController;
+        private Camera _playerCamera;
         
         private float _initialCameraYLocalPosition;
-
-        private void Awake()
+        
+        public override void Start()
         {
-            Initialize();
+            
         }
 
-        private void OnEnable()
+        public override void OnEnable()
         {
-            // PlayerInput.OnCrouchActivated += OnCrouchActivated;
-            // PlayerInput.OnCrouchDeactivated += OnCrouchDeactivated;
         }
         
-        private void OnDisable()
+        public override void OnDisable()
         {
-            // PlayerInput.OnCrouchActivated -= OnCrouchActivated;
-            // PlayerInput.OnCrouchDeactivated -= OnCrouchDeactivated;
         }
         
-        private void Update()
+        public override void Update()
         {
             // Eğer crouch durumunda ve isFalling true olduysa, otomatik Stand'a dönüş
-            if (playerMovementData.isCrouching && playerMovementData.isFalling)
+            if (_playerMovementData.isCrouching && _playerMovementData.isFalling)
             {
                 Stand();
                 // İsteğe bağlı: Hızlıca transition uygula veya animasyon tetikle
@@ -50,29 +56,21 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         private void Initialize()
         {
-            if (characterController == null)
-                characterController = GetComponent<CharacterController>();
-
-            _initialCameraYLocalPosition = playerCamera != null ? 
-                playerCamera.localPosition.y : 0f;
+            _initialCameraYLocalPosition = _playerCamera != null ? 
+                _playerCamera.transform.localPosition.y : 0f;
             
-            playerMovementData.standingHeight = characterController.height;
-        }
-
-        public void ToggleCrouch()
-        {
-            OnCrouchActivated();
+            _playerMovementData.standingHeight = _characterController.height;
         }
         
-        private void OnCrouchActivated()
+        public void ToggleCrouch()
         {
-            if (playerMovementData.isCrouching)
+            if (_playerMovementData.isCrouching)
             {
                 Stand();
             }
             else
             {
-                if (playerMovementData.isGrounded)
+                if (_playerMovementData.isGrounded)
                 {
                     Crouch();
                 }
@@ -80,40 +78,38 @@ namespace Epitaph.Scripts.Player.MovementSystem
             // Always call this to handle smooth transition for both crouch and stand
             SmoothCrouchTransition();
         }
-        
-        private void OnCrouchDeactivated() { }
 
         private void Crouch()
         {
-            playerMovementData.isCrouching = true;
-            OnCrouchStateChanged?.Invoke(playerMovementData.isCrouching);
-            OnChangeGroundedGravity?.Invoke(playerMovementData.crouchGroundedGravity);
-            OnChangeCrouchSpeed?.Invoke(playerMovementData.crouchSpeed);
+            _playerMovementData.isCrouching = true;
+            OnCrouchStateChanged?.Invoke(_playerMovementData.isCrouching);
+            OnChangeGroundedGravity?.Invoke(_playerMovementData.crouchGroundedGravity);
+            OnChangeCrouchSpeed?.Invoke(_playerMovementData.crouchSpeed);
         }
 
         private void Stand()
         {
             if (!CanStandUp()) return;
-            playerMovementData.isCrouching = false;
-            OnCrouchStateChanged?.Invoke(playerMovementData.isCrouching);
-            OnChangeGroundedGravity?.Invoke(playerMovementData.groundedGravity);
-            OnChangeCrouchSpeed?.Invoke(playerMovementData.walkSpeed);
+            _playerMovementData.isCrouching = false;
+            OnCrouchStateChanged?.Invoke(_playerMovementData.isCrouching);
+            OnChangeGroundedGravity?.Invoke(_playerMovementData.groundedGravity);
+            OnChangeCrouchSpeed?.Invoke(_playerMovementData.walkSpeed);
         }
 
         private void SmoothCrouchTransition()
         {
-            var startHeight = characterController.height;
-            var endHeight = playerMovementData.isCrouching ? playerMovementData.crouchHeight : playerMovementData.standingHeight;
-            var duration = playerMovementData.isCrouching ? playerMovementData.crouchTransitionTime : playerMovementData.crouchTransitionTime / 2f;
+            var startHeight = _characterController.height;
+            var endHeight = _playerMovementData.isCrouching ? _playerMovementData.crouchHeight : _playerMovementData.standingHeight;
+            var duration = _playerMovementData.isCrouching ? _playerMovementData.crouchTransitionTime : _playerMovementData.crouchTransitionTime / 2f;
 
-            var startCenterY = characterController.center.y;
-            var endCenterY = playerMovementData.isCrouching ? playerMovementData.crouchHeight / 2f : 0f;
+            var startCenterY = _characterController.center.y;
+            var endCenterY = _playerMovementData.isCrouching ? _playerMovementData.crouchHeight / 2f : 0f;
 
             // Animate height
             Tween.Custom(startHeight, endHeight, duration,
                 onValueChange: newHeight =>
                 {
-                    characterController.height = newHeight;
+                    _characterController.height = newHeight;
                 }, Ease.OutQuad
             );
 
@@ -121,26 +117,26 @@ namespace Epitaph.Scripts.Player.MovementSystem
             Tween.Custom(startCenterY, endCenterY, duration,
                 onValueChange: newCenterY =>
                 {
-                    var center = characterController.center;
+                    var center = _characterController.center;
                     center.y = newCenterY;
-                    characterController.center = center;
+                    _characterController.center = center;
                 }, Ease.OutQuad
             );
 
             // Animate camera position for smoother effect
-            if (playerCamera == null) return;
+            if (_playerCamera == null) return;
             
-            var startCameraY = playerCamera.localPosition.y;
+            var startCameraY = _playerCamera.transform.localPosition.y;
             var endCameraY = _initialCameraYLocalPosition + 
-                             (playerMovementData.isCrouching ? playerMovementData.crouchCameraYOffset : 
-                                 playerMovementData.standingCameraYOffset);
+                             (_playerMovementData.isCrouching ? _playerMovementData.crouchCameraYOffset : 
+                                 _playerMovementData.standingCameraYOffset);
 
             Tween.Custom(startCameraY, endCameraY, duration,
                 onValueChange: newCameraY =>
                 {
-                    var camPos = playerCamera.localPosition;
+                    var camPos = _playerCamera.transform.localPosition;
                     camPos.y = newCameraY;
-                    playerCamera.localPosition = camPos;
+                    _playerCamera.transform.localPosition = camPos;
                 }, Ease.OutQuad
             );
             
@@ -148,13 +144,13 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         private bool CanStandUp()
         {
-            if (characterController == null) return false;
+            if (_characterController == null) return false;
             
             ComputeCeilingRayOrigin(out var radius, out var rayDistance, 
                 out var originTip, out var originRoot);
             
-            var raycast = !Physics.Raycast(originRoot, Vector3.up, rayDistance, playerMovementData.ceilingLayers);
-            var raySphere = !Physics.CheckSphere(originTip, radius, playerMovementData.ceilingLayers);
+            var raycast = !Physics.Raycast(originRoot, Vector3.up, rayDistance, _playerMovementData.ceilingLayers);
+            var raySphere = !Physics.CheckSphere(originTip, radius, _playerMovementData.ceilingLayers);
             
             return raycast && raySphere;
         }
@@ -162,21 +158,21 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private void ComputeCeilingRayOrigin(out float radius, 
             out float rayDistance, out Vector3 originTip, out Vector3 originRoot)
         {
-            radius = characterController.radius;
-            rayDistance = playerMovementData.ceilingCheckDistance;
-            originTip = characterController.transform.position
-                        + characterController.center
-                        + Vector3.up * (characterController.height / 2f)
+            radius = _characterController.radius;
+            rayDistance = _playerMovementData.ceilingCheckDistance;
+            originTip = _characterController.transform.position
+                        + _characterController.center
+                        + Vector3.up * (_characterController.height / 2f)
                         + Vector3.up * rayDistance;
-            originRoot = characterController.transform.position
-                         + characterController.center
-                         + Vector3.up * (characterController.height / 2f);
+            originRoot = _characterController.transform.position
+                         + _characterController.center
+                         + Vector3.up * (_characterController.height / 2f);
         }
 
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
-            if (characterController == null) return;
+            if (_characterController == null) return;
             
             ComputeCeilingRayOrigin(out var radius, out var rayDistance, 
                 out var originTip, out var originRoot);

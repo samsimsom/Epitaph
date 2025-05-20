@@ -82,7 +82,6 @@ namespace Epitaph.Scripts
         {
             if (context.performed)
             {
-                // OnInteractPerformed?.Invoke();
                 _playerController.HandleInteract();
             }
         }
@@ -91,12 +90,11 @@ namespace Epitaph.Scripts
         {
             if (context.started)
             {
-                _playerController.ToggleCrouch();
-                // OnCrouchActivated?.Invoke();
+                _playerController.GetPlayerCrouch().ToggleCrouch();
             }
             else if (context.canceled)
             {
-                // OnCrouchDeactivated?.Invoke();
+                
             }
         }
 
@@ -104,8 +102,7 @@ namespace Epitaph.Scripts
         {
             if (context.performed)
             {
-                _playerController.Jump();
-                // OnJumpPerformed?.Invoke();
+                _playerController.GetPlayerJump().ProcessJump();
             }
         }
 
@@ -115,7 +112,6 @@ namespace Epitaph.Scripts
             {
                 GameTime.Instance.SkipTimeAsync(1f).Forget();
             }
-
         }
 
         public void OnNext(InputAction.CallbackContext context)
@@ -128,12 +124,10 @@ namespace Epitaph.Scripts
             if (context.performed)
             {
                 _playerController.GetPlayerSprint().TryStartSprint();
-                // OnSprintActivated?.Invoke();
             }
             else if (context.canceled)
             {
                 _playerController.GetPlayerSprint().StopSprint();
-                // OnSprintDeactivated?.Invoke();
             }
         }
         #endregion

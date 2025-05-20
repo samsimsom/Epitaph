@@ -4,22 +4,40 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
 {
-    public class PlayerJump : MonoBehaviour
+    public class PlayerJump : PlayerBehaviour
     {
-        private PlayerController _playerController;
+        public PlayerJump(PlayerController playerController,
+            PlayerMovementData playerMovementData) : base(playerController)
+        {
+            _playerController = playerController;
+            _playerMovementData = playerMovementData;
+        }
         
-        private bool _canJump = true;
+        private PlayerController _playerController;
+        private PlayerMovementData _playerMovementData;
+        
+        private bool _canJump;
         private float _jumpCooldownTimer;
         private float _coyoteTimeCounter;
         private float _jumpBufferCounter;
         private bool _wasGroundedLastFrame;
 
-        private void Awake()
+        public override void Start()
         {
-            _playerController = GetComponent<PlayerController>();
+            
         }
 
-        private void Update()
+        public override void OnEnable()
+        {
+            
+        }
+
+        public override void OnDisable()
+        {
+            
+        }
+
+        public override void Update()
         {
             HandleJumpCooldown();
             HandleCoyoteTime();

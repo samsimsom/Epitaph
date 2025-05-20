@@ -22,14 +22,14 @@ namespace Epitaph.Scripts.Player
         
         // // Movement Components
         private PlayerMove _playerMove;
-        // private PlayerJump _playerJump;
-        // private PlayerCrouch _playerCrouch;
+        private PlayerJump _playerJump;
+        private PlayerCrouch _playerCrouch;
         private PlayerSprint _playerSprint;
-        // private PlayerGravity _playerGravity;
+        private PlayerGravity _playerGravity;
         private PlayerLook _playerLook;
         // private PlayerHeadBob _playerHeadBob;
         // private PlayerInteraction _playerInteraction;
-        //
+        
         // // Health System Components
         private PlayerCondition _playerCondition;
         
@@ -91,11 +91,22 @@ namespace Epitaph.Scripts.Player
             _playerSprint = new PlayerSprint(this, playerMovementData, 
                 _playerCondition);
 
+            _playerGravity = new PlayerGravity(this, playerMovementData, 
+                characterController);
+
+            _playerCrouch = new PlayerCrouch(this, playerMovementData, 
+                characterController, playerCamera);
+
+            _playerJump = new PlayerJump(this, playerMovementData);
             
             _playerBehaviours.Add(_playerCondition);
             _playerBehaviours.Add(_playerLook);
             _playerBehaviours.Add(_playerMove);
+            _playerBehaviours.Add(_playerGravity);
             _playerBehaviours.Add(_playerSprint);
+            _playerBehaviours.Add(_playerCrouch);
+            _playerBehaviours.Add(_playerLook);
+            _playerBehaviours.Add(_playerJump);
         }
         
         private void RegisterEvents()
@@ -120,6 +131,9 @@ namespace Epitaph.Scripts.Player
         public PlayerLook GetPlayerLook() => _playerLook;
         public PlayerSprint GetPlayerSprint() => _playerSprint;
         public PlayerCondition GetPlayerCondition() => _playerCondition;
+        public PlayerGravity GetPlayerGravity() => _playerGravity;
+        public PlayerCrouch GetPlayerCrouch() => _playerCrouch;
+        public PlayerJump GetPlayerJump() => _playerJump;
         
         // Methods for coordinating between systems
         public void SetMovementEnabled(bool enabled)
@@ -153,13 +167,13 @@ namespace Epitaph.Scripts.Player
             }
         }
         
-        public void ToggleCrouch()
-        {
-            // if (_playerCrouch != null)
-            // {
-            //     _playerCrouch.ToggleCrouch();
-            // }
-        }
+        // public void ToggleCrouch()
+        // {
+        //     if (_playerCrouch != null)
+        //     {
+        //         _playerCrouch.ToggleCrouch();
+        //     }
+        // }
 
         public void Jump()
         {
