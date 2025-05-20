@@ -1,22 +1,22 @@
 using System;
 using Epitaph.Scripts.Player.HealthSystem;
-using Epitaph.Scripts.Player.ScriptableObjects.MovementSO;
+using Epitaph.Scripts.Player.ScriptableObjects;
 
 namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class PlayerSprint : PlayerBehaviour
     {
         public PlayerSprint(PlayerController playerController, 
-            PlayerMovementData playerMovementData,
+            PlayerData playerData,
             PlayerCondition playerCondition) : base(playerController)
         {
-            _playerMovementData = playerMovementData;
+            _playerData = playerData;
             _playerCondition = playerCondition;
         }
 
         public static event Action<float> OnChangeSprintSpeed;
         
-        private PlayerMovementData _playerMovementData;
+        private PlayerData _playerData;
         private PlayerCondition _playerCondition;
         
         private bool _isSprintKeyHeld;
@@ -72,34 +72,34 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         public void TryStartSprint()
         {
-            if (!_playerMovementData.isGrounded || 
+            if (!_playerData.isGrounded || 
                 PlayerController.GetPlayerCondition()?.Stamina == null ||
                 PlayerController.GetPlayerCondition().Stamina.Value <= 0) return;
             
-            if (_playerMovementData.isCrouching) return;
+            if (_playerData.isCrouching) return;
             
-            _playerMovementData.isSprinting = true;
+            _playerData.isSprinting = true;
             PlayerController.GetPlayerCondition().SetRunning(true); // hunger, thirst modifikasyon için
             PlayerController.GetPlayerCondition().Stamina.StartStaminaConsuming();
-            OnChangeSprintSpeed?.Invoke(_playerMovementData.sprintSpeed);
+            OnChangeSprintSpeed?.Invoke(_playerData.sprintSpeed);
         }
 
         public void StopSprint()
         {
-            if (!_playerMovementData.isSprinting) return;
+            if (!_playerData.isSprinting) return;
             
-            _playerMovementData.isSprinting = false;
+            _playerData.isSprinting = false;
             PlayerController.GetPlayerCondition().SetRunning(false); // hunger, thirst eski haline döner
             PlayerController.GetPlayerCondition().Stamina.StopStaminaConsuming();
-            OnChangeSprintSpeed?.Invoke(_playerMovementData.walkSpeed);
+            OnChangeSprintSpeed?.Invoke(_playerData.walkSpeed);
         }
         
         private void HandleCrouchStateChanged(bool isCrouching)
         {
-            if (!isCrouching || !_playerMovementData.isSprinting) return;
+            if (!isCrouching || !_playerData.isSprinting) return;
             
             StopSprint();
-            OnChangeSprintSpeed?.Invoke(_playerMovementData.crouchSpeed);
+            OnChangeSprintSpeed?.Invoke(_playerData.crouchSpeed);
         }
         
     }

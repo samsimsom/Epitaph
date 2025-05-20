@@ -1,5 +1,5 @@
 using System;
-using Epitaph.Scripts.Player.ScriptableObjects.MovementSO;
+using Epitaph.Scripts.Player.ScriptableObjects;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
@@ -7,14 +7,14 @@ namespace Epitaph.Scripts.Player.MovementSystem
     public class PlayerJump : PlayerBehaviour
     {
         public PlayerJump(PlayerController playerController,
-            PlayerMovementData playerMovementData) : base(playerController)
+            PlayerData playerData) : base(playerController)
         {
             _playerController = playerController;
-            _playerMovementData = playerMovementData;
+            _playerData = playerData;
         }
         
         private PlayerController _playerController;
-        private PlayerMovementData _playerMovementData;
+        private PlayerData _playerData;
         
         private bool _canJump;
         private float _jumpCooldownTimer;

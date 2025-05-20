@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Epitaph.Scripts.Player.HealthSystem;
 using Epitaph.Scripts.Player.MovementSystem;
-using Epitaph.Scripts.Player.ScriptableObjects.MovementSO;
+using Epitaph.Scripts.Player.ScriptableObjects;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -11,7 +11,7 @@ namespace Epitaph.Scripts.Player
     public class PlayerController : MonoBehaviour
     {
         [Header("Data")]
-        [SerializeField] private PlayerMovementData playerMovementData;
+        [SerializeField] private PlayerData playerData;
         
         [Header("Components")]
         [SerializeField] private CharacterController characterController;
@@ -80,26 +80,26 @@ namespace Epitaph.Scripts.Player
             if (playerInput == null) 
                 playerInput = GetComponent<PlayerInput>();
 
-            _playerCondition = new PlayerCondition(this, playerMovementData);
+            _playerCondition = new PlayerCondition(this, playerData);
             
             _playerLook = new PlayerLook(this, 
-                playerMovementData, playerCamera, fpCamera);
+                playerData, playerCamera, fpCamera);
             
             _playerMove = new PlayerMove(this,
-                playerMovementData, characterController, playerCamera);
+                playerData, characterController, playerCamera);
 
-            _playerSprint = new PlayerSprint(this, playerMovementData, 
+            _playerSprint = new PlayerSprint(this, playerData, 
                 _playerCondition);
 
-            _playerGravity = new PlayerGravity(this, playerMovementData, 
+            _playerGravity = new PlayerGravity(this, playerData, 
                 characterController);
 
-            _playerCrouch = new PlayerCrouch(this, playerMovementData, 
+            _playerCrouch = new PlayerCrouch(this, playerData, 
                 characterController, playerCamera);
 
-            _playerJump = new PlayerJump(this, playerMovementData);
+            _playerJump = new PlayerJump(this, playerData);
 
-            _playerHeadBob = new PlayerHeadBob(this, playerMovementData, 
+            _playerHeadBob = new PlayerHeadBob(this, playerData, 
                 playerCameraTransform);
 
             _playerInteraction = new PlayerInteraction(this, playerCamera);
@@ -117,7 +117,7 @@ namespace Epitaph.Scripts.Player
         
         // Public interfaces for external access
         public CharacterController GetCharacterController() => characterController;
-        public PlayerMovementData GetMovementData() => playerMovementData;
+        public PlayerData GetMovementData() => playerData;
         public PlayerInput GetPlayerInput() => playerInput;
         public PlayerLook GetPlayerLook() => _playerLook;
         public PlayerSprint GetPlayerSprint() => _playerSprint;
@@ -131,9 +131,9 @@ namespace Epitaph.Scripts.Player
         
         
         // Methods for proxying state information
-        public bool IsSprinting() => playerMovementData.isSprinting;
-        public bool IsCrouching() => playerMovementData.isCrouching;
-        public bool IsGrounded() => playerMovementData.isGrounded;
+        public bool IsSprinting() => playerData.isSprinting;
+        public bool IsCrouching() => playerData.isCrouching;
+        public bool IsGrounded() => playerData.isGrounded;
 
 #if UNITY_EDITOR
         private void OnDrawGizmos()

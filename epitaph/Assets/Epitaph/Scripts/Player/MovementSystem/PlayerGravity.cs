@@ -1,4 +1,4 @@
-using Epitaph.Scripts.Player.ScriptableObjects.MovementSO;
+using Epitaph.Scripts.Player.ScriptableObjects;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
@@ -6,16 +6,16 @@ namespace Epitaph.Scripts.Player.MovementSystem
     public class PlayerGravity : PlayerBehaviour
     { 
         public PlayerGravity(PlayerController playerController, 
-            PlayerMovementData playerMovementData, 
+            PlayerData playerData, 
             CharacterController characterController) : base(playerController)
         {
-            _playerMovementData = playerMovementData;
+            _playerData = playerData;
             _characterController = characterController;
             
             Initialize();
         }
         
-        private PlayerMovementData _playerMovementData;
+        private PlayerData _playerData;
         private CharacterController _characterController;
         
         private float _steepSlopeTime = 0f;
@@ -45,9 +45,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         private void Initialize()
         {
-            _groundedGravity = _playerMovementData.groundedGravity;
+            _groundedGravity = _playerData.groundedGravity;
             _ungroundedTime = 0f;
-            _playerMovementData.isFalling = false;
+            _playerData.isFalling = false;
         }
 
         public override void Update()
@@ -60,7 +60,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private void UpdateGroundedStatus()
         {
             _isGrounded = PerformGroundCheck();
-            _playerMovementData.isGrounded = _isGrounded;
+            _playerData.isGrounded = _isGrounded;
         }
         
         private void UpdateFallingStatus()
@@ -68,15 +68,15 @@ namespace Epitaph.Scripts.Player.MovementSystem
             if (!_isGrounded)
             {
                 _ungroundedTime += Time.deltaTime;
-                if (_ungroundedTime > _playerMovementData.fallThreshold)
+                if (_ungroundedTime > _playerData.fallThreshold)
                 {
-                    _playerMovementData.isFalling = true;
+                    _playerData.isFalling = true;
                 }
             }
             else
             {
                 _ungroundedTime = 0f;
-                _playerMovementData.isFalling = false;
+                _playerData.isFalling = false;
             }
         }
 
@@ -85,7 +85,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             if (_characterController == null) return false;
             
             ComputeGroundCheckSphere(out var radius, out var origin);
-            return Physics.CheckSphere(origin, radius, _playerMovementData.groundLayers);
+            return Physics.CheckSphere(origin, radius, _playerData.groundLayers);
         }
 
         private void ComputeGroundCheckSphere(out float radius, out Vector3 origin)
@@ -98,24 +98,24 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         private void ApplyGravity()
         {
-            if (_isGrounded && _playerMovementData.verticalVelocity < 0)
+            if (_isGrounded && _playerData.verticalVelocity < 0)
             {
-                _playerMovementData.verticalVelocity = _groundedGravity;
+                _playerData.verticalVelocity = _groundedGravity;
             }
             else
             {
-                _playerMovementData.verticalVelocity += Gravity * _playerMovementData.gravityMultiplier * Time.deltaTime;
+                _playerData.verticalVelocity += Gravity * _playerData.gravityMultiplier * Time.deltaTime;
 
                 // Terminal hız sınırı kontrolü
-                if (_playerMovementData.verticalVelocity < _playerMovementData.maxFallSpeed)
-                    _playerMovementData.verticalVelocity = _playerMovementData.maxFallSpeed;
+                if (_playerData.verticalVelocity < _playerData.maxFallSpeed)
+                    _playerData.verticalVelocity = _playerData.maxFallSpeed;
             }
 
-            var movement = Vector3.up * (_playerMovementData.verticalVelocity * Time.deltaTime);
+            var movement = Vector3.up * (_playerData.verticalVelocity * Time.deltaTime);
             HandleSlope(ref movement);
     
             _characterController.Move(movement);
-            _playerMovementData.currentVelocity.y = _characterController.velocity.y;
+            _playerData.currentVelocity.y = _characterController.velocity.y;
         }
 
 
@@ -128,25 +128,25 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
             RaycastHit hit;
             if (Physics.Raycast(PlayerController.transform.position, Vector3.down, out hit,
-                       (_characterController.height / 2f) + _playerMovementData.slopeForceRayLength,
-                       _playerMovementData.groundLayers))
+                       (_characterController.height / 2f) + _playerData.slopeForceRayLength,
+                       _playerData.groundLayers))
             {
                 var slopeNormal = hit.normal;
                 var slopeAngle = Vector3.Angle(slopeNormal, Vector3.up);
                 if (slopeAngle > _characterController.slopeLimit)
                 {
                     _steepSlopeTime += Time.deltaTime;
-                    if (_steepSlopeTime >= _playerMovementData.slopeClimbThreshold)
+                    if (_steepSlopeTime >= _playerData.slopeClimbThreshold)
                     {
                         // Kaymaya başla
                         var slopeDirection = Vector3.Cross(
                             Vector3.Cross(Vector3.up, slopeNormal), slopeNormal);
                         var slideAmount = Mathf.Clamp(
-                            _playerMovementData.slideVelocity + (slopeAngle / 90f) * _playerMovementData.slopeForce,
-                            0, _playerMovementData.maxSlideSpeed
+                            _playerData.slideVelocity + (slopeAngle / 90f) * _playerData.slopeForce,
+                            0, _playerData.maxSlideSpeed
                         );
                         moveDirection += slopeDirection.normalized * (slideAmount * Time.deltaTime);
-                        _playerMovementData.verticalVelocity = _playerMovementData.groundedGravity * 2;
+                        _playerData.verticalVelocity = _playerData.groundedGravity * 2;
                     }
                     // (opsiyonel) threshold süresi dolmadan burada oyuncu ilerleyebilir,
                     // yani ek bir şey yapmanız gerekmez

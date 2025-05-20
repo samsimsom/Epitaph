@@ -1,4 +1,4 @@
-using Epitaph.Scripts.Player.ScriptableObjects.MovementSO;
+using Epitaph.Scripts.Player.ScriptableObjects;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -6,16 +6,16 @@ namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class PlayerLook : PlayerBehaviour
     {
-        private PlayerMovementData _playerMovementData;
+        private PlayerData _playerData;
         private PlayerController _playerController;
         private CinemachineCamera _fpCamera;
         
         public PlayerLook(PlayerController playerController, 
-            PlayerMovementData playerMovementData,
+            PlayerData playerData,
             Camera playerCamera,
             CinemachineCamera fpCamera) : base(playerController)
         {
-            _playerMovementData = playerMovementData;
+            _playerData = playerData;
             _fpCamera = fpCamera;
         }
 
@@ -57,14 +57,14 @@ namespace Epitaph.Scripts.Player.MovementSystem
             var currentAspect = (float)Screen.width / Screen.height;
             
             // En-boy oranı çarpanı
-            var aspectMultiplier = _playerMovementData.referanceAspect / currentAspect;
+            var aspectMultiplier = _playerData.referanceAspect / currentAspect;
             
             foreach (var controller in _fpCamera.GetComponent<CinemachineInputAxisController>().Controllers)
             {
                 controller.Input.Gain = controller.Name switch
                 {
-                    "Look X (Pan)" => _playerMovementData.lookSensitivity.x * aspectMultiplier,
-                    "Look Y (Tilt)" => -_playerMovementData.lookSensitivity.y * aspectMultiplier,
+                    "Look X (Pan)" => _playerData.lookSensitivity.x * aspectMultiplier,
+                    "Look Y (Tilt)" => -_playerData.lookSensitivity.y * aspectMultiplier,
                     _ => controller.Input.Gain
                 };
             }

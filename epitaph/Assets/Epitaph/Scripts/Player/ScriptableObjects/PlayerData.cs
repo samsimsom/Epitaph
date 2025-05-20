@@ -1,9 +1,9 @@
 using UnityEngine;
 
-namespace Epitaph.Scripts.Player.ScriptableObjects.MovementSO
+namespace Epitaph.Scripts.Player.ScriptableObjects
 {
     [CreateAssetMenu(fileName = "PlayerMovementData", menuName = "Systems/Movement System", order = 0)]
-    public class PlayerMovementData : ScriptableObject
+    public class PlayerData : ScriptableObject
     {
         [Header("Condition")]
         public float health;

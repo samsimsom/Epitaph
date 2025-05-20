@@ -12331,7 +12331,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98d0b3e04fc14a46870083c3733b4940, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerMovementData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
+  playerData: {fileID: 11400000, guid: 85d7a5904813f468ab4eb2ef221313c9, type: 2}
   characterController: {fileID: 335799411769818269}
   playerInput: {fileID: 7711096113604129953}
   playerCamera: {fileID: 97344946005274002}

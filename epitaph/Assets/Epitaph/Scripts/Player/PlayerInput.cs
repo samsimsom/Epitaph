@@ -1,10 +1,9 @@
 using Cysharp.Threading.Tasks;
 using Epitaph.Scripts.GameTimeManager;
-using Epitaph.Scripts.Player;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Epitaph.Scripts
+namespace Epitaph.Scripts.Player
 {
     public class PlayerInput : MonoBehaviour, PlayerInputActions.IPlayerActions
     {

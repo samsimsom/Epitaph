@@ -1,20 +1,20 @@
-using Epitaph.Scripts.Player.ScriptableObjects.MovementSO;
+using Epitaph.Scripts.Player.ScriptableObjects;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class PlayerHeadBob : PlayerBehaviour
     {
-        private PlayerMovementData _playerMovementData;
+        private PlayerData _playerData;
         private Transform _playerCameraTransform;
         
         private Vector3 _startPosition;
 
         public PlayerHeadBob(PlayerController playerController, 
-            PlayerMovementData playerMovementData, 
+            PlayerData playerData, 
             Transform playerCameraTransform) : base(playerController)
         {
-            _playerMovementData = playerMovementData;
+            _playerData = playerData;
             _playerCameraTransform = playerCameraTransform;
         }
 
@@ -46,7 +46,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         private void CheckForHeadBobTrigger()
         {
-            if (_playerMovementData.currentVelocity.sqrMagnitude > _playerMovementData.treshold)
+            if (_playerData.currentVelocity.sqrMagnitude > _playerData.treshold)
             {
                 StartHeadBob();
             }
@@ -55,10 +55,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private void StartHeadBob()
         {
             var pos = Vector3.zero;
-            pos.y += Mathf.Lerp(pos.y, Mathf.Sin(Time.time * _playerMovementData.frequenct) 
-                                       * _playerMovementData.amount * 1.4f, _playerMovementData.smooth * Time.deltaTime);
-            pos.x += Mathf.Lerp(pos.x, Mathf.Cos(Time.time * _playerMovementData.frequenct / 2f) 
-                                       * _playerMovementData.amount * 1.6f, _playerMovementData.smooth * Time.deltaTime);
+            pos.y += Mathf.Lerp(pos.y, Mathf.Sin(Time.time * _playerData.frequenct) 
+                                       * _playerData.amount * 1.4f, _playerData.smooth * Time.deltaTime);
+            pos.x += Mathf.Lerp(pos.x, Mathf.Cos(Time.time * _playerData.frequenct / 2f) 
+                                       * _playerData.amount * 1.6f, _playerData.smooth * Time.deltaTime);
             _playerCameraTransform.localPosition += pos;
 
             // return pos;
@@ -70,7 +70,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             
             _playerCameraTransform.localPosition = Vector3.Lerp(
                 _playerCameraTransform.localPosition, _startPosition,
-                _playerMovementData.smooth * Time.deltaTime);
+                _playerData.smooth * Time.deltaTime);
         }
     }
 }

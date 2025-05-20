@@ -1,4 +1,4 @@
-using Epitaph.Scripts.Player.ScriptableObjects.MovementSO;
+using Epitaph.Scripts.Player.ScriptableObjects;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
@@ -6,18 +6,18 @@ namespace Epitaph.Scripts.Player.MovementSystem
     public class PlayerMove : PlayerBehaviour
     {
         public PlayerMove(PlayerController playerController, 
-            PlayerMovementData playerMovementData,
+            PlayerData playerData,
             CharacterController characterController,
             Camera playerCamera) : base(playerController)
         {
-            _playerMovementData = playerMovementData;
+            _playerData = playerData;
             _characterController = characterController;
             _playerCamera = playerCamera;
             
             Initialize();
         }
         
-        private PlayerMovementData _playerMovementData;
+        private PlayerData _playerData;
         private CharacterController _characterController;
         private Camera _playerCamera;
         private float _speed;
@@ -64,7 +64,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         private void Initialize()
         {
-            _speed = _playerMovementData.walkSpeed;
+            _speed = _playerData.walkSpeed;
         }
         
         private void AdjustPlayerPosition()
@@ -105,8 +105,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             var direction = CalculateMoveDirection(input);
             var movement = direction * (_speed * Time.deltaTime);
             _characterController.Move(movement);
-            _playerMovementData.currentVelocity.x = _characterController.velocity.x;
-            _playerMovementData.currentVelocity.z = _characterController.velocity.z;
+            _playerData.currentVelocity.x = _characterController.velocity.x;
+            _playerData.currentVelocity.z = _characterController.velocity.z;
         }
         #endregion
         

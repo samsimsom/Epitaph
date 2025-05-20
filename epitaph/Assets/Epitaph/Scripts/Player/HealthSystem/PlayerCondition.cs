@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Epitaph.Scripts.GameTimeManager;
-using Epitaph.Scripts.Player.ScriptableObjects.MovementSO;
+using Epitaph.Scripts.Player.ScriptableObjects;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.HealthSystem
@@ -9,9 +9,9 @@ namespace Epitaph.Scripts.Player.HealthSystem
     public class PlayerCondition : PlayerBehaviour
     {
         public PlayerCondition(PlayerController playerController, 
-            PlayerMovementData playerMovementData) : base(playerController)
+            PlayerData playerData) : base(playerController)
         {
-            _playerMovementData = playerMovementData;
+            _playerData = playerData;
             InitializeConditions();
         }
         
@@ -45,7 +45,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
 
         #region Private Fields
 
-        private PlayerMovementData _playerMovementData;
+        private PlayerData _playerData;
         
         private Health _health;
         private Stamina _stamina;
@@ -131,15 +131,15 @@ namespace Epitaph.Scripts.Player.HealthSystem
                 Health.UpdateStat(delta);
                 Stamina.UpdateStat(delta);
                 
-                _playerMovementData.health = Health.Value;
+                _playerData.health = Health.Value;
                 // _playerMovementData.maxHealth = Health.MaxValue;
-                _playerMovementData.stamina = Stamina.Value;
+                _playerData.stamina = Stamina.Value;
                 // _playerMovementData.maxStamina = Stamina.MaxValue;
-                _playerMovementData.hunger = Hunger.Value;
+                _playerData.hunger = Hunger.Value;
                 // _playerMovementData.maxHunger = Hunger.MaxValue;
-                _playerMovementData.thirst = Thirst.Value;
+                _playerData.thirst = Thirst.Value;
                 // _playerMovementData.maxThirst = Thirst.MaxValue;
-                _playerMovementData.fatigue = Fatigue.Value;
+                _playerData.fatigue = Fatigue.Value;
                 // _playerMovementData.maxFatigue = Fatigue.MaxValue;
                 
                 await UniTask.Yield(PlayerLoopTiming.Update);
