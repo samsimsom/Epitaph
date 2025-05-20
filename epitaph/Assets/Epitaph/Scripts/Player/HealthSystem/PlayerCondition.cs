@@ -67,7 +67,6 @@ namespace Epitaph.Scripts.Player.HealthSystem
             {
                 GameTime.Instance.OnTimeSkipped -= OnTimeSkipped;
             }
-
         }
 
         private void InitializeConditions()
