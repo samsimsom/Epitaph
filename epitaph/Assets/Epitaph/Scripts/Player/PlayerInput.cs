@@ -59,8 +59,6 @@ namespace Epitaph.Scripts.Player
         {
             if (context.performed)
             {
-                // Eski: _playerController.GetPlayerInteraction().TryInteract();
-                // Yeni:
                 _playerController.InteractionController?.PlayerInteraction?.TryInteract();
             }
         }
@@ -69,8 +67,6 @@ namespace Epitaph.Scripts.Player
         {
             if (context.started)
             {
-                // Eski: _playerController.GetPlayerCrouch().ToggleCrouch();
-                // Yeni:
                 _playerController.MovementController?.PlayerCrouch?.ToggleCrouch();
             }
             else if (context.canceled)
@@ -83,8 +79,6 @@ namespace Epitaph.Scripts.Player
         {
             if (context.performed)
             {
-                // Eski: _playerController.GetPlayerJump().ProcessJump();
-                // Yeni:
                 _playerController.MovementController?.PlayerJump?.ProcessJump();
             }
         }
@@ -106,14 +100,10 @@ namespace Epitaph.Scripts.Player
         {
             if (context.performed)
             {
-                // Eski: _playerController.GetPlayerSprint().TryStartSprint();
-                // Yeni:
                 _playerController.MovementController?.PlayerSprint?.TryStartSprint();
             }
             else if (context.canceled)
             {
-                // Eski: _playerController.GetPlayerSprint().StopSprint();
-                // Yeni:
                 _playerController.MovementController?.PlayerSprint?.StopSprint();
             }
         }

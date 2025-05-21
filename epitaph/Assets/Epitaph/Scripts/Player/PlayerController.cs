@@ -37,7 +37,6 @@ namespace Epitaph.Scripts.Player
             {
                 subController.PlayerAwake();
             }
-            // HealthController?.Awake(); // Bu satır kaldırılacak, döngü içinde hallediliyor.
         }
         
         private void OnEnable()
@@ -46,7 +45,6 @@ namespace Epitaph.Scripts.Player
             {
                 subController.PlayerOnEnable();
             }
-            // HealthController?.OnEnable(); // Bu satır kaldırılacak
         }
         
         private void Start()
@@ -55,7 +53,6 @@ namespace Epitaph.Scripts.Player
             {
                 subController.PlayerStart();
             }
-            // HealthController?.Start(); // Bu satır kaldırılacak
         }
         
         private void Update()
@@ -64,7 +61,6 @@ namespace Epitaph.Scripts.Player
             {
                 subController.PlayerUpdate();
             }
-            // HealthController?.Update(); // Bu satır kaldırılacak
         }
         
         private void LateUpdate()
@@ -73,7 +69,6 @@ namespace Epitaph.Scripts.Player
             {
                 subController.PlayerLateUpdate();
             }
-            // HealthController?.LateUpdate(); // Bu satır kaldırılacak
         }
         
         private void FixedUpdate()
@@ -82,7 +77,6 @@ namespace Epitaph.Scripts.Player
             {
                 subController.PlayerFixedUpdate();
             }
-            // HealthController?.FixedUpdate(); // Bu satır kaldırılacak
         }
         
         private void OnDisable()
@@ -91,7 +85,6 @@ namespace Epitaph.Scripts.Player
             {
                 subController.PlayerOnDisable();
             }
-            // HealthController?.OnDisable(); // Bu satır kaldırılacak
         }
         
         private void OnDestroy()
@@ -100,7 +93,6 @@ namespace Epitaph.Scripts.Player
             {
                 subController.PlayerOnDestroy();
             }
-            // HealthController?.OnDestroy(); // Bu satır kaldırılacak
         }
 
 #if UNITY_EDITOR
@@ -113,7 +105,6 @@ namespace Epitaph.Scripts.Player
             {
                 subController?.PlayerOnDrawGizmos();
             }
-            // HealthController?.OnDrawGizmos(); // Bu satır kaldırılacak
         }
 #endif
         #endregion
