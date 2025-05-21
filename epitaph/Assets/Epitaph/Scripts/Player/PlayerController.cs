@@ -40,7 +40,7 @@ namespace Epitaph.Scripts.Player
                 subController.PlayerAwake();
             }
             // HealthController ayrı yönetiliyorsa onun Awake'i çağrılabilir.
-            // HealthController?.Awake(); // Eğer HealthController PlayerBehaviour ise. Şimdiki yapıda değil.
+            HealthController?.Awake(); // Eğer HealthController PlayerBehaviour ise. Şimdiki yapıda değil.
         }
         
         private void OnEnable()

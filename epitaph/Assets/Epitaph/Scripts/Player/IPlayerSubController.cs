@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using Epitaph.Scripts.Player.ScriptableObjects;
-using UnityEngine;
 
 namespace Epitaph.Scripts.Player
 {
