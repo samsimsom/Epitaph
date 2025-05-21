@@ -35,7 +35,7 @@ namespace Epitaph.Scripts.Player
         private PlayerInteraction _playerInteraction;
         
         // Health System Components
-        private PlayerCondition _playerCondition;
+        private HealthController _healthController;
         #endregion
 
         #region Unity Lifecycle Methods
@@ -133,13 +133,13 @@ namespace Epitaph.Scripts.Player
             
             
             // Initialize player condition first as other components may depend on it
-            _playerCondition = AddPlayerBehaviour(new PlayerCondition(this, playerData));
+            _healthController = AddPlayerBehaviour(new HealthController(this, playerData));
             
             // Initialize movement components
             _playerLook = AddPlayerBehaviour(new PlayerLook(this, playerData, playerCamera, fpCamera));
             _playerMove = AddPlayerBehaviour(new PlayerMove(this, playerData, characterController, playerCamera));
             _playerGravity = AddPlayerBehaviour(new PlayerGravity(this, playerData, characterController));
-            _playerSprint = AddPlayerBehaviour(new PlayerSprint(this, playerData, _playerCondition, _playerMove));
+            _playerSprint = AddPlayerBehaviour(new PlayerSprint(this, playerData, _healthController, _playerMove));
             _playerCrouch = AddPlayerBehaviour(new PlayerCrouch(this, playerData, characterController, _playerMove, playerCamera));
             _playerJump = AddPlayerBehaviour(new PlayerJump(this, playerData));
             _playerHeadBob = AddPlayerBehaviour(new PlayerHeadBob(this, playerData, playerCameraTransform));
@@ -154,7 +154,7 @@ namespace Epitaph.Scripts.Player
         public PlayerInput GetPlayerInput() => playerInput;
         
         // Player component accessors
-        public PlayerCondition GetPlayerCondition() => _playerCondition;
+        public HealthController GetPlayerCondition() => _healthController;
         public PlayerLook GetPlayerLook() => _playerLook;
         public PlayerMove GetPlayerMove() => _playerMove;
         public PlayerGravity GetPlayerGravity() => _playerGravity;

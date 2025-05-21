@@ -6,13 +6,12 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.HealthSystem
 {
-    public class PlayerCondition : PlayerBehaviour
+    public class HealthController : PlayerBehaviour
     {
-        public PlayerCondition(PlayerController playerController, 
+        public HealthController(PlayerController playerController, 
             PlayerData playerData) : base(playerController)
         {
             _playerData = playerData;
-            InitializeConditions();
         }
         
         #region Public Properties
@@ -60,6 +59,11 @@ namespace Epitaph.Scripts.Player.HealthSystem
         #endregion
 
         #region Lifecycle Methods
+        public override void Awake()
+        {
+            InitializeConditions();
+        }
+        
         public override void Start()
         {
             StartUpdates();
@@ -89,16 +93,6 @@ namespace Epitaph.Scripts.Player.HealthSystem
             {
                 GameTime.Instance.OnTimeSkipped -= OnTimeSkipped;
             }
-        }
-
-        public override void Update()
-        {
-            
-        }
-
-        public override void OnDrawGizmos()
-        {
-            
         }
         #endregion
         

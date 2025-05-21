@@ -9,18 +9,18 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public static event Action<float> OnChangeSprintSpeed;
 
         private PlayerData _playerData;
-        private PlayerCondition _playerCondition;
+        private HealthController _healthController;
         private PlayerMove _playerMove;
         
         private bool _isSprintKeyHeld; // This field is declared but never used.
 
         public PlayerSprint(PlayerController playerController, 
             PlayerData playerData,
-            PlayerCondition playerCondition,
+            HealthController healthController,
             PlayerMove playerMove) : base(playerController)
         {
             _playerData = playerData;
-            _playerCondition = playerCondition;
+            _healthController = healthController;
             _playerMove = playerMove;
         }
 
@@ -28,18 +28,18 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             PlayerCrouch.OnCrouchStateChanged += HandleCrouchStateChanged;
             
-            _playerCondition.Stamina.OnStaminaDepleted += OnStaminaDepleted;
-            _playerCondition.Stamina.OnStaminaRecoveryStarted += OnRecoveryStarted;
-            _playerCondition.Stamina.OnStaminaRecoveryFinished += OnRecoveryFinished;
+            _healthController.Stamina.OnStaminaDepleted += OnStaminaDepleted;
+            _healthController.Stamina.OnStaminaRecoveryStarted += OnRecoveryStarted;
+            _healthController.Stamina.OnStaminaRecoveryFinished += OnRecoveryFinished;
         }
 
         public override void OnDisable()
         {
             PlayerCrouch.OnCrouchStateChanged -= HandleCrouchStateChanged;
             
-            _playerCondition.Stamina.OnStaminaDepleted -= OnStaminaDepleted;
-            _playerCondition.Stamina.OnStaminaRecoveryStarted -= OnRecoveryStarted;
-            _playerCondition.Stamina.OnStaminaRecoveryFinished -= OnRecoveryFinished;
+            _healthController.Stamina.OnStaminaDepleted -= OnStaminaDepleted;
+            _healthController.Stamina.OnStaminaRecoveryStarted -= OnRecoveryStarted;
+            _healthController.Stamina.OnStaminaRecoveryFinished -= OnRecoveryFinished;
         }
         
         public void TryStartSprint()
