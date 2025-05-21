@@ -79,7 +79,7 @@ namespace Epitaph.Scripts.Player.ScriptableObjects
         
         [Header("Interaction Data")]
         public float interactionDistance = 3f;
-        public LayerMask interactableLayer = LayerMask.GetMask("Interactable");
+        public LayerMask interactableLayer;
         public float raycastInterval = 0.05f;
         
         [Space]

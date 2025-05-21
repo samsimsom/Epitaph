@@ -6,6 +6,13 @@ namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class PlayerSprint : PlayerBehaviour
     {
+        public static event Action<float> OnChangeSprintSpeed;
+
+        private PlayerData _playerData;
+        private PlayerCondition _playerCondition;
+        
+        private bool _isSprintKeyHeld; // This field is declared but never used.
+
         public PlayerSprint(PlayerController playerController, 
             PlayerData playerData,
             PlayerCondition playerCondition) : base(playerController)
@@ -14,16 +21,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
             _playerCondition = playerCondition;
         }
 
-        public static event Action<float> OnChangeSprintSpeed;
-        
-        private PlayerData _playerData;
-        private PlayerCondition _playerCondition;
-        
-        private bool _isSprintKeyHeld;
-
         public override void OnEnable()
         {
-            // PlayerCrouch.OnCrouchStateChanged += HandleCrouchStateChanged;
+            PlayerCrouch.OnCrouchStateChanged += HandleCrouchStateChanged;
             
             _playerCondition.Stamina.OnStaminaDepleted += OnStaminaDepleted;
             _playerCondition.Stamina.OnStaminaRecoveryStarted += OnRecoveryStarted;
@@ -32,42 +32,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public override void OnDisable()
         {
-            // PlayerCrouch.OnCrouchStateChanged -= HandleCrouchStateChanged;
+            PlayerCrouch.OnCrouchStateChanged -= HandleCrouchStateChanged;
             
             _playerCondition.Stamina.OnStaminaDepleted -= OnStaminaDepleted;
             _playerCondition.Stamina.OnStaminaRecoveryStarted -= OnRecoveryStarted;
             _playerCondition.Stamina.OnStaminaRecoveryFinished -= OnRecoveryFinished;
-        }
-
-        public override void Start()
-        {
-
-        }
-
-        public override void Update()
-        {
-            
-        }
-
-        public override void OnDrawGizmos()
-        {
-            
-        }
-
-        private void OnStaminaDepleted()
-        {
-            StopSprint();
-            // Debug.Log("Sprint recovery depleted");
-        }
-        
-        private void OnRecoveryStarted()
-        {
-            // Debug.Log("Sprint recovery started");
-        }
-        
-        private void OnRecoveryFinished()
-        {
-            // Debug.Log("Sprint recovery finished");
         }
         
         public void TryStartSprint()
@@ -94,6 +63,22 @@ namespace Epitaph.Scripts.Player.MovementSystem
             OnChangeSprintSpeed?.Invoke(_playerData.walkSpeed);
         }
         
+        private void OnStaminaDepleted()
+        {
+            StopSprint();
+            // Debug.Log("Sprint recovery depleted");
+        }
+        
+        private void OnRecoveryStarted()
+        {
+            // Debug.Log("Sprint recovery started");
+        }
+        
+        private void OnRecoveryFinished()
+        {
+            // Debug.Log("Sprint recovery finished");
+        }
+        
         private void HandleCrouchStateChanged(bool isCrouching)
         {
             if (!isCrouching || !_playerData.isSprinting) return;
@@ -101,6 +86,5 @@ namespace Epitaph.Scripts.Player.MovementSystem
             StopSprint();
             OnChangeSprintSpeed?.Invoke(_playerData.crouchSpeed);
         }
-        
     }
 }

@@ -8,13 +8,14 @@ namespace Epitaph.Scripts.Player
             PlayerController = playerController;
         }
 
-        public abstract void Start();
-        public abstract void OnEnable();
-        public abstract void OnDisable();
-        public abstract void Update();
-
+        public virtual void Start() { /* Varsayılan boş implementasyon */ }
+        public virtual void OnEnable()  { /* Varsayılan boş implementasyon */ }
+        public virtual void OnDisable()  { /* Varsayılan boş implementasyon */ }
+        public virtual void Update()  { /* Varsayılan boş implementasyon */ }
+        
 #if UNITY_EDITOR
-        public abstract void OnDrawGizmos();
+        public virtual void OnDrawGizmos() { /* Varsayılan boş implementasyon */ }
+
 #endif
     }
 }

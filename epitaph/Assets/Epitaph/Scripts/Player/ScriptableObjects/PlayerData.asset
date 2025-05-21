@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: PlayerData
   m_EditorClassIdentifier: 
   health: 100
-  hunger: 0
-  thirst: 1.3800001
-  fatigue: 0.4
-  stamina: 98.34903
+  stamina: 99.88902
+  hunger: 0.1
+  thirst: 0.90000004
+  fatigue: 0.3
   walkSpeed: 2.5
   currentVelocity: {x: 0, y: 0, z: 0}
   lookSensitivity: {x: 20, y: 15}
@@ -45,10 +45,10 @@ MonoBehaviour:
   jumpBufferTime: 0.2
   coyoteTime: 0.2
   useCoyoteTime: 1
-  isCrouching: 0
+  isCrouching: 1
   crouchHeight: 0.75
   standingHeight: 1.8
-  crouchSpeed: 1.5
+  crouchSpeed: 1.25
   crouchCameraYOffset: -0.05
   standingCameraYOffset: 0
   crouchTransitionTime: 0.45
@@ -59,3 +59,11 @@ MonoBehaviour:
   ceilingCheckDistance: 0.5
   isSprinting: 0
   sprintSpeed: 4.5
+  interactionDistance: 3
+  interactableLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  raycastInterval: 0.05
+  showDebugGizmos: 1
+  hitGizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  gizmoColor: {r: 1, g: 0, b: 0, a: 1}

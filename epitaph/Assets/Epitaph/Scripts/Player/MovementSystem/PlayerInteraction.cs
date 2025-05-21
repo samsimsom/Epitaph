@@ -9,7 +9,23 @@ namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class PlayerInteraction : PlayerBehaviour
     {
-     
+        // Events
+        public event Action<IInteractable> OnInteractableFound;
+        public event Action OnInteractableLost;
+
+        // Private Fields
+        private readonly PlayerController _playerController;
+        private readonly PlayerData _playerData;
+        private readonly Camera _playerCamera;
+        
+        private RaycastHit _lastHit;
+        private bool _didHit;
+        private Vector3 _rayDirection;
+        private Vector3 _rayOrigin;
+        private CancellationTokenSource _cts;
+        private IInteractable _currentInteractable;
+
+        // Constructor
         public PlayerInteraction(PlayerController playerController, 
             PlayerData playerData, Camera playerCamera) : base(playerController)
         {
@@ -18,26 +34,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             _playerCamera = playerCamera;
         }
 
-        private PlayerController _playerController;
-        private PlayerData _playerData;
-        private Camera _playerCamera;
-        
-        // Events
-        public event Action<IInteractable> OnInteractableFound;
-        public event Action OnInteractableLost;
-
-        private RaycastHit _lastHit;
-        private bool _didHit;
-        private Vector3 _rayDirection;
-        private Vector3 _rayOrigin;
-        private CancellationTokenSource _cts;
-        private IInteractable _currentInteractable;
-
-        public override void Start()
-        {
-            
-        }
-
+        // Lifecycle Methods
         public override void OnEnable()
         {
             _cts = new CancellationTokenSource();
@@ -51,6 +48,43 @@ namespace Epitaph.Scripts.Player.MovementSystem
             _cts = null;
         }
 
+        public override void Update()
+        {
+            DebugDrawLine();
+        }
+
+        // Public Methods
+        public void TryInteract()
+        {
+            _currentInteractable?.Interact();
+        }
+        
+        public void ProcessInteraction()
+        {
+            _currentInteractable?.Interact();
+        }
+
+        public bool IsTargetingInteractable()
+        {
+            return _didHit && _currentInteractable != null;
+        }
+
+        public GameObject GetTargetedObject()
+        {
+            return _didHit ? _lastHit.collider.gameObject : null;
+        }
+
+        public RaycastHit GetLastHit()
+        {
+            return _lastHit;
+        }
+        
+        public IInteractable GetCurrentInteractable()
+        {
+            return _currentInteractable;
+        }
+
+        // Private Methods
         private async UniTaskVoid StartRaycastLoop(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
@@ -93,16 +127,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             OnInteractableFound?.Invoke(interactable);
         }
 
-        public override void Update()
-        {
-            DebugDrawLine();
-        }
-
-        public override void OnDrawGizmos()
-        {
-            
-        }
-
         private void DebugDrawLine()
         {
             if (!_playerData.showDebugGizmos) return;
@@ -117,39 +141,5 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 Debug.DrawLine(_rayOrigin, _rayOrigin + _rayDirection * _playerData.interactionDistance, _playerData.gizmoColor);
             }
         }
-
-        #region Public Methods
-        // Public method to handle interaction input
-        public void TryInteract()
-        {
-            _currentInteractable?.Interact();
-        }
-        
-        public void ProcessInteraction()
-        {
-            _currentInteractable?.Interact();
-        }
-
-        // Helper methods
-        public bool IsTargetingInteractable()
-        {
-            return _didHit && _currentInteractable != null;
-        }
-
-        public GameObject GetTargetedObject()
-        {
-            return _didHit ? _lastHit.collider.gameObject : null;
-        }
-
-        public RaycastHit GetLastHit()
-        {
-            return _lastHit;
-        }
-        
-        public IInteractable GetCurrentInteractable()
-        {
-            return _currentInteractable;
-        }
-        #endregion
     }
 }

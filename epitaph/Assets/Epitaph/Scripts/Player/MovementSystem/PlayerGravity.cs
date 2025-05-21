@@ -4,52 +4,31 @@ using UnityEngine;
 namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class PlayerGravity : PlayerBehaviour
-    { 
-        public PlayerGravity(PlayerController playerController, 
-            PlayerData playerData, 
+    {
+        // Private Fields
+        private PlayerData _playerData;
+        private CharacterController _characterController;
+
+        private float _steepSlopeTime;
+        private float _ungroundedTime;
+        private float _groundedGravity;
+        private bool _isGrounded;
+
+        // Static Properties
+        private static float Gravity => Physics.gravity.y;
+
+        // Constructor
+        public PlayerGravity(PlayerController playerController,
+            PlayerData playerData,
             CharacterController characterController) : base(playerController)
         {
             _playerData = playerData;
             _characterController = characterController;
-            
+
             Initialize();
         }
-        
-        private PlayerData _playerData;
-        private CharacterController _characterController;
-        
-        private float _steepSlopeTime = 0f;
-        
-        private float _ungroundedTime;
-        private bool _isFalling;
-        
-        private float _groundedGravity;
-        private bool _isGrounded;
 
-        private static float Gravity => Physics.gravity.y;
-
-        public override void Start()
-        {
-            
-        }
-
-        public override void OnEnable()
-        {
-            
-        }
-
-        public override void OnDisable()
-        {
-            
-        }
-
-        private void Initialize()
-        {
-            _groundedGravity = _playerData.groundedGravity;
-            _ungroundedTime = 0f;
-            _playerData.isFalling = false;
-        }
-
+        // Unity Lifecycle Methods
         public override void Update()
         {
             UpdateGroundedStatus();
@@ -57,12 +36,20 @@ namespace Epitaph.Scripts.Player.MovementSystem
             ApplyGravity();
         }
 
+        // Private Methods
+        private void Initialize()
+        {
+            _groundedGravity = _playerData.groundedGravity;
+            _ungroundedTime = 0f;
+            _playerData.isFalling = false;
+        }
+
         private void UpdateGroundedStatus()
         {
             _isGrounded = PerformGroundCheck();
             _playerData.isGrounded = _isGrounded;
         }
-        
+
         private void UpdateFallingStatus()
         {
             if (!_isGrounded)
@@ -83,7 +70,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private bool PerformGroundCheck()
         {
             if (_characterController == null) return false;
-            
+
             ComputeGroundCheckSphere(out var radius, out var origin);
             return Physics.CheckSphere(origin, radius, _playerData.groundLayers);
         }
@@ -91,8 +78,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private void ComputeGroundCheckSphere(out float radius, out Vector3 origin)
         {
             radius = _characterController.radius;
-            origin = _characterController.transform.position 
-                     + _characterController.center 
+            origin = _characterController.transform.position
+                     + _characterController.center
                      + Vector3.down * (_characterController.height / 2f);
         }
 
@@ -113,7 +100,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
             var movement = Vector3.up * (_playerData.verticalVelocity * Time.deltaTime);
             HandleSlope(ref movement);
-    
+
             _characterController.Move(movement);
             _playerData.currentVelocity.y = _characterController.velocity.y;
         }
@@ -163,12 +150,13 @@ namespace Epitaph.Scripts.Player.MovementSystem
         }
 
 #if UNITY_EDITOR
+        // Editor-Only Methods
         public override void OnDrawGizmos()
         {
             if (_characterController == null) return;
-            
+
             ComputeGroundCheckSphere(out var radius, out var origin);
-            
+
             var color = _isGrounded ? Color.green : Color.red;
             Gizmos.color = color;
             Gizmos.DrawWireSphere(origin, radius);

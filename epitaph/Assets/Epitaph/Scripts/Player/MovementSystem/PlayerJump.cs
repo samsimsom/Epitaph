@@ -1,4 +1,3 @@
-using System;
 using Epitaph.Scripts.Player.ScriptableObjects;
 using UnityEngine;
 
@@ -6,13 +5,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class PlayerJump : PlayerBehaviour
     {
-        public PlayerJump(PlayerController playerController,
-            PlayerData playerData) : base(playerController)
-        {
-            _playerController = playerController;
-            _playerData = playerData;
-        }
-        
         private PlayerController _playerController;
         private PlayerData _playerData;
         
@@ -22,19 +14,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private float _jumpBufferCounter;
         private bool _wasGroundedLastFrame;
 
-        public override void Start()
+        public PlayerJump(PlayerController playerController,
+            PlayerData playerData) : base(playerController)
         {
-            
-        }
-
-        public override void OnEnable()
-        {
-            
-        }
-
-        public override void OnDisable()
-        {
-            
+            _playerController = playerController;
+            _playerData = playerData;
         }
 
         public override void Update()
@@ -43,10 +27,29 @@ namespace Epitaph.Scripts.Player.MovementSystem
             HandleCoyoteTime();
             HandleJumpBuffer();
         }
-
-        public override void OnDrawGizmos()
+        
+        public bool CanJump()
         {
+            ComputeCeilingRayOrigin(out var radius, out var rayDistance, 
+                out var originTip, out var originRoot);
+            var cannotHitCeiling = !Physics.Raycast(originRoot, Vector3.up, rayDistance,
+                _playerController.GetMovementData().ceilingLayers);
+            var isInCoyoteTime = _playerController.GetMovementData().useCoyoteTime && _coyoteTimeCounter > 0;
             
+            return !_playerController.GetMovementData().isCrouching && _canJump && (_playerController.GetMovementData().isGrounded || isInCoyoteTime) && cannotHitCeiling;
+        }
+        
+        public void ProcessJump()
+        {
+            if (CanJump())
+            {
+                ExecuteJump();
+            }
+            else
+            {
+                // Zıplayamasa bile jump buffer'ı başlat
+                _jumpBufferCounter = _playerController.GetMovementData().jumpBufferTime;
+            }
         }
 
         private void HandleJumpCooldown()
@@ -101,17 +104,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             }
         }
         
-        public bool CanJump()
-        {
-            ComputeCeilingRayOrigin(out var radius, out var rayDistance, 
-                out var originTip, out var originRoot);
-            var cannotHitCeiling = !Physics.Raycast(originRoot, Vector3.up, rayDistance,
-                _playerController.GetMovementData().ceilingLayers);
-            var isInCoyoteTime = _playerController.GetMovementData().useCoyoteTime && _coyoteTimeCounter > 0;
-            
-            return !_playerController.GetMovementData().isCrouching && _canJump && (_playerController.GetMovementData().isGrounded || isInCoyoteTime) && cannotHitCeiling;
-        }
-        
         private void ComputeCeilingRayOrigin(out float radius, 
             out float rayDistance, out Vector3 originTip, out Vector3 originRoot)
         {
@@ -126,33 +118,18 @@ namespace Epitaph.Scripts.Player.MovementSystem
                          + Vector3.up * (_playerController.GetCharacterController().height / 2f);
         }
         
-        public void ProcessJump()
-        {
-            if (CanJump())
-            {
-                ExecuteJump();
-            }
-            else
-            {
-                // Zıplayamasa bile jump buffer'ı başlat
-                _jumpBufferCounter = _playerController.GetMovementData().jumpBufferTime;
-            }
-        }
-        
         private void ExecuteJump()
         {
-            var jumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(Physics.gravity.y) * 
-                                          _playerController.GetMovementData().jumpHeight);
-            _playerController.GetMovementData().verticalVelocity = jumpVelocity;
+            var jumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(Physics.gravity.y) * _playerData.jumpHeight);
+            _playerData.verticalVelocity = jumpVelocity;
     
             _canJump = false;
-            _jumpCooldownTimer = _playerController.GetMovementData().jumpCooldown;
+            _jumpCooldownTimer = _playerData.jumpCooldown;
             _coyoteTimeCounter = 0; // Zıpladıktan sonra coyote time'ı sıfırla
         }
 
-        
-#if false
-        private void OnDrawGizmos()
+#if UNITY_EDITOR
+        public override void OnDrawGizmos()
         {
             if (_playerController.GetCharacterController() == null) return;
             
@@ -165,6 +142,5 @@ namespace Epitaph.Scripts.Player.MovementSystem
             Gizmos.DrawWireSphere(originRoot + Vector3.up * rayDistance, 0.05f);
         }
 #endif
-
     }
 }

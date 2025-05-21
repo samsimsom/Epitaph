@@ -7,7 +7,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
     {
         private PlayerData _playerData;
         private Transform _playerCameraTransform;
-        
         private Vector3 _startPosition;
 
         public PlayerHeadBob(PlayerController playerController, 
@@ -23,25 +22,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
             _startPosition = _playerCameraTransform.transform.localPosition;
         }
 
-        public override void OnEnable()
-        {
-            
-        }
-
-        public override void OnDisable()
-        {
-            
-        }
-
         public override void Update()
         {
             CheckForHeadBobTrigger();
             StopHeadBob();
-        }
-
-        public override void OnDrawGizmos()
-        {
-            
         }
 
         private void CheckForHeadBobTrigger()
@@ -60,8 +44,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             pos.x += Mathf.Lerp(pos.x, Mathf.Cos(Time.time * _playerData.frequenct / 2f) 
                                        * _playerData.amount * 1.6f, _playerData.smooth * Time.deltaTime);
             _playerCameraTransform.localPosition += pos;
-
-            // return pos;
         }
 
         private void StopHeadBob()

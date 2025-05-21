@@ -9,8 +9,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private PlayerData _playerData;
         private PlayerController _playerController;
         private CinemachineCamera _fpCamera;
-        
-        public PlayerLook(PlayerController playerController, 
+
+        public PlayerLook(PlayerController playerController,
             PlayerData playerData,
             Camera playerCamera,
             CinemachineCamera fpCamera) : base(playerController)
@@ -25,26 +25,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             UpdateCameraSensitivity();
         }
 
-        public override void OnEnable()
-        {
-            
-        }
-
-        public override void OnDisable()
-        {
-            
-        }
-
-        public override void Update()
-        {
-            
-        }
-
-        public override void OnDrawGizmos()
-        {
-            
-        }
-
         private static void LockCursor()
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -55,10 +35,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             // Mevcut en-boy oranı
             var currentAspect = (float)Screen.width / Screen.height;
-            
+
             // En-boy oranı çarpanı
             var aspectMultiplier = _playerData.referanceAspect / currentAspect;
-            
+
             foreach (var controller in _fpCamera.GetComponent<CinemachineInputAxisController>().Controllers)
             {
                 controller.Input.Gain = controller.Name switch
@@ -69,6 +49,5 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 };
             }
         }
-        
     }
 }
