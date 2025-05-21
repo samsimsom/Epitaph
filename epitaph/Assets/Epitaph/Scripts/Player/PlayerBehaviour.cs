@@ -15,7 +15,6 @@ namespace Epitaph.Scripts.Player
         
 #if UNITY_EDITOR
         public virtual void OnDrawGizmos() { /* Varsayılan boş implementasyon */ }
-
 #endif
     }
 }
