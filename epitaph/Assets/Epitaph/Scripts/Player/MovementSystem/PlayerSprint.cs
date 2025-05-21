@@ -10,15 +10,18 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         private PlayerData _playerData;
         private PlayerCondition _playerCondition;
+        private PlayerMove _playerMove;
         
         private bool _isSprintKeyHeld; // This field is declared but never used.
 
         public PlayerSprint(PlayerController playerController, 
             PlayerData playerData,
-            PlayerCondition playerCondition) : base(playerController)
+            PlayerCondition playerCondition,
+            PlayerMove playerMove) : base(playerController)
         {
             _playerData = playerData;
             _playerCondition = playerCondition;
+            _playerMove = playerMove;
         }
 
         public override void OnEnable()
@@ -48,7 +51,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             if (_playerData.isCrouching) return;
             
             _playerData.isSprinting = true;
-            PlayerController.GetPlayerCondition().SetRunning(true); // hunger, thirst modifikasyon için
+            _playerMove.SetRunningSpeed();
+            PlayerController.GetPlayerCondition().SetRunning(_playerData.isSprinting); // hunger, thirst modifikasyon için
             PlayerController.GetPlayerCondition().Stamina.StartStaminaConsuming();
             OnChangeSprintSpeed?.Invoke(_playerData.sprintSpeed);
         }
@@ -58,7 +62,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             if (!_playerData.isSprinting) return;
             
             _playerData.isSprinting = false;
-            PlayerController.GetPlayerCondition().SetRunning(false); // hunger, thirst eski haline döner
+            _playerMove.SetWalkingSpeed();
+            PlayerController.GetPlayerCondition().SetRunning(_playerData.isSprinting); // hunger, thirst eski haline döner
             PlayerController.GetPlayerCondition().Stamina.StopStaminaConsuming();
             OnChangeSprintSpeed?.Invoke(_playerData.walkSpeed);
         }
@@ -84,7 +89,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             if (!isCrouching || !_playerData.isSprinting) return;
             
             StopSprint();
-            OnChangeSprintSpeed?.Invoke(_playerData.crouchSpeed);
+            _playerMove.SetCrouchingSpeed();
         }
     }
 }

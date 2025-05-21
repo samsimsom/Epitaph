@@ -8,7 +8,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private PlayerData _playerData;
         private CharacterController _characterController;
         private Camera _playerCamera;
-        private float _speed;
+
+        public float Speed { get; private set; } = 1f;
+        public float MaxSpeed { get; private set; } = 20f;
+        public float Modifier { get; set; } = 1f;
+        public float EffectiveSpeed => Speed * Modifier;
 
         public PlayerMove(PlayerController playerController,
             PlayerData playerData,
@@ -23,18 +27,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         }
 
         #region MonoBehaviour Methods
-        public override void OnEnable()
-        {
-            PlayerSprint.OnChangeSprintSpeed += OnChangeSprintSpeed;
-            PlayerCrouch.OnChangeCrouchSpeed += OnChangeCrouchSpeed;
-        }
-
-        public override void OnDisable()
-        {
-            PlayerSprint.OnChangeSprintSpeed -= OnChangeSprintSpeed;
-            PlayerCrouch.OnChangeCrouchSpeed -= OnChangeCrouchSpeed;
-        }
-
         public override void Start()
         {
             AdjustPlayerPosition();
@@ -50,8 +42,12 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public void ProcessMove(Vector2 input)
         {
             var direction = CalculateMoveDirection(input);
-            var movement = direction * (_speed * Time.deltaTime);
+            var speed = Mathf.Clamp(Speed, EffectiveSpeed, MaxSpeed);
+            var movement = direction * (speed * Time.deltaTime);
             _characterController.Move(movement);
+
+            // DEBUG
+            _playerData.currentSpeed = speed;
             _playerData.currentVelocity.x = _characterController.velocity.x;
             _playerData.currentVelocity.z = _characterController.velocity.z;
         }
@@ -60,7 +56,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         #region Private Methods
         private void Initialize()
         {
-            _speed = _playerData.walkSpeed;
+            SetWalkingSpeed();
         }
 
         private void AdjustPlayerPosition()
@@ -95,14 +91,19 @@ namespace Epitaph.Scripts.Player.MovementSystem
             return moveDirection;
         }
 
-        private void OnChangeCrouchSpeed(float obj)
+        public void SetWalkingSpeed()
         {
-            _speed = obj;
+            Modifier = 2.75f;
         }
-
-        private void OnChangeSprintSpeed(float obj)
+        
+        public void SetRunningSpeed()
         {
-            _speed = obj;
+            Modifier = 4.75f;
+        }
+        
+        public void SetCrouchingSpeed()
+        {
+            Modifier = 1.5f;
         }
         #endregion
     }

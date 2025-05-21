@@ -9,12 +9,12 @@ namespace Epitaph.Scripts.Player.MovementSystem
     {
         // Static Events
         public static event Action<bool> OnCrouchStateChanged;
-        public static event Action<float> OnChangeCrouchSpeed;
-        public static event Action<float> OnChangeGroundedGravity;
+        // public static event Action<float> OnChangeGroundedGravity;
 
         // Private Instance Fields
         private PlayerData _playerData;
         private CharacterController _characterController;
+        private PlayerMove _playerMove;
         private Camera _playerCamera;
         private float _initialCameraYLocalPosition;
 
@@ -22,10 +22,12 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public PlayerCrouch(PlayerController playerController,
             PlayerData playerData,
             CharacterController characterController,
+            PlayerMove playerMove,
             Camera playerCamera) : base(playerController)
         {
             _playerData = playerData;
             _characterController = characterController;
+            _playerMove = playerMove;
             _playerCamera = playerCamera;
 
             Initialize();
@@ -73,8 +75,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             _playerData.isCrouching = true;
             OnCrouchStateChanged?.Invoke(_playerData.isCrouching);
-            OnChangeGroundedGravity?.Invoke(_playerData.crouchGroundedGravity);
-            OnChangeCrouchSpeed?.Invoke(_playerData.crouchSpeed);
+            // OnChangeGroundedGravity?.Invoke(_playerData.crouchGroundedGravity);
+            _playerMove.SetCrouchingSpeed();
         }
 
         private void Stand()
@@ -82,8 +84,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             if (!CanStandUp()) return;
             _playerData.isCrouching = false;
             OnCrouchStateChanged?.Invoke(_playerData.isCrouching);
-            OnChangeGroundedGravity?.Invoke(_playerData.groundedGravity);
-            OnChangeCrouchSpeed?.Invoke(_playerData.walkSpeed);
+            // OnChangeGroundedGravity?.Invoke(_playerData.groundedGravity);
+            _playerMove.SetWalkingSpeed();
         }
 
         private bool CanStandUp()

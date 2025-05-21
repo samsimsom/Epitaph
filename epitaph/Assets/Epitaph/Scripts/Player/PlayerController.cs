@@ -110,8 +110,8 @@ namespace Epitaph.Scripts.Player
             _playerLook = AddPlayerBehaviour(new PlayerLook(this, playerData, playerCamera, fpCamera));
             _playerMove = AddPlayerBehaviour(new PlayerMove(this, playerData, characterController, playerCamera));
             _playerGravity = AddPlayerBehaviour(new PlayerGravity(this, playerData, characterController));
-            _playerSprint = AddPlayerBehaviour(new PlayerSprint(this, playerData, _playerCondition));
-            _playerCrouch = AddPlayerBehaviour(new PlayerCrouch(this, playerData, characterController, playerCamera));
+            _playerSprint = AddPlayerBehaviour(new PlayerSprint(this, playerData, _playerCondition, _playerMove));
+            _playerCrouch = AddPlayerBehaviour(new PlayerCrouch(this, playerData, characterController, _playerMove, playerCamera));
             _playerJump = AddPlayerBehaviour(new PlayerJump(this, playerData));
             _playerHeadBob = AddPlayerBehaviour(new PlayerHeadBob(this, playerData, playerCameraTransform));
             _playerInteraction = AddPlayerBehaviour(new PlayerInteraction(this, playerData, playerCamera));

@@ -18,8 +18,9 @@ namespace Epitaph.Scripts.Player.ScriptableObjects
         // public float maxThirst;
         public float fatigue;
         // public float maxFatigue;
-        
-        [Header("Movement Data")]
+
+        [Header("Movement Data")] 
+        public float currentSpeed;
         public float walkSpeed;
         public Vector3 currentVelocity;
         
