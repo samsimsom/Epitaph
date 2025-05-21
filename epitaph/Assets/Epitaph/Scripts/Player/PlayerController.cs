@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Epitaph.Scripts.Player.HealthSystem;
 using Epitaph.Scripts.Player.MovementSystem;
 using Epitaph.Scripts.Player.ScriptableObjects;
+using Epitaph.Scripts.Player.SubController;
 using Unity.Cinemachine;
 using UnityEngine;
 

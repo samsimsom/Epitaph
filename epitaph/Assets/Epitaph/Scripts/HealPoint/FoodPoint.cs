@@ -1,6 +1,7 @@
+using Epitaph.Scripts.Player;
 using UnityEngine;
 
-namespace Epitaph.Scripts.Player.HealthSystem.HealPoint
+namespace Epitaph.Scripts.HealPoint
 {
     public class FoodPoint : MonoBehaviour
     {
@@ -15,7 +16,7 @@ namespace Epitaph.Scripts.Player.HealthSystem.HealPoint
             if (other.gameObject.TryGetComponent<PlayerController>(out var playerController))
             {
                 foodMaterial.color = Color.white;
-                // playerController.GetPlayerCondition().Eat(foodAmount);
+                playerController.HealthController.Eat(foodAmount);
             }
         }
 

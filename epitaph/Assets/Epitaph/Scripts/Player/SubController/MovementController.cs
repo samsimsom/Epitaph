@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using Epitaph.Scripts.Player.HealthSystem;
+using Epitaph.Scripts.Player.MovementSystem;
 using Epitaph.Scripts.Player.ScriptableObjects;
 using UnityEngine;
 
-namespace Epitaph.Scripts.Player.MovementSystem
+namespace Epitaph.Scripts.Player.SubController
 {
     public class MovementController : IPlayerSubController
     {

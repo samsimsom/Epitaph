@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Epitaph.Scripts.GameTimeManager;
+using Epitaph.Scripts.Player.HealthSystem;
 using Epitaph.Scripts.Player.ScriptableObjects;
 using UnityEngine;
 
-namespace Epitaph.Scripts.Player.HealthSystem
+namespace Epitaph.Scripts.Player.SubController
 {
     public class HealthController : IPlayerSubController // PlayerBehaviour yerine IPlayerSubController
     {
@@ -59,7 +60,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
         private List<ICondition> _allStats;
         
         private int _lastMinute = -1;
-        private int _lastSecond = -1;
+        // private int _lastSecond = -1;
         
         private bool _isUpdating;
         #endregion
@@ -263,7 +264,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
                     // örneğin Hunger için: Value -= BaseDecreaseRate * Modifier * amount;
                     // Burada amount = 1.0f. Yani her oyun dakikası için Value -= BaseDecreaseRate * Modifier;
                     // Dolayısıyla, atlanan her dakika için bu işlemi uygulamalıyız.
-                    var decreaseAmount = 0f; // Bu, ICondition'a göre değişir.
+                    // var decreaseAmount = 0f; // Bu, ICondition'a göre değişir.
                                              // Şimdilik, stat.UpdateStat(minutesSkipped) çağrısını varsayalım,
                                              // ve ICondition implementasyonları (Hunger, Thirst, Fatigue)
                                              // bu 'minutesSkipped' değerini uygun şekilde yorumlasın.
