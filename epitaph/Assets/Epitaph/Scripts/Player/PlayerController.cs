@@ -22,7 +22,7 @@ namespace Epitaph.Scripts.Player
         #endregion
         
         #region Player Behaviors
-        private readonly List<IBehaviour> _playerBehaviours = new();
+        private readonly List<PlayerBehaviour> _playerBehaviours = new();
         
         // Movement Components
         private PlayerMove _playerMove;
@@ -116,7 +116,7 @@ namespace Epitaph.Scripts.Player
         #endregion
 
         #region Initialization
-        private T AddPlayerBehaviour<T>(T behaviour) where T : IBehaviour
+        private T AddPlayerBehaviour<T>(T behaviour) where T : PlayerBehaviour
         {
             _playerBehaviours.Add(behaviour);
             return behaviour;

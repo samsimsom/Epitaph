@@ -1,6 +1,6 @@
 namespace Epitaph.Scripts.Player
 {
-    public abstract class PlayerBehaviour : IBehaviour
+    public abstract class PlayerBehaviour
     {
         protected PlayerController PlayerController;
         protected PlayerBehaviour(PlayerController playerController)
