@@ -51,6 +51,21 @@ namespace Epitaph.Scripts.Player.MovementSystem
             _playerData.currentVelocity.x = _characterController.velocity.x;
             _playerData.currentVelocity.z = _characterController.velocity.z;
         }
+        
+        public void SetWalkingSpeed()
+        {
+            Modifier = 2.75f;
+        }
+        
+        public void SetRunningSpeed()
+        {
+            Modifier = 4.75f;
+        }
+        
+        public void SetCrouchingSpeed()
+        {
+            Modifier = 1.5f;
+        }
         #endregion
 
         #region Private Methods
@@ -89,21 +104,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             var moveDirection = (forward * input.y) + (right * input.x);
 
             return moveDirection;
-        }
-
-        public void SetWalkingSpeed()
-        {
-            Modifier = 2.75f;
-        }
-        
-        public void SetRunningSpeed()
-        {
-            Modifier = 4.75f;
-        }
-        
-        public void SetCrouchingSpeed()
-        {
-            Modifier = 1.5f;
         }
         #endregion
     }
