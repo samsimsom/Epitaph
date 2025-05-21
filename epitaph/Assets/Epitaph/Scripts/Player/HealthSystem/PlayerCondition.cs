@@ -44,7 +44,6 @@ namespace Epitaph.Scripts.Player.HealthSystem
         #endregion
 
         #region Private Fields
-
         private PlayerData _playerData;
         
         private Health _health;
@@ -76,7 +75,8 @@ namespace Epitaph.Scripts.Player.HealthSystem
             }
             else
             {
-                Debug.LogWarning("GameTime instance not found. Player conditions will not update on time skip.");
+                Debug.LogWarning("GameTime instance not found. " +
+                                 "Player conditions will not update on time skip.");
             }
 
         }
@@ -100,7 +100,6 @@ namespace Epitaph.Scripts.Player.HealthSystem
         {
             
         }
-
         #endregion
         
         private void InitializeConditions()
@@ -129,7 +128,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
                 // Update frame-sensitive stats
                 var delta = Time.deltaTime;
                 Health.UpdateStat(delta);
-                Stamina.UpdateStat(delta);
+                // Stamina.UpdateStat(delta); // Removed as Stamina.UpdateStat is empty
                 
                 _playerData.health = Health.Value;
                 // _playerMovementData.maxHealth = Health.MaxValue;

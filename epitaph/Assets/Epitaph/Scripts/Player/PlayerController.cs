@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Epitaph.Scripts.Player.HealthSystem;
 using Epitaph.Scripts.Player.MovementSystem;
@@ -10,6 +9,7 @@ namespace Epitaph.Scripts.Player
 {
     public class PlayerController : MonoBehaviour
     {
+        #region Inspector Fields
         [Header("Data")]
         [SerializeField] private PlayerData playerData;
         
@@ -19,10 +19,12 @@ namespace Epitaph.Scripts.Player
         [SerializeField] private Camera playerCamera;
         [SerializeField] private CinemachineCamera fpCamera;
         [SerializeField] private Transform playerCameraTransform;
+        #endregion
         
-        private List<PlayerBehaviour> _playerBehaviours = new();
+        #region Player Behaviors
+        private readonly List<PlayerBehaviour> _playerBehaviours = new();
         
-        // // Movement Components
+        // Movement Components
         private PlayerMove _playerMove;
         private PlayerJump _playerJump;
         private PlayerCrouch _playerCrouch;
@@ -31,46 +33,67 @@ namespace Epitaph.Scripts.Player
         private PlayerLook _playerLook;
         private PlayerHeadBob _playerHeadBob;
         private PlayerInteraction _playerInteraction;
-        // // Health System Components
-        private PlayerCondition _playerCondition;
         
+        // Health System Components
+        private PlayerCondition _playerCondition;
+        #endregion
+
+        #region Unity Lifecycle Methods
         private void Awake()
         {
             InitializeComponents();
         }
         
+        private void Start()
+        {
+            foreach (var behaviour in _playerBehaviours)
+            {
+                behaviour.Start();
+            }
+        }
+        
+        private void Update()
+        {
+            foreach (var behaviour in _playerBehaviours)
+            {
+                behaviour.Update();
+            }
+        }
+        
         private void OnEnable()
         {
-            for (var i = 0; i < _playerBehaviours.Count; i++)
+            foreach (var behaviour in _playerBehaviours)
             {
-                _playerBehaviours[i].OnEnable();
+                behaviour.OnEnable();
             }
         }
         
         private void OnDisable()
         {
-            for (var i = 0; i < _playerBehaviours.Count; i++)
+            foreach (var behaviour in _playerBehaviours)
             {
-                _playerBehaviours[i].OnDisable();
+                behaviour.OnDisable();
             }
         }
 
-        private void Start()
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
         {
-            for (var i = 0; i < _playerBehaviours.Count; i++)
+            foreach (var behaviour in _playerBehaviours)
             {
-                _playerBehaviours[i].Start();
+                behaviour.OnDrawGizmos();
             }
         }
+#endif
+        #endregion
 
-        private void Update()
+        #region Initialization
+        private T AddPlayerBehaviour<T>(T behaviour) where T : PlayerBehaviour
         {
-            for (var i = 0; i < _playerBehaviours.Count; i++)
-            {
-                _playerBehaviours[i].Update();
-            }
+            _playerBehaviours.Add(behaviour);
+            return behaviour;
         }
-
+        
         private void InitializeComponents()
         {
             // Get required components if not already assigned
@@ -80,70 +103,44 @@ namespace Epitaph.Scripts.Player
             if (playerInput == null) 
                 playerInput = GetComponent<PlayerInput>();
 
-            _playerCondition = new PlayerCondition(this, playerData);
+            // Initialize player condition first as other components may depend on it
+            _playerCondition = AddPlayerBehaviour(new PlayerCondition(this, playerData));
             
-            _playerLook = new PlayerLook(this, 
-                playerData, playerCamera, fpCamera);
-            
-            _playerMove = new PlayerMove(this,
-                playerData, characterController, playerCamera);
-
-            _playerSprint = new PlayerSprint(this, playerData, 
-                _playerCondition);
-
-            _playerGravity = new PlayerGravity(this, playerData, 
-                characterController);
-
-            _playerCrouch = new PlayerCrouch(this, playerData, 
-                characterController, playerCamera);
-
-            _playerJump = new PlayerJump(this, playerData);
-
-            _playerHeadBob = new PlayerHeadBob(this, playerData, 
-                playerCameraTransform);
-
-            _playerInteraction = new PlayerInteraction(this, playerCamera);
-            
-            _playerBehaviours.Add(_playerCondition);
-            _playerBehaviours.Add(_playerLook);
-            _playerBehaviours.Add(_playerMove);
-            _playerBehaviours.Add(_playerGravity);
-            _playerBehaviours.Add(_playerSprint);
-            _playerBehaviours.Add(_playerCrouch);
-            _playerBehaviours.Add(_playerJump);
-            _playerBehaviours.Add(_playerHeadBob);
-            _playerBehaviours.Add(_playerInteraction);
+            // Initialize movement components
+            _playerLook = AddPlayerBehaviour(new PlayerLook(this, playerData, playerCamera, fpCamera));
+            _playerMove = AddPlayerBehaviour(new PlayerMove(this, playerData, characterController, playerCamera));
+            _playerGravity = AddPlayerBehaviour(new PlayerGravity(this, playerData, characterController));
+            _playerSprint = AddPlayerBehaviour(new PlayerSprint(this, playerData, _playerCondition));
+            _playerCrouch = AddPlayerBehaviour(new PlayerCrouch(this, playerData, characterController, playerCamera));
+            _playerJump = AddPlayerBehaviour(new PlayerJump(this, playerData));
+            _playerHeadBob = AddPlayerBehaviour(new PlayerHeadBob(this, playerData, playerCameraTransform));
+            _playerInteraction = AddPlayerBehaviour(new PlayerInteraction(this, playerData, playerCamera));
         }
+        #endregion
         
+        #region Public Accessor Methods
         // Public interfaces for external access
         public CharacterController GetCharacterController() => characterController;
         public PlayerData GetMovementData() => playerData;
         public PlayerInput GetPlayerInput() => playerInput;
-        public PlayerLook GetPlayerLook() => _playerLook;
-        public PlayerSprint GetPlayerSprint() => _playerSprint;
+        
+        // Player component accessors
         public PlayerCondition GetPlayerCondition() => _playerCondition;
+        public PlayerLook GetPlayerLook() => _playerLook;
+        public PlayerMove GetPlayerMove() => _playerMove;
         public PlayerGravity GetPlayerGravity() => _playerGravity;
+        public PlayerSprint GetPlayerSprint() => _playerSprint;
         public PlayerCrouch GetPlayerCrouch() => _playerCrouch;
         public PlayerJump GetPlayerJump() => _playerJump;
-        public PlayerMove GetPlayerMove() => _playerMove;
         public PlayerHeadBob GetPlayerHeadBob() => _playerHeadBob;
         public PlayerInteraction GetPlayerInteraction() => _playerInteraction;
+        #endregion
         
-        
+        #region State Methods
         // Methods for proxying state information
         public bool IsSprinting() => playerData.isSprinting;
         public bool IsCrouching() => playerData.isCrouching;
         public bool IsGrounded() => playerData.isGrounded;
-
-#if UNITY_EDITOR
-        private void OnDrawGizmos()
-        {
-            for (var i = 0; i < _playerBehaviours.Count; i++)
-            {
-                _playerBehaviours[i].OnDrawGizmos();
-            }
-        }
-#endif
-        
+        #endregion
     }
 }

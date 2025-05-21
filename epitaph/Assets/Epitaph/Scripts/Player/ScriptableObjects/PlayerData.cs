@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Epitaph.Scripts.Player.ScriptableObjects
 {
@@ -8,14 +9,15 @@ namespace Epitaph.Scripts.Player.ScriptableObjects
         [Header("Condition")]
         public float health;
         // public float maxHealth;
+        public float stamina;
+        // public float maxStamina;
+        [Space]
         public float hunger;
         // public float maxHunger;
         public float thirst;
         // public float maxThirst;
         public float fatigue;
         // public float maxFatigue;
-        public float stamina;
-        // public float maxStamina;
         
         [Header("Movement Data")]
         public float walkSpeed;
@@ -74,5 +76,15 @@ namespace Epitaph.Scripts.Player.ScriptableObjects
         [Header("Sprint Settings")]
         public bool isSprinting;
         public float sprintSpeed = 10f;
+        
+        [Header("Interaction Data")]
+        public float interactionDistance = 3f;
+        public LayerMask interactableLayer = LayerMask.GetMask("Interactable");
+        public float raycastInterval = 0.05f;
+        
+        [Space]
+        public bool showDebugGizmos = true;
+        public Color hitGizmoColor = Color.yellow;
+        public Color gizmoColor = Color.red;
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Epitaph.Scripts.Interaction;
+using Epitaph.Scripts.Player.ScriptableObjects;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
@@ -10,21 +11,15 @@ namespace Epitaph.Scripts.Player.MovementSystem
     {
      
         public PlayerInteraction(PlayerController playerController, 
-            Camera playerCamera) : base(playerController)
+            PlayerData playerData, Camera playerCamera) : base(playerController)
         {
+            _playerController = playerController;
+            _playerData = playerData;
             _playerCamera = playerCamera;
         }
-        
-        [Header("Raycast Settings")]
-        public float InteractionDistance = 3f;
-        public LayerMask InteractableLayer = LayerMask.GetMask("Interactable");
-        private float _raycastInterval = 0.05f;
-        
-        [Header("Debug Settings")]
-        public bool ShowDebugGizmos = true;
-        public Color HitGizmoColor = Color.yellow;
-        public Color GizmoColor = Color.red;
 
+        private PlayerController _playerController;
+        private PlayerData _playerData;
         private Camera _playerCamera;
         
         // Events
@@ -67,7 +62,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 // Perform raycast
                 var previousHitState = _didHit; 
                 _didHit = Physics.Raycast(_rayOrigin, _rayDirection, out _lastHit, 
-                    InteractionDistance, InteractableLayer);
+                    _playerData.interactionDistance, _playerData.interactableLayer);
 
                 switch (_didHit)
                 {
@@ -82,7 +77,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 }
                 
                 // Run at intervals to reduce CPU usage
-                await UniTask.Delay(TimeSpan.FromSeconds(_raycastInterval), 
+                await UniTask.Delay(TimeSpan.FromSeconds(_playerData.raycastInterval), 
                     cancellationToken: cancellationToken);
             }
         }
@@ -110,16 +105,16 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         private void DebugDrawLine()
         {
-            if (!ShowDebugGizmos) return;
+            if (!_playerData.showDebugGizmos) return;
             
             // Debug visualization
             if (_didHit)
             {
-                Debug.DrawLine(_rayOrigin, _lastHit.point, HitGizmoColor);
+                Debug.DrawLine(_rayOrigin, _lastHit.point, _playerData.hitGizmoColor);
             }
             else
             {
-                Debug.DrawLine(_rayOrigin, _rayOrigin + _rayDirection * InteractionDistance, GizmoColor);
+                Debug.DrawLine(_rayOrigin, _rayOrigin + _rayDirection * _playerData.interactionDistance, _playerData.gizmoColor);
             }
         }
 
