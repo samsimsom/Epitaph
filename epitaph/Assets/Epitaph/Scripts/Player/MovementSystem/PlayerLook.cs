@@ -6,16 +6,18 @@ namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class PlayerLook : PlayerBehaviour
     {
-        private PlayerData _playerData;
         private PlayerController _playerController;
+        private PlayerData _playerData;
+        private Transform _playerCameraTransform;
         private CinemachineCamera _fpCamera;
 
         public PlayerLook(PlayerController playerController,
             PlayerData playerData,
-            Camera playerCamera,
+            Transform playerCameraTransform,
             CinemachineCamera fpCamera) : base(playerController)
         {
             _playerData = playerData;
+            _playerCameraTransform = playerCameraTransform;
             _fpCamera = fpCamera;
         }
 
@@ -48,6 +50,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
                     _ => controller.Input.Gain
                 };
             }
+        }
+
+        public void SetMouseInput(Vector2 input)
+        {
+            
         }
     }
 }

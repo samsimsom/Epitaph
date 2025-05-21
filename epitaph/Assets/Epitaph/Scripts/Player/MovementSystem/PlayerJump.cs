@@ -33,10 +33,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
             ComputeCeilingRayOrigin(out var radius, out var rayDistance, 
                 out var originTip, out var originRoot);
             var cannotHitCeiling = !Physics.Raycast(originRoot, Vector3.up, rayDistance,
-                _playerController.GetMovementData().ceilingLayers);
-            var isInCoyoteTime = _playerController.GetMovementData().useCoyoteTime && _coyoteTimeCounter > 0;
+                _playerData.ceilingLayers);
+            var isInCoyoteTime = _playerData.useCoyoteTime && _coyoteTimeCounter > 0;
             
-            return !_playerController.GetMovementData().isCrouching && _canJump && (_playerController.GetMovementData().isGrounded || isInCoyoteTime) && cannotHitCeiling;
+            return !_playerData.isCrouching && _canJump && (_playerData.isGrounded || isInCoyoteTime) && cannotHitCeiling;
         }
         
         public void ProcessJump()
@@ -48,7 +48,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             else
             {
                 // Zıplayamasa bile jump buffer'ı başlat
-                _jumpBufferCounter = _playerController.GetMovementData().jumpBufferTime;
+                _jumpBufferCounter = _playerData.jumpBufferTime;
             }
         }
 
@@ -65,14 +65,14 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         private void HandleCoyoteTime()
         {
-            if (!_playerController.GetMovementData().useCoyoteTime) return;
+            if (!_playerData.useCoyoteTime) return;
             
-            var isGrounded = _playerController.GetMovementData().isGrounded;
+            var isGrounded = _playerData.isGrounded;
             
             // Yerdeyken coyote sayacını max değerine ayarla
             if (isGrounded)
             {
-                _coyoteTimeCounter = _playerController.GetMovementData().coyoteTime;
+                _coyoteTimeCounter = _playerData.coyoteTime;
             }
             else
             {
@@ -108,7 +108,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             out float rayDistance, out Vector3 originTip, out Vector3 originRoot)
         {
             radius = _playerController.GetCharacterController().radius;
-            rayDistance = _playerController.GetMovementData().ceilingCheckDistance;
+            rayDistance = _playerData.ceilingCheckDistance;
             originTip = _playerController.GetCharacterController().transform.position
                         + _playerController.GetCharacterController().center
                         + Vector3.up * (_playerController.GetCharacterController().height / 2f)

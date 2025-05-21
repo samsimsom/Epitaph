@@ -44,18 +44,24 @@ namespace Epitaph.Scripts.Player
         public void OnLook(InputAction.CallbackContext context)
         {
             mouseDelta = context.ReadValue<Vector2>();
+            // PlayerLook'a mouse deltasını ilet
+            _playerController.ViewController?.PlayerLook?.SetMouseInput(mouseDelta); // PlayerLook'ta böyle bir metot olduğunu varsayıyoruz
         }
 
         public void OnAttack(InputAction.CallbackContext context)
         {
-            
+            // Henüz bir AttackController veya benzeri bir yapı yok,
+            // bu implemente edildiğinde ilgili kontrolcü üzerinden çağrılacak.
+            // Örneğin: _playerController.AttackController?.PlayerAttack?.TryAttack();
         }
 
         public void OnInteract(InputAction.CallbackContext context)
         {
             if (context.performed)
             {
-                _playerController.GetPlayerInteraction().TryInteract();
+                // Eski: _playerController.GetPlayerInteraction().TryInteract();
+                // Yeni:
+                _playerController.InteractionController?.PlayerInteraction?.TryInteract();
             }
         }
 
@@ -63,11 +69,13 @@ namespace Epitaph.Scripts.Player
         {
             if (context.started)
             {
-                _playerController.GetPlayerCrouch().ToggleCrouch();
+                // Eski: _playerController.GetPlayerCrouch().ToggleCrouch();
+                // Yeni:
+                _playerController.MovementController?.PlayerCrouch?.ToggleCrouch();
             }
             else if (context.canceled)
             {
-                
+                // Gerekirse burası da güncellenir.
             }
         }
 
@@ -75,7 +83,9 @@ namespace Epitaph.Scripts.Player
         {
             if (context.performed)
             {
-                _playerController.GetPlayerJump().ProcessJump();
+                // Eski: _playerController.GetPlayerJump().ProcessJump();
+                // Yeni:
+                _playerController.MovementController?.PlayerJump?.ProcessJump();
             }
         }
 
@@ -96,15 +106,18 @@ namespace Epitaph.Scripts.Player
         {
             if (context.performed)
             {
-                _playerController.GetPlayerSprint().TryStartSprint();
+                // Eski: _playerController.GetPlayerSprint().TryStartSprint();
+                // Yeni:
+                _playerController.MovementController?.PlayerSprint?.TryStartSprint();
             }
             else if (context.canceled)
             {
-                _playerController.GetPlayerSprint().StopSprint();
+                // Eski: _playerController.GetPlayerSprint().StopSprint();
+                // Yeni:
+                _playerController.MovementController?.PlayerSprint?.StopSprint();
             }
         }
         #endregion
         // ---------------------------------------------------------------------------- //
-        
     }
 }

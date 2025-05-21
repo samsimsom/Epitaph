@@ -15,7 +15,7 @@ namespace Epitaph.Scripts.Player.HealthSystem.HealPoint
             if (other.gameObject.TryGetComponent<PlayerController>(out var playerController))
             {
                 foodMaterial.color = Color.white;
-                playerController.GetPlayerCondition().Eat(foodAmount);
+                // playerController.GetPlayerCondition().Eat(foodAmount);
             }
         }
 

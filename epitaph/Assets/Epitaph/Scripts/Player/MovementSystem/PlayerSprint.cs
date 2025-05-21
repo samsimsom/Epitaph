@@ -45,15 +45,15 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public void TryStartSprint()
         {
             if (!_playerData.isGrounded || 
-                PlayerController.GetPlayerCondition()?.Stamina == null ||
-                PlayerController.GetPlayerCondition().Stamina.Value <= 0) return;
+                _healthController?.Stamina == null ||
+                _healthController.Stamina.Value <= 0) return;
             
             if (_playerData.isCrouching) return;
             
             _playerData.isSprinting = true;
             _playerMove.SetRunningSpeed();
-            PlayerController.GetPlayerCondition().SetRunning(_playerData.isSprinting); // hunger, thirst modifikasyon için
-            PlayerController.GetPlayerCondition().Stamina.StartStaminaConsuming();
+            _healthController.SetRunning(_playerData.isSprinting); // hunger, thirst modifikasyon için
+            _healthController.Stamina.StartStaminaConsuming();
             OnChangeSprintSpeed?.Invoke(_playerData.sprintSpeed);
         }
 
@@ -63,8 +63,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             
             _playerData.isSprinting = false;
             _playerMove.SetWalkingSpeed();
-            PlayerController.GetPlayerCondition().SetRunning(_playerData.isSprinting); // hunger, thirst eski haline döner
-            PlayerController.GetPlayerCondition().Stamina.StopStaminaConsuming();
+            _healthController.SetRunning(_playerData.isSprinting); // hunger, thirst eski haline döner
+            _healthController.Stamina.StopStaminaConsuming();
             OnChangeSprintSpeed?.Invoke(_playerData.walkSpeed);
         }
         
