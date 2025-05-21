@@ -22,7 +22,7 @@ namespace Epitaph.Scripts.Player
         #endregion
         
         #region Player Behaviors
-        private readonly List<PlayerBehaviour> _playerBehaviours = new();
+        private readonly List<IBehaviour> _playerBehaviours = new();
         
         // Movement Components
         private PlayerMove _playerMove;
@@ -42,6 +42,18 @@ namespace Epitaph.Scripts.Player
         private void Awake()
         {
             InitializeComponents();
+            foreach (var behaviour in _playerBehaviours)
+            {
+                behaviour.Awake();
+            }
+        }
+        
+        private void OnEnable()
+        {
+            foreach (var behaviour in _playerBehaviours)
+            {
+                behaviour.OnEnable();
+            }
         }
         
         private void Start()
@@ -60,11 +72,19 @@ namespace Epitaph.Scripts.Player
             }
         }
         
-        private void OnEnable()
+        private void LateUpdate()
         {
             foreach (var behaviour in _playerBehaviours)
             {
-                behaviour.OnEnable();
+                behaviour.LateUpdate();
+            }
+        }
+        
+        private void FixedUpdate()
+        {
+            foreach (var behaviour in _playerBehaviours)
+            {
+                behaviour.FixedUpdate();
             }
         }
         
@@ -73,6 +93,14 @@ namespace Epitaph.Scripts.Player
             foreach (var behaviour in _playerBehaviours)
             {
                 behaviour.OnDisable();
+            }
+        }
+        
+        private void OnDestroy()
+        {
+            foreach (var behaviour in _playerBehaviours)
+            {
+                behaviour.OnDestroy();
             }
         }
 
@@ -88,7 +116,7 @@ namespace Epitaph.Scripts.Player
         #endregion
 
         #region Initialization
-        private T AddPlayerBehaviour<T>(T behaviour) where T : PlayerBehaviour
+        private T AddPlayerBehaviour<T>(T behaviour) where T : IBehaviour
         {
             _playerBehaviours.Add(behaviour);
             return behaviour;
@@ -102,7 +130,8 @@ namespace Epitaph.Scripts.Player
 
             if (playerInput == null) 
                 playerInput = GetComponent<PlayerInput>();
-
+            
+            
             // Initialize player condition first as other components may depend on it
             _playerCondition = AddPlayerBehaviour(new PlayerCondition(this, playerData));
             
