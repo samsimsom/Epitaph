@@ -16,19 +16,18 @@ namespace Epitaph.Scripts.Player
         [Header("Components")]
         [SerializeField] private CharacterController characterController;
         [SerializeField] private PlayerInput playerInput;
-        [SerializeField] private Camera playerCamera; // Ana oyuncu kamerası
-        [SerializeField] private CinemachineCamera fpCamera; // Cinemachine kamerası
-        [SerializeField] private Transform playerCameraTransform; // Genellikle kameranın parent'ı olan ve döndürülen transform
+        [SerializeField] private Camera playerCamera; 
+        [SerializeField] private CinemachineCamera fpCamera; 
+        [SerializeField] private Transform playerCameraTransform; 
         #endregion
         
         #region Player SubControllers
         private readonly List<IPlayerSubController> _subControllers = new();
         
-        // Alt Kontrolcüler
         public MovementController MovementController { get; private set; }
         public HealthController HealthController { get; private set; } 
         public InteractionController InteractionController { get; private set; } 
-        public ViewController ViewController { get; private set; } // Yeni eklendi
+        public ViewController ViewController { get; private set; } 
         #endregion
 
         #region Unity Lifecycle Methods
@@ -39,8 +38,7 @@ namespace Epitaph.Scripts.Player
             {
                 subController.PlayerAwake();
             }
-            // HealthController ayrı yönetiliyorsa onun Awake'i çağrılabilir.
-            HealthController?.Awake(); // Eğer HealthController PlayerBehaviour ise. Şimdiki yapıda değil.
+            // HealthController?.Awake(); // Bu satır kaldırılacak, döngü içinde hallediliyor.
         }
         
         private void OnEnable()
@@ -49,7 +47,7 @@ namespace Epitaph.Scripts.Player
             {
                 subController.PlayerOnEnable();
             }
-            // HealthController?.OnEnable();
+            // HealthController?.OnEnable(); // Bu satır kaldırılacak
         }
         
         private void Start()
@@ -58,7 +56,7 @@ namespace Epitaph.Scripts.Player
             {
                 subController.PlayerStart();
             }
-            // HealthController?.Start();
+            // HealthController?.Start(); // Bu satır kaldırılacak
         }
         
         private void Update()
@@ -67,7 +65,7 @@ namespace Epitaph.Scripts.Player
             {
                 subController.PlayerUpdate();
             }
-            // HealthController?.Update();
+            // HealthController?.Update(); // Bu satır kaldırılacak
         }
         
         private void LateUpdate()
@@ -76,7 +74,7 @@ namespace Epitaph.Scripts.Player
             {
                 subController.PlayerLateUpdate();
             }
-            // HealthController?.LateUpdate();
+            // HealthController?.LateUpdate(); // Bu satır kaldırılacak
         }
         
         private void FixedUpdate()
@@ -85,7 +83,7 @@ namespace Epitaph.Scripts.Player
             {
                 subController.PlayerFixedUpdate();
             }
-            // HealthController?.FixedUpdate();
+            // HealthController?.FixedUpdate(); // Bu satır kaldırılacak
         }
         
         private void OnDisable()
@@ -94,7 +92,7 @@ namespace Epitaph.Scripts.Player
             {
                 subController.PlayerOnDisable();
             }
-            // HealthController?.OnDisable();
+            // HealthController?.OnDisable(); // Bu satır kaldırılacak
         }
         
         private void OnDestroy()
@@ -103,17 +101,20 @@ namespace Epitaph.Scripts.Player
             {
                 subController.PlayerOnDestroy();
             }
-            // HealthController?.OnDestroy();
+            // HealthController?.OnDestroy(); // Bu satır kaldırılacak
         }
 
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
+            // OnDrawGizmos çağrısı her subcontroller için null kontrolü yapmalı
+            // veya _subControllers listesi null eleman içermemeli.
+            if (_subControllers == null) return;
             foreach (var subController in _subControllers)
             {
-                subController.PlayerOnDrawGizmos();
+                subController?.PlayerOnDrawGizmos();
             }
-            // HealthController?.OnDrawGizmos();
+            // HealthController?.OnDrawGizmos(); // Bu satır kaldırılacak
         }
 #endif
         #endregion
@@ -127,21 +128,16 @@ namespace Epitaph.Scripts.Player
         
         private void InitializeSubControllersAndBehaviours()
         {
-            // Get required components if not already assigned
             if (characterController == null) 
                 characterController = GetComponent<CharacterController>();
 
             if (playerInput == null) 
                 playerInput = GetComponent<PlayerInput>();
             
-            // Componentlerin atanıp atanmadığını kontrol et (Inspector'dan atanmamış olabilirler)
             if (playerCamera == null)
             {
-                // Genellikle ana kamera Tag ile bulunur veya direkt atanır.
-                // Bu örnekte, child bir obje olduğunu varsayarak bulmaya çalışabiliriz
-                // ya da Inspector'dan atanması zorunlu kılınabilir.
                 var camComponent = GetComponentInChildren<Camera>();
-                if (camComponent != null && camComponent.CompareTag("MainCamera")) // Veya özel bir tag/isim
+                if (camComponent != null && camComponent.CompareTag("MainCamera"))
                     playerCamera = camComponent;
                 else
                     Debug.LogError("PlayerCamera is not assigned in PlayerController and could not be found automatically.", this);
@@ -149,37 +145,29 @@ namespace Epitaph.Scripts.Player
 
             if (fpCamera == null && playerCamera != null)
             {
-                // Eğer playerCamera bir Cinemachine Brain ise veya fpCamera direkt atanmamışsa,
-                // CinemachineCamera'yı playerCamera objesinde veya bir child objede arayabiliriz.
-                // Bu kısım projenizin yapısına göre değişir.
-                // Genellikle fpCamera direkt olarak Inspector'dan atanır.
-                // Eğer PlayerCameraTransform üzerinde bir CinemachineVirtualCamera varsa:
                 if (playerCameraTransform != null)
-                     fpCamera = playerCameraTransform.GetComponentInChildren<CinemachineCamera>(); // Veya GetComponent<CinemachineBrain>() ve oradan aktif kamera.
-                // else
-                // Debug.LogWarning("fpCamera or playerCameraTransform is not assigned. ViewController might not function correctly.", this);
+                     fpCamera = playerCameraTransform.GetComponentInChildren<CinemachineCamera>();
             }
 
             if (playerCameraTransform == null && playerCamera != null)
             {
-                // Genellikle playerCamera'nın parent'ı ya da kendisi olur.
-                // PlayerLook genellikle bu transformu döndürür.
-                playerCameraTransform = playerCamera.transform; // Veya kameranın parent'ıysa playerCamera.transform.parent;
-                // Debug.LogWarning("playerCameraTransform is not assigned. Assigning playerCamera.transform by default.", this);
+                playerCameraTransform = playerCamera.transform;
             }
             
-            HealthController = new HealthController(this, playerData); 
+            // HealthController'ı oluştur ve listeye ekle
+            HealthController = AddSubController(new HealthController()); 
+            HealthController.InitializeBehaviours(this, playerData); // Bağımlılıkları enjekte et
 
             MovementController = AddSubController(new MovementController(characterController, playerCamera));
+            // MovementController'ın HealthController'a erişimi varsa, bunu InitializeBehaviours içinde yapabilir
+            // veya ayrı bir InjectDependencies metodu kalabilir. Şimdilik InjectDependencies kullanılıyor.
             MovementController.InjectDependencies(HealthController); 
             MovementController.InitializeBehaviours(this, playerData);
             
             InteractionController = AddSubController(new InteractionController(playerCamera)); 
             InteractionController.InitializeBehaviours(this, playerData);
             
-            // Initialize ViewController
-            // Gerekli componentlerin null olup olmadığını kontrol et veya varsayılan ata
-            if (playerCamera != null && playerCameraTransform != null) // fpCamera opsiyonel olabilir, PlayerLook'a bağlı
+            if (playerCamera != null && playerCameraTransform != null)
             {
                 ViewController = AddSubController(new ViewController(playerCamera, fpCamera, playerCameraTransform));
                 ViewController.InitializeBehaviours(this, playerData);
@@ -195,19 +183,18 @@ namespace Epitaph.Scripts.Player
         public CharacterController GetCharacterController() => characterController;
         public PlayerData GetPlayerData() => playerData; 
         public PlayerInput GetPlayerInput() => playerInput;
-        public HealthController GetHealthController() => HealthController; 
+        // HealthController'a erişim zaten public bir property olarak tanımlı
+        // public HealthController GetHealthController() => HealthController; 
 
-        // Kamera ile ilgili bileşenlere erişim için getter'lar (ViewController veya PlayerInput kullanabilir)
         public Camera GetPlayerCamera() => playerCamera;
         public CinemachineCamera GetFPCamera() => fpCamera;
         public Transform GetPlayerCameraTransform() => playerCameraTransform;
         #endregion
         
         #region State Methods
-        // Bu metotlar hala geçerli olabilir veya ilgili alt kontrolcülere taşınabilir.
-        public bool IsSprinting() => playerData.isSprinting; // veya MovementController.IsSprinting()
-        public bool IsCrouching() => playerData.isCrouching; // veya MovementController.IsCrouching()
-        public bool IsGrounded() => playerData.isGrounded;   // veya MovementController.IsGrounded()
+        public bool IsSprinting() => playerData.isSprinting;
+        public bool IsCrouching() => playerData.isCrouching;
+        public bool IsGrounded() => playerData.isGrounded;
         #endregion
     }
 }
