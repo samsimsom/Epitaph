@@ -1,7 +1,7 @@
 using Epitaph.Scripts.Player.ScriptableObjects;
 using UnityEngine;
 
-namespace Epitaph.Scripts.Player.MovementSystem
+namespace Epitaph.Scripts.Player.ViewSystem
 {
     public class PlayerHeadBob : PlayerBehaviour
     {

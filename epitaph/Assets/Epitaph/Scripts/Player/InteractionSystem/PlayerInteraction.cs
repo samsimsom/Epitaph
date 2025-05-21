@@ -5,7 +5,7 @@ using Epitaph.Scripts.Interaction;
 using Epitaph.Scripts.Player.ScriptableObjects;
 using UnityEngine;
 
-namespace Epitaph.Scripts.Player.MovementSystem
+namespace Epitaph.Scripts.Player.InteractionSystem
 {
     public class PlayerInteraction : PlayerBehaviour
     {

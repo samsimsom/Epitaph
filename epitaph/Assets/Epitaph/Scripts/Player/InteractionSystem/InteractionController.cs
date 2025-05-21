@@ -3,7 +3,7 @@ using Epitaph.Scripts.Player.MovementSystem;
 using Epitaph.Scripts.Player.ScriptableObjects;
 using UnityEngine;
 
-namespace Epitaph.Scripts.Player.SubController
+namespace Epitaph.Scripts.Player.InteractionSystem
 {
     public class InteractionController : IPlayerSubController
     {

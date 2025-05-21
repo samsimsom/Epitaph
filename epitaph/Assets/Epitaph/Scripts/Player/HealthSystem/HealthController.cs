@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Epitaph.Scripts.GameTimeManager;
-using Epitaph.Scripts.Player.HealthSystem;
-using Epitaph.Scripts.Player.ScriptableObjects; // Assuming PlayerData is here
+using Epitaph.Scripts.Player.ScriptableObjects;
 using UnityEngine;
 
-namespace Epitaph.Scripts.Player.SubController
+namespace Epitaph.Scripts.Player.HealthSystem
 {
     public class HealthController : IPlayerSubController
     {

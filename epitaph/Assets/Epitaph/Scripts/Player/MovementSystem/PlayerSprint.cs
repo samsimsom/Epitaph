@@ -1,7 +1,6 @@
 using System;
 using Epitaph.Scripts.Player.HealthSystem;
 using Epitaph.Scripts.Player.ScriptableObjects;
-using Epitaph.Scripts.Player.SubController;
 
 namespace Epitaph.Scripts.Player.MovementSystem
 {

@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using Epitaph.Scripts.Player.MovementSystem;
 using Epitaph.Scripts.Player.ScriptableObjects;
 using Unity.Cinemachine;
 using UnityEngine;
 
-namespace Epitaph.Scripts.Player.SubController
+namespace Epitaph.Scripts.Player.ViewSystem
 {
     public class ViewController : IPlayerSubController
     {

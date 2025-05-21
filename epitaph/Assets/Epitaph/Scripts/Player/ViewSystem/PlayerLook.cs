@@ -2,7 +2,7 @@ using Epitaph.Scripts.Player.ScriptableObjects;
 using Unity.Cinemachine;
 using UnityEngine;
 
-namespace Epitaph.Scripts.Player.MovementSystem
+namespace Epitaph.Scripts.Player.ViewSystem
 {
     public class PlayerLook : PlayerBehaviour
     {
