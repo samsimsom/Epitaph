@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Epitaph.Scripts.Player.ScriptableObjects
 {
@@ -8,16 +7,36 @@ namespace Epitaph.Scripts.Player.ScriptableObjects
     {
         [Header("Condition")]
         public float health;
-        // public float maxHealth;
+        public float maxHealth;
+        public float healthIncreaseRate;
+        public float healthDecreaseRate;
+        [Space]
         public float stamina;
-        // public float maxStamina;
+        public float maxStamina;
+        public float staminaIncreaseRate;
+        public float staminaDecreaseRate;
+        public float staminaRecoveryDelay;
+        public float staminaEnoughPercentage;
         [Space]
         public float hunger;
-        // public float maxHunger;
+        public float maxHunger;
+        public float hungerIncreaseRate;
+        public float hungerStarvingThreshold;
+        public float hungerDefaultModifier;
+        public float hungerRunningModifier;
+        [Space]
         public float thirst;
-        // public float maxThirst;
+        public float maxThirst;
+        public float thirstIncreaseRate;
+        public float thirstDehydrationThreshold;
+        public float thirstDefaultModifier;
+        public float thirstRunningModifier;
+        [Space]
         public float fatigue;
-        // public float maxFatigue;
+        public float maxFatigue;
+        public float fatiqueIncreaseRate;
+        public float fatiqueExhaustionThreshold;
+        public float fatigueRecoveryPerHour;
 
         [Header("Movement Data")] 
         public float currentSpeed;
@@ -42,8 +61,8 @@ namespace Epitaph.Scripts.Player.ScriptableObjects
         public float verticalVelocity;
         public LayerMask groundLayers;
         [Space] 
-        public bool isFalling = false;
-        public float fallThreshold = 0.2f;
+        public bool isFalling;
+        public float fallThreshold;
         [Space]
         public float slopeClimbThreshold = 0.5f;
         public float slopeForce;

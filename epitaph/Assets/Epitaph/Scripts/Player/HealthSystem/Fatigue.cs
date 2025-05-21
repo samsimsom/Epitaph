@@ -4,45 +4,53 @@ namespace Epitaph.Scripts.Player.HealthSystem
 {
     public class Fatigue : ICondition
     {
-        public float Value { get; private set; }
-        public float MaxValue { get; private set; }
-        public float BaseIncreaseRate { get; set; }
-        public float BaseDecreaseRate { get; set; }
-        public float Modifier { get; set; } = 1f;
+        public float Value { get; private set; } // Current fatigue level (0 = not fatigued, MaxValue = very fatigued)
+        public float MaxValue { get; private set; } // The point at which "very fatigued" state begins
+        public float BaseIncreaseRate { get; set; } // Rate at which fatigue increases
+        public float BaseDecreaseRate { get; set; } // Rate at which fatigue decreases (e.g. sleeping) - used by external actions
+        public float Modifier { get; set; } = 1f; // Affects BaseIncreaseRate
         
-        private float _exhaustionThreshold = 25.0f;
+        private float _exhaustionThreshold; // Additional value beyond MaxValue for "exhaustion"
+        public float CurrentExhaustionPoint => MaxValue + _exhaustionThreshold;
 
         public float EffectiveIncreaseRate => BaseIncreaseRate * Modifier;
-        public float EffectiveDecreaseRate => BaseDecreaseRate * Modifier;
+        // EffectiveDecreaseRate can be used by external actions like Sleep if Modifier should apply there too
 
-        public Fatigue(float max, float rate)
+        public Fatigue(float initialValue, float maxValue, float baseIncreaseRate, float exhaustionThreshold, float baseDecreaseRate = 0f)
         {
-            MaxValue = max;
-            Value = 0;
-            BaseIncreaseRate = rate;
+            MaxValue = maxValue;
+            _exhaustionThreshold = exhaustionThreshold;
+            Value = Mathf.Clamp(initialValue, 0, CurrentExhaustionPoint);
+            BaseIncreaseRate = baseIncreaseRate;
+            BaseDecreaseRate = baseDecreaseRate; // Store this if sleeping effectiveness depends on it
         }
 
-        public void Increase(float amount)
+        public void Increase(float amount) // Make more fatigued
         {
-            Value = Mathf.Clamp(Value + amount, 0, MaxValue);
+            Value = Mathf.Clamp(Value + amount, 0, CurrentExhaustionPoint);
+            CheckExhaustion();
         }
 
-        public void Decrease(float amount)
+        public void Decrease(float amount) // Make less fatigued (e.g., sleeping)
         {
-            Value = Mathf.Clamp(Value - amount, 0, MaxValue);
+            Value = Mathf.Clamp(Value - amount, 0, CurrentExhaustionPoint);
         }
 
         public void UpdateStat(float deltaTime)
         {
-            Value = Mathf.Clamp(Value + EffectiveIncreaseRate * deltaTime, 0,
-                MaxValue + _exhaustionThreshold);
+            Increase(EffectiveIncreaseRate * deltaTime);
         }
 
         public void CheckExhaustion()
         {
-            if (Value >= MaxValue + _exhaustionThreshold)
+            if (Value >= CurrentExhaustionPoint)
             {
-                Debug.Log("Start Exhaustion!");
+                Debug.Log("Player is Exhausted!");
+                // Trigger events or apply debuffs
+            }
+            else if (Value >= MaxValue)
+            {
+                Debug.Log("Player is Very Fatigued!");
             }
         }
     }

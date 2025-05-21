@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using Epitaph.Scripts.Player.HealthSystem;
-using Epitaph.Scripts.Player.MovementSystem;
 using Epitaph.Scripts.Player.ScriptableObjects;
 using Epitaph.Scripts.Player.SubController;
 using Unity.Cinemachine;
@@ -157,11 +155,9 @@ namespace Epitaph.Scripts.Player
             
             // HealthController'ı oluştur ve listeye ekle
             HealthController = AddSubController(new HealthController()); 
-            HealthController.InitializeBehaviours(this, playerData); // Bağımlılıkları enjekte et
+            HealthController.InitializeBehaviours(this, playerData);
 
             MovementController = AddSubController(new MovementController(characterController, playerCamera));
-            // MovementController'ın HealthController'a erişimi varsa, bunu InitializeBehaviours içinde yapabilir
-            // veya ayrı bir InjectDependencies metodu kalabilir. Şimdilik InjectDependencies kullanılıyor.
             MovementController.InjectDependencies(HealthController); 
             MovementController.InitializeBehaviours(this, playerData);
             
@@ -188,7 +184,7 @@ namespace Epitaph.Scripts.Player
         // public HealthController GetHealthController() => HealthController; 
 
         public Camera GetPlayerCamera() => playerCamera;
-        public CinemachineCamera GetFPCamera() => fpCamera;
+        public CinemachineCamera GetFpCamera() => fpCamera;
         public Transform GetPlayerCameraTransform() => playerCameraTransform;
         #endregion
         

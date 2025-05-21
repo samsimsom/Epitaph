@@ -2,70 +2,26 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Epitaph.Scripts.GameTimeManager;
 using Epitaph.Scripts.Player.HealthSystem;
-using Epitaph.Scripts.Player.ScriptableObjects;
+using Epitaph.Scripts.Player.ScriptableObjects; // Assuming PlayerData is here
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.SubController
 {
-    public class HealthController : IPlayerSubController // PlayerBehaviour yerine IPlayerSubController
+    public class HealthController : IPlayerSubController
     {
-        // PlayerController ve PlayerData alanları InitializeBehaviours içinde atanacak
         private PlayerController _playerController;
-        private PlayerData _playerData;
+        private PlayerData _playerData; // Assume this holds all configuration values
 
-        // Yapıcı metot (constructor) IPlayerSubController deseni için genellikle kaldırılır
-        // veya parametresiz hale getirilir. Gerekli bağımlılıklar InitializeBehaviours ile enjekte edilir.
-        // public HealthController(PlayerController playerController, PlayerData playerData)
-        // {
-        //     _playerController = playerController;
-        //     _playerData = playerData;
-        // }
+        public Health Health { get; private set; }
+        public Stamina Stamina { get; private set; }
+        public Hunger Hunger { get; private set; }
+        public Thirst Thirst { get; private set; }
+        public Fatigue Fatigue { get; private set; }
         
-        #region Public Properties
-        public Health Health
-        {
-            get => _health;
-            private set => _health = value;
-        }
-        public Stamina Stamina
-        {
-            get => _stamina;
-            private set => _stamina = value;
-        }
-        public Hunger Hunger
-        {
-            get => _hunger;
-            private set => _hunger = value;
-        }
-        public Thirst Thirst
-        {
-            get => _thirst;
-            private set => _thirst = value;
-        }
-        public Fatigue Fatigue
-        {
-            get => _fatigue;
-            private set => _fatigue = value;
-        }
-        #endregion
-
-        #region Private Fields
-        // private PlayerData _playerData; // InitializeBehaviours'da atanacak
-        
-        private Health _health;
-        private Stamina _stamina;
-        private Hunger _hunger;
-        private Thirst _thirst;
-        private Fatigue _fatigue;
         private List<ICondition> _allStats;
-        
         private int _lastMinute = -1;
-        // private int _lastSecond = -1;
-        
         private bool _isUpdating;
-        #endregion
 
-        #region IPlayerSubController Implementation
         public void InitializeBehaviours(PlayerController playerController, PlayerData playerData)
         {
             _playerController = playerController;
@@ -85,95 +41,119 @@ namespace Epitaph.Scripts.Player.SubController
         public void PlayerOnEnable()
         {
             _isUpdating = true;
-            
             if (GameTime.Instance != null)
             {
                 GameTime.Instance.OnTimeSkipped += OnTimeSkipped;
+                // Assuming GameTime also fires an event for regular time changes if needed for OnTimeChanged
+                // For now, OnTimeChanged is called externally or through a different mechanism.
             }
             else
             {
-                Debug.LogWarning("GameTime instance not found. " +
-                                 "Player conditions will not update on time skip.");
+                Debug.LogWarning("GameTime instance not found. Player conditions will not update on time skip.");
             }
         }
 
-        public void PlayerUpdate()
-        {
-            // FrameBasedUpdates zaten kendi döngüsünde çalışıyor.
-            // PlayerController.Update'den buraya sürekli çağrı yapılmasına gerek yok
-            // eğer FrameBasedUpdates içindeki gibi bir async loop kullanılıyorsa.
-            // Ancak, PlayerData'ya değer atamaları gibi senkronize işler varsa burada yapılabilir.
-            // Şimdilik FrameBasedUpdates'in bu işi yaptığı varsayılıyor.
-        }
-
-        public void PlayerLateUpdate() { /* Gerekirse implementasyon eklenebilir */ }
-        public void PlayerFixedUpdate() { /* Gerekirse implementasyon eklenebilir */ }
+        public void PlayerUpdate() { /* No continuous calls needed if async updates handle their logic */ }
+        public void PlayerLateUpdate() { }
+        public void PlayerFixedUpdate() { }
 
         public void PlayerOnDisable()
         {
-            _isUpdating = false; // Async loop'ların durmasını sağlar
-            
+            _isUpdating = false; 
             if (GameTime.Instance != null)
             {
                 GameTime.Instance.OnTimeSkipped -= OnTimeSkipped;
             }
+            // Important: Also cancel any running UniTasks in Stamina if HealthController itself is disabled/destroyed
+            // Stamina's CancellationTokenSources should ideally be linked to _isUpdating or a token from HealthController
+            // For simplicity here, assuming Stamina handles its cancellations if its owner becomes inactive.
+            // A more robust solution would pass a CancellationToken from HealthController to Stamina.
         }
         
-        public void PlayerOnDestroy() { /* Gerekirse implementasyon eklenebilir */ }
+        public void PlayerOnDestroy() { /* Cleanup if necessary */ }
 
 #if UNITY_EDITOR
-        public void PlayerOnDrawGizmos() { /* Gerekirse implementasyon eklenebilir */ }
+        public void PlayerOnDrawGizmos() { }
 #endif
-        #endregion
         
         private void InitializeConditions()
         {
-            Health = new Health(100f, 1.0f);
-            Stamina = new Stamina(100f, 1f, 1f);
-            Hunger = new Hunger(100f, 0.1f);
-            Thirst = new Thirst(100f, 0.3f);
-            Fatigue = new Fatigue(100f, 0.1f);
+            // Values should come from _playerData (e.g., _playerData.healthConfig.initialValue)
+            // Using placeholder values here for demonstration if _playerData structure is unknown.
+            // Replace these with actual _playerData fields.
+
+            // Example: _playerData might have distinct config objects or just loose fields.
+            // float healthInitial = _playerData.healthInitialValue; float healthMax = _playerData.healthMaxValue; ...
+
+            Health = new Health(
+                _playerData.health,
+                _playerData.maxHealth,
+                _playerData.healthIncreaseRate,
+                _playerData.healthDecreaseRate);
+
+            Stamina = new Stamina(
+                _playerData.stamina,
+                _playerData.maxStamina,
+                _playerData.staminaIncreaseRate,
+                _playerData.staminaDecreaseRate,
+                _playerData.staminaRecoveryDelay,
+                _playerData.staminaEnoughPercentage);
+
+            Hunger = new Hunger(
+                _playerData.hunger,
+                _playerData.maxHunger,
+                _playerData.hungerIncreaseRate,
+                _playerData.hungerStarvingThreshold);
+
+            Thirst = new Thirst(
+                _playerData.thirst,
+                _playerData.maxThirst,
+                _playerData.thirstIncreaseRate,
+                _playerData.thirstDehydrationThreshold);
+
+            Fatigue = new Fatigue(
+                _playerData.fatigue,
+                _playerData.maxFatigue,
+                _playerData.fatiqueIncreaseRate,
+                _playerData.fatiqueExhaustionThreshold);
             
             _allStats = new List<ICondition> { Health, Stamina, Hunger, Thirst, Fatigue };
         }
         
         private void StartUpdates()
         {
-            FrameBasedUpdates().Forget();
-            MinuteBasedUpdates().Forget();
-            // SecondBasedUpdates().Forget(); // Kullanılmıyorsa kaldırıldı
+            FrameBasedUpdates().Forget(); // Handles continuous PlayerData sync
+            MinuteBasedUpdates().Forget(); // Handles per-minute stat degradation
         }
         
-        #region Update Methods
         private async UniTaskVoid FrameBasedUpdates()
         {
-            while (_isUpdating) // _isUpdating kontrolü eklendi
+            while (_isUpdating)
             {
-                var delta = Time.deltaTime;
-                Health.UpdateStat(delta);
+                // Health.UpdateStat(Time.deltaTime); // If health had passive regen/degen per frame
+                // Stamina is handled by its own async methods.
                 
-                // PlayerData güncellemeleri
-                _playerData.health = Health.Value;
-                _playerData.stamina = Stamina.Value;
-                _playerData.hunger = Hunger.Value;
-                _playerData.thirst = Thirst.Value;
-                _playerData.fatigue = Fatigue.Value;
+                // Sync current values to PlayerData
+                if (_playerData != null)
+                {
+                    _playerData.health = Health.Value;
+                    _playerData.stamina = Stamina.Value;
+                    _playerData.hunger = Hunger.Value;
+                    _playerData.thirst = Thirst.Value;
+                    _playerData.fatigue = Fatigue.Value;
+                }
                 
                 await UniTask.Yield(PlayerLoopTiming.Update);
             }
         }
         
-        // SecondBasedUpdates kaldırıldı, MinuteBasedUpdates benzer işlevi görüyor gibi.
-        // Eğer saniye bazlı ayrı bir mantık gerekirse geri eklenebilir.
-        // private async UniTaskVoid SecondBasedUpdates() ...
-        
         private async UniTaskVoid MinuteBasedUpdates()
         {
-            while (_isUpdating) // _isUpdating kontrolü eklendi
+            while (_isUpdating)
             {
                 if (GameTime.Instance == null)
                 {
-                    await UniTask.Yield(PlayerLoopTiming.Update); // GameTime yoksa bekle
+                    await UniTask.Yield(PlayerLoopTiming.Update); 
                     continue;
                 }
 
@@ -181,116 +161,98 @@ namespace Epitaph.Scripts.Player.SubController
                 if (currentMinute != _lastMinute)
                 {
                     _lastMinute = currentMinute;
-                    UpdateNonVitalStats(1.0f); // Her oyun dakikasında 1 birim etki
+                    // Pass 1.0f as deltaTime, signifying one minute has passed.
+                    // The BaseIncreaseRate in Hunger, Thirst, Fatigue should be scaled accordingly (e.g., units per minute).
+                    UpdateNonVitalStats(1.0f); 
                 }
                 
-                // Bir sonraki oyun saniyesini bekle (veya daha uygun bir bekleme süresi)
-                // Eğer bu çok sık ise ve performansı etkiliyorsa, bekleme süresi artırılabilir.
-                await GameTime.Instance.WaitForGameSecond();
+                await GameTime.Instance.WaitForGameSecond(); // Check every game second for a minute change
             }
         }
         
-        private void UpdateNonVitalStats(float amount)
+        private void UpdateNonVitalStats(float timeDeltaInMinutes)
         {
             foreach (var stat in _allStats)
             {
-                if (stat != Health && stat != Stamina) // Stamina otomatik güncellenmiyor, kendi mantığı var
-                    stat.UpdateStat(amount);
+                // Health might have its own passive update logic or none.
+                // Stamina is managed by its active consumption/recovery cycles.
+                if (stat is Hunger || stat is Thirst || stat is Fatigue)
+                {
+                    stat.UpdateStat(timeDeltaInMinutes);
+                }
             }
         }
-        #endregion
 
-        #region Public Interaction Methods
-        public void Eat(float amount) => Hunger.Decrease(amount);
-        public void Drink(float amount) => Thirst.Decrease(amount);
-        public void Sleep(float hours) => Fatigue.Decrease(hours * 20f); // Yorgunluğu saat başına 20 azaltır
-        #endregion
+        public void Eat(float foodValue) => Hunger.Decrease(foodValue); // foodValue is how much hunger is reduced
+        public void Drink(float waterValue) => Thirst.Decrease(waterValue); // waterValue is how much thirst is reduced
+        
+        public void Sleep(float hoursSlept) 
+        {
+            // Effectiveness of sleep should be configurable
+            var fatigueRecoveryPerHour = _playerData.fatigueRecoveryPerHour;
+            Fatigue.Decrease(hoursSlept * fatigueRecoveryPerHour);
+        }
 
-        #region Condition Modifiers
         public void SetRunning(bool isRunning)
         {
-            Hunger.Modifier = isRunning ? 1.2f : 1f;
-            Thirst.Modifier = isRunning ? 1.6f : 1f;
-            // Stamina tüketimi zaten MovementController veya Stamina class'ı tarafından yönetiliyor olabilir.
-            // Eğer HealthController'dan da yönetilmesi gerekiyorsa Stamina.IsSprinting gibi bir özellik kullanılabilir.
+            // Modifiers should come from PlayerData
+            Hunger.Modifier = isRunning ? _playerData.hungerRunningModifier : _playerData.hungerDefaultModifier;
+            Thirst.Modifier = isRunning ? _playerData.thirstRunningModifier : _playerData.thirstDefaultModifier;
+
+            // Manage Stamina consumption
+            if (isRunning)
+            {
+                Stamina.StartStaminaConsuming();
+            }
+            else
+            {
+                Stamina.StopStaminaConsuming();
+            }
         }
         
         public void SetOutsideTemperature(float temperature)
         {
-            Thirst.Modifier = temperature > 35f ? 1.5f : 1f;
+            // float highTempThreshold = _playerData.GetFloat("Thirst.HighTempThreshold", 35f);
+            // Thirst.Modifier = temperature > highTempThreshold ? _playerData.GetFloat("Thirst.HighTempModifier", 1.5f) : _playerData.GetFloat("Thirst.DefaultModifier", 1f);
         }
         
-        public void OnTimeChanged(int gameHour)
+        public void OnTimeChanged(int gameHour) // Called when game hour changes
         {
-            Fatigue.Modifier = (gameHour >= 22 || gameHour <= 6) ? 1.4f : 1f;
+            // int nightStartHour = _playerData.GetInt("Fatigue.NightStartHour", 22);
+            // int nightEndHour = _playerData.GetInt("Fatigue.NightEndHour", 6);
+            // var isNight = (gameHour >= nightStartHour || gameHour <= nightEndHour);
+
+            // Fatigue.Modifier = isNight ? _playerData.GetFloat("Fatigue.NightModifier", 1.4f) : _playerData.GetFloat("Fatigue.DefaultModifier", 1f);
         }
-        #endregion
         
-        #region Time Skip Handler
         private void OnTimeSkipped(float hoursSkipped)
         {
             Debug.Log($"Time skipped: {hoursSkipped} hours. Updating player conditions...");
-    
             var minutesSkipped = hoursSkipped * 60f;
     
             foreach (var stat in _allStats)
             {
-                if (stat != Health && stat != Stamina)
+                if (stat is Hunger || stat is Thirst || stat is Fatigue)
                 {
-                    // Her dakika için 1.0f değerinde bir etki (UpdateNonVitalStats ile aynı mantık)
-                    // Bu, stat'ın kendi UpdateStat metodundaki deltaTime (veya benzeri) mantığına göre olmalı.
-                    // Mevcut UpdateNonVitalStats(1.0f) çağrısı her oyun dakikası için.
-                    // Bu yüzden minutesSkipped kadar bu etkiyi uygulamalıyız.
-                    // ICondition.UpdateStat genellikle deltaTime alır.
-                    // Burada her bir dakika için simülasyon yapıyoruz.
-                    // Eğer ICondition.UpdateStat doğrudan ne kadar azaltılacağını/artırılacağını alıyorsa,
-                    // o zaman her stat için (DecreaseRate * Modifier * minutesSkipped) gibi bir hesaplama yapılmalı.
-                    // Mevcut Hunger, Thirst, Fatigue UpdateStat'ları deltaTime alıyor ve kendi içlerinde rate * modifier * deltaTime yapıyor.
-                    // Bu durumda, doğrudan minutesSkipped * (dakika başına etki) kadar güncellemeliyiz.
-                    // UpdateNonVitalStats'taki 'amount' parametresi, her çağrıldığında statların ne kadar değişeceğini belirtiyor.
-                    // Bu durumda, OnTimeSkipped'de, her atlanan dakika için bu 'amount' kadar güncelleme yapmalıyız.
-                    // Eğer UpdateStat(float deltaTime) ise ve her oyun dakikasında UpdateNonVitalStats(1.0f) çağrılıyorsa,
-                    // ve UpdateNonVitalStats içindeki UpdateStat(amount) ise, bu durumda 'amount' 1.0f oluyor.
-                    // Yani her oyun dakikasında statlar 'BaseDecreaseRate * Modifier * 1.0f' kadar azalıyor.
-                    // Öyleyse, atlanılan her dakika için bu etkiyi uygulamalıyız.
-                    // stat.Decrease(stat.BaseDecreaseRate * stat.Modifier * minutesSkipped); // Bu daha doğru olabilir.
-                    // Ancak mevcut UpdateStat'lar deltaTime alıp rate ile çarpıyor.
-                    // Ve UpdateNonVitalStats(1.0f) çağrısı ile 1.0f * rate * mod kadar azalıyorlar her dakika.
-                    // Bu durumda, minutesSkipped kadar bu işlemi tekrarlamış gibi olmalıyız.
-                    
-                    // Mevcut UpdateStat, bir "tick" için ne kadar etkileneceğini belirtir.
-                    // MinuteBasedUpdates'te UpdateNonVitalStats(1.0f) çağrılıyor,
-                    // ve UpdateNonVitalStats içindeki stat.UpdateStat(amount) çağrısı
-                    // örneğin Hunger için: Value -= BaseDecreaseRate * Modifier * amount;
-                    // Burada amount = 1.0f. Yani her oyun dakikası için Value -= BaseDecreaseRate * Modifier;
-                    // Dolayısıyla, atlanan her dakika için bu işlemi uygulamalıyız.
-                    // var decreaseAmount = 0f; // Bu, ICondition'a göre değişir.
-                                             // Şimdilik, stat.UpdateStat(minutesSkipped) çağrısını varsayalım,
-                                             // ve ICondition implementasyonları (Hunger, Thirst, Fatigue)
-                                             // bu 'minutesSkipped' değerini uygun şekilde yorumlasın.
-                                             // Örneğin, UpdateStat(float timePassedInMinutes) gibi.
-                                             // Mevcut UpdateStat(float deltaTime) bunu doğrudan desteklemiyor.
-
-                    // En basit yaklaşım, her atlanan dakika için bir kez UpdateNonVitalStats(1.0f)'in etkisini simüle etmek:
-                    if (stat is Hunger hunger) hunger.Decrease(hunger.BaseDecreaseRate * hunger.Modifier * minutesSkipped);
-                    else if (stat is Thirst thirst) thirst.Decrease(thirst.BaseDecreaseRate * thirst.Modifier * minutesSkipped);
-                    else if (stat is Fatigue fatigue) fatigue.Decrease(fatigue.BaseDecreaseRate * fatigue.Modifier * minutesSkipped);
-                    // Ya da ICondition.UpdateStat metodunu, geçen süreyi (dakika cinsinden) alacak şekilde yeniden tasarlamak.
-                    // Şimdilik yukarıdaki gibi doğrudan azaltma yapalım.
-                    // Veya, ICondition.UpdateStat'ı şu şekilde kullanabiliriz, her bir stat için rate'leri farklı olduğundan:
-                    // stat.UpdateStat(minutesSkipped); // Eğer UpdateStat, BaseDecreaseRate * Modifier * deltaTime yapıyorsa ve biz deltaTime yerine minutesSkipped veriyorsak.
-                    // Bu, her stat'ın kendi BaseDecreaseRate ve Modifier'ını kullanarak azalmasını sağlar.
-                    
-                    // Önceki `stat.UpdateStat(minutesSkipped);` çağrısı doğruydu, çünkü ICondition'daki
-                    // Hunger, Thirst, Fatigue sınıflarının UpdateStat metotları
-                    // Value -= BaseDecreaseRate * Modifier * deltaTime; şeklinde çalışıyor.
-                    // Burada deltaTime yerine minutesSkipped vererek doğru hesaplamayı yapmış oluruz.
+                    // UpdateStat expects a delta, and BaseIncreaseRate is per minute.
                     stat.UpdateStat(minutesSkipped);
-
                     Debug.Log($"Updated {stat.GetType().Name} after time skip. New value: {stat.Value}");
+                }
+                // Health and Stamina might need special handling for time skips if they have complex logic
+                // For example, Stamina should likely be fully recovered. Health might regenerate.
+                else if (stat is Stamina stamina)
+                {
+                    stamina.Increase(stamina.MaxValue); // Fully recover stamina on time skip
+                     Debug.Log($"Stamina fully recovered after time skip. New value: {stamina.Value}");
+                }
+                else if (stat is Health health)
+                {
+                    // Optional: Passive health regeneration during time skip
+                    // float healthRegenPerMinute = health.BaseIncreaseRate; // If BaseIncreaseRate is per minute
+                    // health.Increase(healthRegenPerMinute * minutesSkipped * health.Modifier);
+                    // Debug.Log($"Updated Health after time skip. New value: {health.Value}");
                 }
             }
         }
-        #endregion
     }
 }

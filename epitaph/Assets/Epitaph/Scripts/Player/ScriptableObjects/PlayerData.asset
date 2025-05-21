@@ -13,10 +13,33 @@ MonoBehaviour:
   m_Name: PlayerData
   m_EditorClassIdentifier: 
   health: 100
-  stamina: 97.98146
-  hunger: 18.900003
-  thirst: 62.699997
-  fatigue: 20.900003
+  maxHealth: 100
+  healthIncreaseRate: 2
+  healthDecreaseRate: 1
+  stamina: 5.950855
+  maxStamina: 20
+  staminaIncreaseRate: 2
+  staminaDecreaseRate: 5
+  staminaRecoveryDelay: 3
+  staminaEnoughPercentage: 0.25
+  hunger: 52.9
+  maxHunger: 100
+  hungerIncreaseRate: 2
+  hungerStarvingThreshold: 1.25
+  hungerDefaultModifier: 1
+  hungerRunningModifier: 2
+  thirst: 101.25
+  maxThirst: 100
+  thirstIncreaseRate: 2
+  thirstDehydrationThreshold: 1.25
+  thirstDefaultModifier: 1
+  thirstRunningModifier: 3
+  fatigue: 31.900003
+  maxFatigue: 100
+  fatiqueIncreaseRate: 1
+  fatiqueExhaustionThreshold: 1.25
+  fatigueRecoveryPerHour: 1
+  currentSpeed: 2.75
   walkSpeed: 2.75
   currentVelocity: {x: 0, y: 0, z: 0}
   lookSensitivity: {x: 20, y: 15}

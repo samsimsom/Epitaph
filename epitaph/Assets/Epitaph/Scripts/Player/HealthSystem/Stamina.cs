@@ -13,46 +13,44 @@ namespace Epitaph.Scripts.Player.HealthSystem
 
         public float Value { get; private set; }
         public float MaxValue { get; private set; }
-
-        public float BaseIncreaseRate { get; set; }
-        public float BaseDecreaseRate { get; set; }
-        public float Modifier { get; set; } = 1f;
+        public float BaseIncreaseRate { get; set; } // Regeneration rate
+        public float BaseDecreaseRate { get; set; } // Consumption rate
+        public float Modifier { get; set; } = 1f;   // General modifier (e.g., for faster consumption or recovery)
 
         public float EffectiveIncreaseRate => BaseIncreaseRate * Modifier;
         public float EffectiveDecreaseRate => BaseDecreaseRate * Modifier;
 
-        public float RecoveryDelay { get; set; } = 3.0f;
-        public float EnoughPercentage { get; set; } = 0.25f;
+        public float RecoveryDelay { get; set; }
+        public float EnoughPercentage { get; set; } // Percentage of stamina to be considered "enough" (not currently used, but was a field)
 
-        private bool _isConsuming;
+        private bool _isConsuming; // Internal state, not directly IsSprinting
         private bool _hasFinishedRecovery;
 
         private CancellationTokenSource _sprintCts;
         private CancellationTokenSource _recoveryCts;
 
-        public bool IsSprinting
-        {
-            get => _isConsuming;
-            set => _isConsuming = value;
-        }
+        // Consider if IsSprinting should be managed externally or if Start/Stop methods are sufficient.
+        // For now, keeping it as is, tied to internal _isConsuming.
+        public bool IsConsuming => _isConsuming;
 
-        public Stamina(float max, float increaseRate, float decreaseRate)
+
+        public Stamina(float initialValue, float maxValue, float baseIncreaseRate, float baseDecreaseRate, float recoveryDelay, float enoughPercentage = 0.25f)
         {
-            MaxValue = max;
-            Value = max;
-            BaseIncreaseRate = increaseRate;
-            BaseDecreaseRate = decreaseRate;
+            MaxValue = maxValue;
+            Value = Mathf.Clamp(initialValue, 0, MaxValue);
+            BaseIncreaseRate = baseIncreaseRate;
+            BaseDecreaseRate = baseDecreaseRate;
+            RecoveryDelay = recoveryDelay;
+            EnoughPercentage = enoughPercentage;
         }
 
         public void StartStaminaConsuming()
         {
-            // Sprint başlatıldı, önce varsa toparlanmayı ve eski sprinti iptal et
-            if (_recoveryCts != null && !_recoveryCts.IsCancellationRequested)
-            {
-                _recoveryCts.Cancel();
-                _recoveryCts.Dispose();
-                _recoveryCts = null;
-            }
+            _isConsuming = true; // Mark as consuming
+            _recoveryCts?.Cancel();
+            _recoveryCts?.Dispose();
+            _recoveryCts = null;
+            
             if (_sprintCts == null || _sprintCts.IsCancellationRequested)
             {
                 _sprintCts = new CancellationTokenSource();
@@ -62,53 +60,57 @@ namespace Epitaph.Scripts.Player.HealthSystem
 
         public void StopStaminaConsuming()
         {
-            // Sprint bırakıldı, hemen stamina doldurma başlatma! Önce delay başlat.
-            if (_sprintCts != null && !_sprintCts.IsCancellationRequested)
+            _isConsuming = false; // Mark as not consuming
+            _sprintCts?.Cancel();
+            _sprintCts?.Dispose();
+            _sprintCts = null;
+
+            if (Value < MaxValue) // Only start recovery if not already full
             {
-                _sprintCts.Cancel();
-                _sprintCts.Dispose();
-                _sprintCts = null;
-            }
-            if (_recoveryCts == null || _recoveryCts.IsCancellationRequested)
-            {
-                _recoveryCts = new CancellationTokenSource();
-                StaminaRecoveryWithDelay(_recoveryCts.Token).Forget();
+                if (_recoveryCts == null || _recoveryCts.IsCancellationRequested)
+                {
+                    _recoveryCts = new CancellationTokenSource();
+                    StaminaRecoveryWithDelay(_recoveryCts.Token).Forget();
+                }
             }
         }
 
         private async UniTaskVoid StaminaConsumeAsync(CancellationToken token)
         {
-            _isConsuming = true;
+            // _isConsuming is already set true by StartStaminaConsuming
             _hasFinishedRecovery = false;
 
-            while (!token.IsCancellationRequested)
+            while (!token.IsCancellationRequested && _isConsuming) // Check _isConsuming as well, in case Stop is called externally without IsSprinting setter
             {
                 Decrease(EffectiveDecreaseRate * Time.deltaTime);
                 if (Value <= 0)
                 {
-                    _isConsuming = false;
                     OnStaminaDepleted?.Invoke();
-                    break;
+                    // _isConsuming should be false now as we can't consume further.
+                    // StopStaminaConsuming might be called by the system listening to OnStaminaDepleted.
+                    break; 
                 }
                 await UniTask.Yield(PlayerLoopTiming.Update, token);
             }
-            _isConsuming = false;
+             // If loop exited due to cancellation or Value <=0, ensure _isConsuming reflects state if not already handled.
+            if (Value <=0) _isConsuming = false;
         }
 
         private async UniTaskVoid StaminaRecoveryWithDelay(CancellationToken token)
         {
-            // Staminanın tekrar dolmaya başlaması için delay
             await UniTask.Delay(TimeSpan.FromSeconds(RecoveryDelay), cancellationToken: token);
 
-            if (token.IsCancellationRequested) return;
+            if (token.IsCancellationRequested || _isConsuming) return; // Don't recover if consuming again
 
             OnStaminaRecoveryStarted?.Invoke();
             _hasFinishedRecovery = false;
 
             await StaminaIncreaseAsync(token);
 
-            if (Mathf.Approximately(Value, MaxValue))
+            // Check if truly finished, Value might not be exactly MaxValue due to float precision
+            if (Value >= MaxValue - float.Epsilon) 
             {
+                Value = MaxValue; // Clamp to max
                 if (!_hasFinishedRecovery)
                 {
                     OnStaminaRecoveryFinished?.Invoke();
@@ -119,7 +121,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
 
         private async UniTask StaminaIncreaseAsync(CancellationToken token)
         {
-            while (!token.IsCancellationRequested && Value < MaxValue)
+            while (!token.IsCancellationRequested && Value < MaxValue && !_isConsuming) // Stop if consuming starts
             {
                 Increase(EffectiveIncreaseRate * Time.deltaTime);
                 await UniTask.Yield(PlayerLoopTiming.Update, token);
@@ -134,11 +136,17 @@ namespace Epitaph.Scripts.Player.HealthSystem
         public void Decrease(float amount)
         {
             Value = Mathf.Clamp(Value - amount, 0, MaxValue);
+            if (Value <= 0)
+            {
+                 Value = 0; // Ensure it's exactly 0 if depleted
+                // OnStaminaDepleted could be invoked here or in ConsumeAsync
+            }
         }
 
         public void UpdateStat(float deltaTime)
         {
-            // Bu kısıma "otomatik dolum" yazmana gerek yok, sistem Consume/Recovery ile yönetiliyor
+            // Stamina is actively managed by Consume/Recovery async methods,
+            // so passive UpdateStat is not typically used.
         }
     }
 }
