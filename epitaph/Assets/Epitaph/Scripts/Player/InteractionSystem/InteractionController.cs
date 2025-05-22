@@ -4,22 +4,24 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.InteractionSystem
 {
-    public class InteractionController : IPlayerSubController
+    public class InteractionController : PlayerBehaviour
     {
         private PlayerController _playerController;
         private PlayerData _playerData;
-        private Camera _playerCamera; // PlayerInteraction için gerekli olabilir
+        private Camera _playerCamera;
 
         private readonly List<PlayerBehaviour> _interactionBehaviours = new();
-
-        // Etkileşim Davranışı
+        
         public PlayerInteraction PlayerInteraction { get; private set; }
-
-        // Constructor, PlayerInteraction'ın ihtiyaç duyduğu bağımlılıkları alabilir.
-        // Örneğin, PlayerCamera.
-        public InteractionController(Camera playerCamera)
+        
+        public InteractionController(PlayerController playerController, 
+            PlayerData playerData, Camera playerCamera) : base(playerController)
         {
+            _playerController = playerController;
+            _playerData = playerData;
             _playerCamera = playerCamera;
+            
+            InitializeBehaviours();
         }
 
         private T AddInteractionBehaviour<T>(T behaviour) where T : PlayerBehaviour
@@ -28,60 +30,53 @@ namespace Epitaph.Scripts.Player.InteractionSystem
             return behaviour;
         }
 
-        public void InitializeBehaviours(PlayerController playerController, PlayerData playerData)
+        public void InitializeBehaviours()
         {
-            _playerController = playerController;
-            _playerData = playerData;
-
-            // PlayerInteraction davranışını oluştur ve listeye ekle
-            // Eski PlayerController'daki başlatmaya göre: new PlayerInteraction(this, playerData, playerCamera)
-            // this -> _playerController olacak
-            // playerCamera -> _playerCamera olacak (constructor'dan gelen)
             PlayerInteraction = AddInteractionBehaviour(new PlayerInteraction(_playerController, _playerData, _playerCamera));
         }
 
-        public void PlayerAwake()
+        public override void Awake()
         {
             foreach (var behaviour in _interactionBehaviours) behaviour.Awake();
         }
 
-        public void PlayerOnEnable()
+        public override void OnEnable()
         {
             foreach (var behaviour in _interactionBehaviours) behaviour.OnEnable();
         }
 
-        public void PlayerStart()
+        public override void Start()
         {
             foreach (var behaviour in _interactionBehaviours) behaviour.Start();
         }
 
-        public void PlayerUpdate()
+        public override void Update()
         {
             foreach (var behaviour in _interactionBehaviours) behaviour.Update();
         }
 
-        public void PlayerLateUpdate()
+        public override void LateUpdate()
         {
             foreach (var behaviour in _interactionBehaviours) behaviour.LateUpdate();
         }
 
-        public void PlayerFixedUpdate()
+        public override void FixedUpdate()
         {
             foreach (var behaviour in _interactionBehaviours) behaviour.FixedUpdate();
         }
 
-        public void PlayerOnDisable()
+        public override void OnDisable()
         {
             foreach (var behaviour in _interactionBehaviours) behaviour.OnDisable();
         }
 
-        public void PlayerOnDestroy()
+        public override void OnDestroy()
         {
             foreach (var behaviour in _interactionBehaviours) behaviour.OnDestroy();
         }
 
 #if UNITY_EDITOR
-        public void PlayerOnDrawGizmos()
+        public override void OnDrawGizmos()
         {
             foreach (var behaviour in _interactionBehaviours) behaviour.OnDrawGizmos();
         }

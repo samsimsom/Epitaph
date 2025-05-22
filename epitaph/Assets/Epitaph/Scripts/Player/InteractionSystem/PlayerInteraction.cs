@@ -33,8 +33,7 @@ namespace Epitaph.Scripts.Player.InteractionSystem
             _playerData = playerData;
             _playerCamera = playerCamera;
         }
-
-        // Lifecycle Methods
+        
         public override void OnEnable()
         {
             _cts = new CancellationTokenSource();
@@ -46,11 +45,6 @@ namespace Epitaph.Scripts.Player.InteractionSystem
             _cts?.Cancel();
             _cts?.Dispose();
             _cts = null;
-        }
-
-        public override void Update()
-        {
-            DebugDrawLine();
         }
 
         // Public Methods
@@ -127,19 +121,24 @@ namespace Epitaph.Scripts.Player.InteractionSystem
             OnInteractableFound?.Invoke(interactable);
         }
 
-        private void DebugDrawLine()
+#if UNITY_EDITOR
+        public override void OnDrawGizmos()
         {
             if (!_playerData.showDebugGizmos) return;
-            
-            // Debug visualization
             if (_didHit)
             {
-                Debug.DrawLine(_rayOrigin, _lastHit.point, _playerData.hitGizmoColor);
+                Gizmos.color = _playerData.hitGizmoColor;
+                Gizmos.DrawLine(_rayOrigin, _lastHit.point);
+                Gizmos.DrawSphere(_lastHit.point, 0.1f);
             }
             else
             {
-                Debug.DrawLine(_rayOrigin, _rayOrigin + _rayDirection * _playerData.interactionDistance, _playerData.gizmoColor);
+                Gizmos.color = _playerData.gizmoColor;
+                Gizmos.DrawLine(_rayOrigin, _rayOrigin + _rayDirection * _playerData.interactionDistance);
+                Gizmos.DrawSphere(_rayOrigin + _rayDirection * _playerData.interactionDistance, 0.1f);
             }
         }
+#endif
+        
     }
 }

@@ -152,9 +152,7 @@ namespace Epitaph.Scripts.Player
             
             HealthController = AddSubController(new HealthController(this, playerData));
             MovementController = AddSubController(new MovementController(this, playerData, characterController, playerCamera, HealthController));
-            
-            // InteractionController = AddSubController(new InteractionController(playerCamera));
-            // InteractionController.InitializeBehaviours(this, playerData);
+            InteractionController = AddSubController(new InteractionController(this, playerData, playerCamera));
             
             if (playerCamera != null && playerCameraTransform != null)
             {
