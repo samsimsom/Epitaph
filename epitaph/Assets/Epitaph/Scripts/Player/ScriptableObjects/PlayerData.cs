@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.ScriptableObjects
@@ -18,7 +19,7 @@ namespace Epitaph.Scripts.Player.ScriptableObjects
         public float staminaRecoveryDelay;
         public float staminaEnoughPercentage;
         [Space]
-        public float hunger;
+        public float hunger = 0f;
         public float maxHunger;
         public float hungerIncreaseRate;
         public float hungerStarvingThreshold;
@@ -106,5 +107,9 @@ namespace Epitaph.Scripts.Player.ScriptableObjects
         public bool showDebugGizmos = true;
         public Color hitGizmoColor = Color.yellow;
         public Color gizmoColor = Color.red;
+        
+        // ---------------------------------------------------------------------------- //
+        
+        
     }
 }

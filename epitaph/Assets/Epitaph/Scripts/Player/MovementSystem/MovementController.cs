@@ -12,7 +12,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private CharacterController _characterController;
         private Camera _playerCamera;
         
-        // Bağımlı olunan diğer sistemler (HealthController örneği)
         private HealthController _healthController;
 
         private readonly List<PlayerBehaviour> _movementBehaviours = new();

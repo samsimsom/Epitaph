@@ -55,7 +55,6 @@ namespace Epitaph.Scripts.Player.HealthSystem
         public void PlayerUpdate() { /* No continuous calls needed if async updates handle their logic */ }
         public void PlayerLateUpdate() { }
         public void PlayerFixedUpdate() { }
-
         public void PlayerOnDisable()
         {
             _isUpdating = false; 
@@ -68,7 +67,6 @@ namespace Epitaph.Scripts.Player.HealthSystem
             // For simplicity here, assuming Stamina handles its cancellations if its owner becomes inactive.
             // A more robust solution would pass a CancellationToken from HealthController to Stamina.
         }
-        
         public void PlayerOnDestroy() { /* Cleanup if necessary */ }
 
 #if UNITY_EDITOR

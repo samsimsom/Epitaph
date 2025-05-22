@@ -121,6 +121,7 @@ namespace Epitaph.Scripts.Player
         
         private void InitializeSubControllersAndBehaviours()
         {
+            #region Inspector Objects
             if (characterController == null) 
                 characterController = GetComponent<CharacterController>();
 
@@ -133,19 +134,21 @@ namespace Epitaph.Scripts.Player
                 if (camComponent != null && camComponent.CompareTag("MainCamera"))
                     playerCamera = camComponent;
                 else
-                    Debug.LogError("PlayerCamera is not assigned in PlayerController and could not be found automatically.", this);
+                    Debug.LogError("PlayerCamera is not assigned in PlayerController " +
+                                   "and could not be found automatically.", this);
             }
 
             if (fpCamera == null && playerCamera != null)
             {
                 if (playerCameraTransform != null)
-                     fpCamera = playerCameraTransform.GetComponentInChildren<CinemachineCamera>();
+                    fpCamera = playerCameraTransform.GetComponentInChildren<CinemachineCamera>();
             }
 
-            if (playerCameraTransform == null && playerCamera != null)
+            if (playerCameraTransform == null)
             {
-                playerCameraTransform = playerCamera.transform;
+                playerCameraTransform = transform.Find("FPCameraTransform");
             }
+            #endregion
             
             // HealthController'ı oluştur ve listeye ekle
             HealthController = AddSubController(new HealthController()); 
@@ -165,7 +168,8 @@ namespace Epitaph.Scripts.Player
             }
             else
             {
-                Debug.LogError("Cannot initialize ViewController because playerCamera or playerCameraTransform is missing!", this);
+                Debug.LogError("Cannot initialize ViewController because playerCamera " +
+                               "or playerCameraTransform is missing!", this);
             }
         }
         #endregion
@@ -174,18 +178,9 @@ namespace Epitaph.Scripts.Player
         public CharacterController GetCharacterController() => characterController;
         public PlayerData GetPlayerData() => playerData; 
         public PlayerInput GetPlayerInput() => playerInput;
-        // HealthController'a erişim zaten public bir property olarak tanımlı
-        // public HealthController GetHealthController() => HealthController; 
-
         public Camera GetPlayerCamera() => playerCamera;
         public CinemachineCamera GetFpCamera() => fpCamera;
         public Transform GetPlayerCameraTransform() => playerCameraTransform;
-        #endregion
-        
-        #region State Methods
-        public bool IsSprinting() => playerData.isSprinting;
-        public bool IsCrouching() => playerData.isCrouching;
-        public bool IsGrounded() => playerData.isGrounded;
         #endregion
     }
 }
