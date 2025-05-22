@@ -7,9 +7,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class PlayerCrouch : PlayerBehaviour
     {
-        // Static Events
-        public static event Action<bool> OnCrouchStateChanged;
-
         // Private Instance Fields
         private PlayerData _playerData;
         private CharacterController _characterController;
@@ -35,8 +32,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
             Initialize();
         }
-
-        // Public Methods (Unity Lifecycle & Public API)
+        
         public override void Update()
         {
             // Eğer crouch durumunda ve isFalling true olduysa, otomatik Stand'a dönüş
@@ -71,12 +67,12 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // Durumu ayarlayan ve geçişi başlatan merkezi bir metod
         private void SetCrouchState(bool newCrouchState)
         {
-            // Eğer durum zaten istenen durumdaysa bir şey yapma (opsiyonel bir kontrol)
             if (_playerData.isCrouching == newCrouchState) return;
 
             _playerData.isCrouching = newCrouchState;
-            OnCrouchStateChanged?.Invoke(_playerData.isCrouching);
-
+            // OnCrouchStateChanged?.Invoke(_playerData.isCrouching);
+            _playerMove.SetCrouchingSpeed();
+            
             if (newCrouchState)
             {
                 _playerMove.SetCrouchingSpeed();

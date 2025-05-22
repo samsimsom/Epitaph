@@ -26,7 +26,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public override void OnEnable()
         {
-            PlayerCrouch.OnCrouchStateChanged += HandleCrouchStateChanged;
+            // PlayerCrouch.OnCrouchStateChanged += HandleCrouchStateChanged;
             
             _healthController.Stamina.OnStaminaDepleted += OnStaminaDepleted;
             _healthController.Stamina.OnStaminaRecoveryStarted += OnRecoveryStarted;
@@ -35,7 +35,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public override void OnDisable()
         {
-            PlayerCrouch.OnCrouchStateChanged -= HandleCrouchStateChanged;
+            // PlayerCrouch.OnCrouchStateChanged -= HandleCrouchStateChanged;
             
             _healthController.Stamina.OnStaminaDepleted -= OnStaminaDepleted;
             _healthController.Stamina.OnStaminaRecoveryStarted -= OnRecoveryStarted;
@@ -84,12 +84,12 @@ namespace Epitaph.Scripts.Player.MovementSystem
             // Debug.Log("Sprint recovery finished");
         }
         
-        private void HandleCrouchStateChanged(bool isCrouching)
-        {
-            if (!isCrouching || !_playerData.isSprinting) return;
-            
-            StopSprint();
-            _playerMove.SetCrouchingSpeed();
-        }
+        // private void HandleCrouchStateChanged(bool isCrouching)
+        // {
+        //     if (!isCrouching || !_playerData.isSprinting) return;
+        //     
+        //     StopSprint();
+        //     _playerMove.SetCrouchingSpeed();
+        // }
     }
 }
