@@ -9,7 +9,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
     public class HealthController : PlayerBehaviour
     {
         private PlayerController _playerController;
-        private PlayerData _playerData; // Assume this holds all configuration values
+        private PlayerData _playerData;
 
         public Health Health { get; private set; }
         public Stamina Stamina { get; private set; }
@@ -48,7 +48,8 @@ namespace Epitaph.Scripts.Player.HealthSystem
             }
             else
             {
-                Debug.LogWarning("GameTime instance not found. Player conditions will not update on time skip.");
+                Debug.LogWarning("GameTime instance not found. " +
+                                 "Player conditions will not update on time skip.");
             }
         }
 
@@ -156,11 +157,12 @@ namespace Epitaph.Scripts.Player.HealthSystem
                 {
                     _lastMinute = currentMinute;
                     // Pass 1.0f as deltaTime, signifying one minute has passed.
-                    // The BaseIncreaseRate in Hunger, Thirst, Fatigue should be scaled accordingly (e.g., units per minute).
+                    // The BaseIncreaseRate in Hunger, Thirst, Fatigue
+                    // should be scaled accordingly (e.g., units per minute).
                     UpdateNonVitalStats(1.0f); 
                 }
                 
-                await GameTime.Instance.WaitForGameSecond(); // Check every game second for a minute change
+                await GameTime.Instance.WaitForGameSecond();
             }
         }
         
@@ -172,13 +174,13 @@ namespace Epitaph.Scripts.Player.HealthSystem
                 // Stamina is managed by its active consumption/recovery cycles.
                 if (stat is Hunger || stat is Thirst || stat is Fatigue)
                 {
-                    stat.UpdateStat(timeDeltaInMinutes);
+                    stat.UpdateCondition(timeDeltaInMinutes);
                 }
             }
         }
 
-        public void Eat(float foodValue) => Hunger.Decrease(foodValue); // foodValue is how much hunger is reduced
-        public void Drink(float waterValue) => Thirst.Decrease(waterValue); // waterValue is how much thirst is reduced
+        public void Eat(float foodValue) => Hunger.Decrease(foodValue);
+        public void Drink(float waterValue) => Thirst.Decrease(waterValue);
         
         public void Sleep(float hoursSlept) 
         {
@@ -229,7 +231,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
                 if (stat is Hunger || stat is Thirst || stat is Fatigue)
                 {
                     // UpdateStat expects a delta, and BaseIncreaseRate is per minute.
-                    stat.UpdateStat(minutesSkipped);
+                    stat.UpdateCondition(minutesSkipped);
                     Debug.Log($"Updated {stat.GetType().Name} after time skip. New value: {stat.Value}");
                 }
                 // Health and Stamina might need special handling for time skips if they have complex logic

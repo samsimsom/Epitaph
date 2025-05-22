@@ -37,7 +37,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
             Value = Mathf.Clamp(Value - amount, 0, CurrentStarvingPoint);
         }
 
-        public void UpdateStat(float deltaTime) // deltaTime here is expected to be scaled appropriately (e.g., 1.0 for 1 minute)
+        public void UpdateCondition(float deltaTime) // deltaTime here is expected to be scaled appropriately (e.g., 1.0 for 1 minute)
         {
             Increase(EffectiveIncreaseRate * deltaTime); // Value increases over time
             // CheckStarving is called within Increase now

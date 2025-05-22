@@ -9,6 +9,6 @@ namespace Epitaph.Scripts.Player.HealthSystem
         public float Modifier { get; set; }
         public void Increase(float amount);
         public void Decrease(float amount);
-        public void UpdateStat(float deltaTime);
+        public void UpdateCondition(float deltaTime);
     }
 }

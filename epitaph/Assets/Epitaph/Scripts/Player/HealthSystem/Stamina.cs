@@ -143,7 +143,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
             }
         }
 
-        public void UpdateStat(float deltaTime)
+        public void UpdateCondition(float deltaTime)
         {
             // Stamina is actively managed by Consume/Recovery async methods,
             // so passive UpdateStat is not typically used.

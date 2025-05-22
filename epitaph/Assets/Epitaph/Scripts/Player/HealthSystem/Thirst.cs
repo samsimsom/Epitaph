@@ -35,7 +35,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
             Value = Mathf.Clamp(Value - amount, 0, CurrentDehydrationPoint);
         }
 
-        public void UpdateStat(float deltaTime)
+        public void UpdateCondition(float deltaTime)
         {
             Increase(EffectiveIncreaseRate * deltaTime);
         }

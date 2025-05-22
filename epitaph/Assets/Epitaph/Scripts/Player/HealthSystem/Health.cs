@@ -32,7 +32,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
             Value = Mathf.Clamp(Value - amount, 0, MaxValue);
         }
 
-        public void UpdateStat(float deltaTime)
+        public void UpdateCondition(float deltaTime)
         {
             // Example: Passive regeneration
             // if (BaseIncreaseRate > 0)
