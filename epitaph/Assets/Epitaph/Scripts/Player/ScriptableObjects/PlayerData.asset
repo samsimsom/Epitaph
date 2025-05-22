@@ -36,18 +36,18 @@ MonoBehaviour:
   thirstRunningModifier: 3
   fatigue: 0
   maxFatigue: 100
-  fatiqueIncreaseRate: 1
-  fatiqueExhaustionThreshold: 1.25
+  fatigueIncreaseRate: 0
+  fatigueExhaustionThreshold: 0
   fatigueRecoveryPerHour: 1
   currentSpeed: 2.75
-  walkSpeed: 2.75
+  walkSpeed: 2.5
   currentVelocity: {x: 0, y: 0, z: 0}
-  lookSensitivity: {x: 20, y: 15}
+  lookSensitivity: {x: 25, y: 25}
   referanceAspect: 1.777778
   amount: 0.02
-  frequenct: 10
+  frequency: 10
   smooth: 10
-  treshold: 2
+  threshold: 2
   isGrounded: 1
   gravityMultiplier: 2.5
   groundedGravity: -5

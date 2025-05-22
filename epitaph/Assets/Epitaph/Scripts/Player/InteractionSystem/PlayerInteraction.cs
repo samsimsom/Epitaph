@@ -129,13 +129,13 @@ namespace Epitaph.Scripts.Player.InteractionSystem
             {
                 Gizmos.color = _playerData.hitGizmoColor;
                 Gizmos.DrawLine(_rayOrigin, _lastHit.point);
-                Gizmos.DrawSphere(_lastHit.point, 0.1f);
+                Gizmos.DrawSphere(_lastHit.point, 0.025f);
             }
             else
             {
                 Gizmos.color = _playerData.gizmoColor;
                 Gizmos.DrawLine(_rayOrigin, _rayOrigin + _rayDirection * _playerData.interactionDistance);
-                Gizmos.DrawSphere(_rayOrigin + _rayDirection * _playerData.interactionDistance, 0.1f);
+                Gizmos.DrawSphere(_rayOrigin + _rayDirection * _playerData.interactionDistance, 0.025f);
             }
         }
 #endif

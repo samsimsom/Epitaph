@@ -23,6 +23,8 @@ namespace Epitaph.Scripts.Player
         [SerializeField] private Transform playerCameraTransform; 
         #endregion
         
+        public static PlayerData CurrentPlayerData { get; private set; }
+        
         #region Player SubControllers
         private readonly List<PlayerBehaviour> _subControllers = new();
         
@@ -35,7 +37,18 @@ namespace Epitaph.Scripts.Player
         #region Unity Lifecycle Methods
         private void Awake()
         {
+            if (playerData != null)
+            {
+                CurrentPlayerData = Instantiate(playerData);
+                // CurrentPlayerData.InitializeDefaults();
+            }
+            else
+            {
+                Debug.LogError("Original PlayerData ScriptableObject atanmamış!");
+            }
+            
             InitializeBehaviours();
+            
             foreach (var subController in _subControllers)
             {
                 subController.Awake();
@@ -150,13 +163,13 @@ namespace Epitaph.Scripts.Player
             }
             #endregion
             
-            HealthController = AddSubController(new HealthController(this, playerData));
-            MovementController = AddSubController(new MovementController(this, playerData, characterController, playerCamera, HealthController));
-            InteractionController = AddSubController(new InteractionController(this, playerData, playerCamera));
+            HealthController = AddSubController(new HealthController(this, CurrentPlayerData));
+            MovementController = AddSubController(new MovementController(this, CurrentPlayerData, characterController, playerCamera, HealthController));
+            InteractionController = AddSubController(new InteractionController(this, CurrentPlayerData, playerCamera));
             
             if (playerCamera != null && playerCameraTransform != null)
             {
-                ViewController = AddSubController(new ViewController(this, playerData, playerCamera, fpCamera, playerCameraTransform));
+                ViewController = AddSubController(new ViewController(this, CurrentPlayerData, playerCamera, fpCamera, playerCameraTransform));
             }
             else
             {

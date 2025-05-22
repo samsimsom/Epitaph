@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.ScriptableObjects
@@ -19,7 +18,7 @@ namespace Epitaph.Scripts.Player.ScriptableObjects
         public float staminaRecoveryDelay;
         public float staminaEnoughPercentage;
         [Space]
-        public float hunger = 0f;
+        public float hunger;
         public float maxHunger;
         public float hungerIncreaseRate;
         public float hungerStarvingThreshold;
@@ -35,8 +34,8 @@ namespace Epitaph.Scripts.Player.ScriptableObjects
         [Space]
         public float fatigue;
         public float maxFatigue;
-        public float fatiqueIncreaseRate;
-        public float fatiqueExhaustionThreshold;
+        public float fatigueIncreaseRate;
+        public float fatigueExhaustionThreshold;
         public float fatigueRecoveryPerHour;
 
         [Header("Movement Data")] 
@@ -50,9 +49,9 @@ namespace Epitaph.Scripts.Player.ScriptableObjects
         
         [Header("Headbob Data")]
         public float amount = 0.02f;
-        public float frequenct = 10.0f;
+        public float frequency = 10.0f;
         public float smooth = 10.0f;
-        public float treshold = 2.0f;
+        public float threshold = 2.0f;
 
         [Header("Gravity Data")] 
         public bool isGrounded;
@@ -110,6 +109,101 @@ namespace Epitaph.Scripts.Player.ScriptableObjects
         
         // ---------------------------------------------------------------------------- //
         
-        
+        public void InitializeDefaults()
+        {
+            // Condition
+            health = 100f;
+            maxHealth = 100f;
+            healthIncreaseRate = 1f;
+            healthDecreaseRate = 5f;
+
+            stamina = 100f;
+            maxStamina = 100f;
+            staminaIncreaseRate = 10f;
+            staminaDecreaseRate = 20f;
+            staminaRecoveryDelay = 2f;
+            staminaEnoughPercentage = 0.3f;
+
+            hunger = 0f;
+            maxHunger = 100f;
+            hungerIncreaseRate = 1f;
+            hungerStarvingThreshold = 20f;
+            hungerDefaultModifier = 1f;
+            hungerRunningModifier = 1.5f;
+
+            thirst = 0f;
+            maxThirst = 100f;
+            thirstIncreaseRate = 1f;
+            thirstDehydrationThreshold = 20f;
+            thirstDefaultModifier = 1f;
+            thirstRunningModifier = 1.5f;
+
+            fatigue = 0f;
+            maxFatigue = 100f;
+            fatigueIncreaseRate = 1f;
+            fatigueExhaustionThreshold = 80f;
+            fatigueRecoveryPerHour = 10f;
+
+            // Movement Data
+            walkSpeed = 5f;
+
+            // Look Data
+            lookSensitivity = new Vector2(20f, 20f);
+            referanceAspect = 16f / 9f;
+
+            // Headbob Data
+            amount = 0.02f;
+            frequency = 10.0f;
+            smooth = 10.0f;
+            threshold = 2.0f;
+
+            // Gravity Data
+            isGrounded = false;
+            gravityMultiplier = 1f;
+            groundedGravity = -9.81f;
+            maxFallSpeed = -50f;
+            verticalVelocity = 0f;
+
+            isFalling = false;
+            fallThreshold = -5f;
+
+            slopeClimbThreshold = 0.5f;
+            slopeForce = 10f;
+            slopeForceRayLength = 1.5f;
+            slideVelocity = 5f;
+            maxSlideSpeed = 15f;
+
+            // Jump Data
+            jumpHeight = 2f;
+            jumpCooldown = 0.1f;
+            jumpBufferTime = 0.2f;
+
+            coyoteTime = 0.2f;
+            useCoyoteTime = true;
+
+            // Crouch Data
+            isCrouching = false;
+            crouchHeight = 1.0f;
+            standingHeight = 2.0f;
+            crouchSpeed = 2.0f;
+            crouchCameraYOffset = -0.5f;
+            standingCameraYOffset = 0f;
+            crouchTransitionTime = 0.2f;
+            crouchGroundedGravity = -100f;
+            // ceilingLayers Inspector'dan atanır
+            ceilingCheckDistance = 0.3f;
+
+            // Sprint Settings
+            isSprinting = false;
+            sprintSpeed = 10f;
+
+            // Interaction Data
+            interactionDistance = 3f;
+            raycastInterval = 0.05f;
+
+            showDebugGizmos = true;
+            hitGizmoColor = Color.yellow;
+            gizmoColor = Color.red;
+        }
     }
 }

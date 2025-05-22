@@ -109,8 +109,8 @@ namespace Epitaph.Scripts.Player.HealthSystem
             Fatigue = new Fatigue(
                 _playerData.fatigue,
                 _playerData.maxFatigue,
-                _playerData.fatiqueIncreaseRate,
-                _playerData.fatiqueExhaustionThreshold);
+                _playerData.fatigueIncreaseRate,
+                _playerData.fatigueExhaustionThreshold);
             
             _allStats = new List<ICondition> { Health, Stamina, Hunger, Thirst, Fatigue };
         }

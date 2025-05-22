@@ -21,10 +21,14 @@ namespace Epitaph.Scripts.Player.ViewSystem
             _fpCamera = fpCamera;
         }
 
+        public override void Awake()
+        {
+            UpdateCameraSensitivity();
+        }
+
         public override void Start()
         {
             LockCursor();
-            UpdateCameraSensitivity();
         }
 
         private static void LockCursor()

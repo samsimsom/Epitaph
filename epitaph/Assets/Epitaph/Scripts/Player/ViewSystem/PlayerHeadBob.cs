@@ -30,7 +30,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
 
         private void CheckForHeadBobTrigger()
         {
-            if (_playerData.currentVelocity.sqrMagnitude > _playerData.treshold)
+            if (_playerData.currentVelocity.sqrMagnitude > _playerData.threshold)
             {
                 StartHeadBob();
             }
@@ -39,9 +39,9 @@ namespace Epitaph.Scripts.Player.ViewSystem
         private void StartHeadBob()
         {
             var pos = Vector3.zero;
-            pos.y += Mathf.Lerp(pos.y, Mathf.Sin(Time.time * _playerData.frequenct) 
+            pos.y += Mathf.Lerp(pos.y, Mathf.Sin(Time.time * _playerData.frequency) 
                                        * _playerData.amount * 1.4f, _playerData.smooth * Time.deltaTime);
-            pos.x += Mathf.Lerp(pos.x, Mathf.Cos(Time.time * _playerData.frequenct / 2f) 
+            pos.x += Mathf.Lerp(pos.x, Mathf.Cos(Time.time * _playerData.frequency / 2f) 
                                        * _playerData.amount * 1.6f, _playerData.smooth * Time.deltaTime);
             _playerCameraTransform.localPosition += pos;
         }
