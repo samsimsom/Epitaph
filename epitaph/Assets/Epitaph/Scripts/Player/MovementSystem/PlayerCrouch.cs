@@ -9,7 +9,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
     {
         // Static Events
         public static event Action<bool> OnCrouchStateChanged;
-        // public static event Action<float> OnChangeGroundedGravity;
 
         // Private Instance Fields
         private PlayerData _playerData;
@@ -17,6 +16,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private PlayerMove _playerMove;
         private Camera _playerCamera;
         private float _initialCameraYLocalPosition;
+        private bool _wasGroundedBeforeTransition; // Kaymayı önlemek için geçiş öncesi durumu sakla
+
+        private Tween _characterControllerTween;
+        private Tween _playerCameraTween;
 
         // Constructor
         public PlayerCrouch(PlayerController playerController,
@@ -39,27 +42,52 @@ namespace Epitaph.Scripts.Player.MovementSystem
             // Eğer crouch durumunda ve isFalling true olduysa, otomatik Stand'a dönüş
             if (_playerData.isCrouching && _playerData.isFalling)
             {
-                Stand();
-                // İsteğe bağlı: Hızlıca transition uygula veya animasyon tetikle
-                SmoothCrouchTransition();
+                // Stand() metodunu doğrudan çağırmak yerine SetCrouchState(false) kullanacağız.
+                if (CanStandUp())
+                {
+                    SetCrouchState(false); // Ayağa kalkma durumunu ayarla ve geçişi başlat
+                }
             }
         }
 
         public void ToggleCrouch()
         {
-            if (_playerData.isCrouching)
+            if (_playerData.isCrouching) // Şu anda eğilmiş durumda, ayağa kalkmayı dene
             {
-                Stand();
+                if (CanStandUp())
+                {
+                    SetCrouchState(false); // Ayağa kalk
+                }
+            }
+            else // Şu anda ayakta, eğilmeyi dene
+            {
+                if (_playerData.isGrounded) // Yalnızca yerdeyse eğil
+                {
+                    SetCrouchState(true); // Eğil
+                }
+            }
+        }
+        
+        // Durumu ayarlayan ve geçişi başlatan merkezi bir metod
+        private void SetCrouchState(bool newCrouchState)
+        {
+            // Eğer durum zaten istenen durumdaysa bir şey yapma (opsiyonel bir kontrol)
+            if (_playerData.isCrouching == newCrouchState) return;
+
+            _playerData.isCrouching = newCrouchState;
+            OnCrouchStateChanged?.Invoke(_playerData.isCrouching);
+
+            if (newCrouchState)
+            {
+                _playerMove.SetCrouchingSpeed();
             }
             else
             {
-                if (_playerData.isGrounded)
-                {
-                    Crouch();
-                }
+                _playerMove.SetWalkingSpeed();
             }
-            // Always call this to handle smooth transition for both crouch and stand
-            SmoothCrouchTransition();
+
+            _wasGroundedBeforeTransition = _characterController.isGrounded; // Mevcut yer durumu sakla
+            SmoothCrouchTransition(); // Animasyonlu geçişi başlat
         }
 
         // Private Methods
@@ -69,23 +97,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 _playerCamera.transform.localPosition.y : 0f;
 
             _playerData.standingHeight = _characterController.height;
-        }
-
-        private void Crouch()
-        {
-            _playerData.isCrouching = true;
-            OnCrouchStateChanged?.Invoke(_playerData.isCrouching);
-            // OnChangeGroundedGravity?.Invoke(_playerData.crouchGroundedGravity);
-            _playerMove.SetCrouchingSpeed();
-        }
-
-        private void Stand()
-        {
-            if (!CanStandUp()) return;
-            _playerData.isCrouching = false;
-            OnCrouchStateChanged?.Invoke(_playerData.isCrouching);
-            // OnChangeGroundedGravity?.Invoke(_playerData.groundedGravity);
-            _playerMove.SetWalkingSpeed();
         }
 
         private bool CanStandUp()
@@ -117,47 +128,80 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         private void SmoothCrouchTransition()
         {
+            // Aynı nesneler üzerindeki mevcut tween'leri durdur (hızlı geçişlerde çakışmayı önler)
+            Tween.StopAll(onTarget: _characterControllerTween);
+            if (_playerCamera != null)
+            {
+                Tween.StopAll(onTarget: _playerCameraTween);
+            }
+
             var startHeight = _characterController.height;
             var endHeight = _playerData.isCrouching ? _playerData.crouchHeight : _playerData.standingHeight;
+            // Ayağa kalkma süresini eğilme süresinin yarısı yapmak mantıklı, orijinaldeki gibi.
             var duration = _playerData.isCrouching ? _playerData.crouchTransitionTime : _playerData.crouchTransitionTime / 2f;
 
             var startCenterY = _characterController.center.y;
+            // Eğilirken merkez Y'si crouchHeight / 2f, ayaktayken 0f (kullanıcının mevcut mantığına göre).
             var endCenterY = _playerData.isCrouching ? _playerData.crouchHeight / 2f : 0f;
 
-            // Animate height
-            Tween.Custom(startHeight, endHeight, duration,
-                onValueChange: newHeight =>
+            // Yükseklik ve merkezi tek bir tween ile güncellemek, senkronizasyonu ve Move çağrısını basitleştirir.
+            // t, 0'dan 1'e interpolasyon faktörü olacaktır.
+            _characterControllerTween = Tween.Custom(0f, 1f, duration,
+                onValueChange: t =>
                 {
+                    // Bu tween adımındaki yükseklik/merkez güncellemelerinden ÖNCEKİ
+                    // CharacterController'ın mevcut yüksekliğine ve merkezine göre
+                    // kapsülün alt kısmının transform'un y pozisyonuna göre olan ofsetini al.
+                    var bottomOffsetBeforeUpdate = _characterController.center.y - _characterController.height / 2f;
+
+                    var newHeight = Mathf.Lerp(startHeight, endHeight, t);
+                    var newCenterY = Mathf.Lerp(startCenterY, endCenterY, t); // Bu, bu kare için hedeflenen merkezdir
+
                     _characterController.height = newHeight;
-                }, Ease.OutQuad
-            );
+                    var centerVec = _characterController.center; // center bir struct olduğu için al, y'yi değiştir, geri ata
+                    centerVec.y = newCenterY;
+                    _characterController.center = centerVec;
 
-            // Animate center.y
-            Tween.Custom(startCenterY, endCenterY, duration,
-                onValueChange: newCenterY =>
-                {
-                    var center = _characterController.center;
-                    center.y = newCenterY;
-                    _characterController.center = center;
-                }, Ease.OutQuad
-            );
+                    // Yükseklik/merkez güncellemelerinden SONRA kapsülün alt kısmının ofsetini hesapla
+                    var bottomOffsetAfterUpdate = newCenterY - newHeight / 2f;
 
-            // Animate camera position for smoother effect
-            if (_playerCamera == null) return;
+                    // Bu adımda yükseklik/merkez değişiklikleri nedeniyle
+                    // kapsülün alt kısmının transform'un pozisyonuna GÖRE ne kadar aşağı doğru yer değiştirdiği.
+                    var relativeBottomDisplacement =
+                        bottomOffsetAfterUpdate - bottomOffsetBeforeUpdate;
 
-            var startCameraY = _playerCamera.transform.localPosition.y;
-            var endCameraY = _initialCameraYLocalPosition +
-                             (_playerData.isCrouching ? _playerData.crouchCameraYOffset :
-                                 _playerData.standingCameraYOffset);
+                    // Transform'u bu miktar kadar YUKARI hareket ettirmek istiyoruz ki
+                    // kapsül altının göreceli batmasını telafi edelim.
+                    // Yani, relativeBottomDisplacement negatifse (aşağı batmışsa), transform'u YUKARI hareket ettiririz.
+                    var compensationMove = Vector3.up * -relativeBottomDisplacement;
 
-            Tween.Custom(startCameraY, endCameraY, duration,
-                onValueChange: newCameraY =>
-                {
-                    var camPos = _playerCamera.transform.localPosition;
-                    camPos.y = newCameraY;
-                    _playerCamera.transform.localPosition = camPos;
-                }, Ease.OutQuad
-            );
+                    // Şimdi topraklama itmesini de uygula
+                    var groundingMove = Vector3.zero;
+                    if (_wasGroundedBeforeTransition || _characterController.isGrounded)
+                    {
+                        groundingMove = Vector3.down * (_characterController.skinWidth + 0.01f);
+                    }
+
+                    // Hareketleri birleştir ve uygula
+                    _characterController.Move(compensationMove + groundingMove);
+                }, ease: Ease.OutQuad);
+
+            // Kamera pozisyonunu yumuşak bir şekilde ayarla
+            if (_playerCamera != null)
+            {
+                var startCameraY = _playerCamera.transform.localPosition.y;
+                var endCameraY = _initialCameraYLocalPosition +
+                                 (_playerData.isCrouching ? _playerData.crouchCameraYOffset :
+                                     _playerData.standingCameraYOffset);
+
+                _playerCameraTween = Tween.Custom(startCameraY, endCameraY, duration,
+                    onValueChange: newCameraY =>
+                    {
+                        var camPos = _playerCamera.transform.localPosition;
+                        camPos.y = newCameraY;
+                        _playerCamera.transform.localPosition = camPos;
+                    }, ease: Ease.OutQuad);
+            }
         }
 
 #if UNITY_EDITOR
