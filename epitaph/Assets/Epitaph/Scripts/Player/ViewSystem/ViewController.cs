@@ -19,7 +19,8 @@ namespace Epitaph.Scripts.Player.ViewSystem
         public PlayerLook PlayerLook { get; private set; }
         public PlayerHeadBob PlayerHeadBob { get; private set; }
 
-        public ViewController(Camera playerCamera, CinemachineCamera fpCamera, Transform playerCameraTransform)
+        public ViewController(Camera playerCamera, CinemachineCamera fpCamera, 
+            Transform playerCameraTransform)
         {
             _playerCamera = playerCamera;
             _fpCamera = fpCamera;
