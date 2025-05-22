@@ -164,7 +164,7 @@ namespace Epitaph.Scripts.Player
             #endregion
             
             HealthController = AddSubController(new HealthController(this, CurrentPlayerData));
-            MovementController = AddSubController(new MovementController(this, CurrentPlayerData, characterController, playerCamera, HealthController));
+            MovementController = AddSubController(new MovementController(this, CurrentPlayerData, characterController, playerCameraTransform, HealthController, playerCamera));
             InteractionController = AddSubController(new InteractionController(this, CurrentPlayerData, playerCamera));
             
             if (playerCamera != null && playerCameraTransform != null)

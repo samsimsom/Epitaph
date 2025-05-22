@@ -1,4 +1,3 @@
-using System;
 using Epitaph.Scripts.Player.ScriptableObjects;
 using PrimeTween;
 using UnityEngine;
@@ -11,7 +10,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private PlayerData _playerData;
         private CharacterController _characterController;
         private PlayerMove _playerMove;
-        private Camera _playerCamera;
+        // private Camera _playerCamera;
+        private Transform _playerCameraTransform;
         private float _initialCameraYLocalPosition;
         private bool _wasGroundedBeforeTransition; // Kaymayı önlemek için geçiş öncesi durumu sakla
 
@@ -23,12 +23,13 @@ namespace Epitaph.Scripts.Player.MovementSystem
             PlayerData playerData,
             CharacterController characterController,
             PlayerMove playerMove,
-            Camera playerCamera) : base(playerController)
+            Transform playerCameraTransform) : base(playerController)
         {
             _playerData = playerData;
             _characterController = characterController;
             _playerMove = playerMove;
-            _playerCamera = playerCamera;
+            // _playerCamera = playerCamera;
+            _playerCameraTransform = playerCameraTransform;
 
             Initialize();
         }
@@ -67,10 +68,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // Durumu ayarlayan ve geçişi başlatan merkezi bir metod
         private void SetCrouchState(bool newCrouchState)
         {
-            if (_playerData.isCrouching == newCrouchState) return;
+            // if (_playerData.isCrouching == newCrouchState) return;
 
             _playerData.isCrouching = newCrouchState;
-            // OnCrouchStateChanged?.Invoke(_playerData.isCrouching);
+            
             _playerMove.SetCrouchingSpeed();
             
             if (newCrouchState)
@@ -89,8 +90,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // Private Methods
         private void Initialize()
         {
-            _initialCameraYLocalPosition = _playerCamera != null ?
-                _playerCamera.transform.localPosition.y : 0f;
+            _initialCameraYLocalPosition = _playerCameraTransform != null ?
+                _playerCameraTransform.localPosition.y : 0f;
 
             _playerData.standingHeight = _characterController.height;
         }
@@ -126,10 +127,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             // Aynı nesneler üzerindeki mevcut tween'leri durdur (hızlı geçişlerde çakışmayı önler)
             Tween.StopAll(onTarget: _characterControllerTween);
-            if (_playerCamera != null)
-            {
-                Tween.StopAll(onTarget: _playerCameraTween);
-            }
+            Tween.StopAll(onTarget: _playerCameraTween);
 
             var startHeight = _characterController.height;
             var endHeight = _playerData.isCrouching ? _playerData.crouchHeight : _playerData.standingHeight;
@@ -142,8 +140,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
             // Yükseklik ve merkezi tek bir tween ile güncellemek, senkronizasyonu ve Move çağrısını basitleştirir.
             // t, 0'dan 1'e interpolasyon faktörü olacaktır.
-            _characterControllerTween = Tween.Custom(0f, 1f, duration,
-                onValueChange: t =>
+            _characterControllerTween = Tween.Custom(0f, 1f, duration, onValueChange: t =>
                 {
                     // Bu tween adımındaki yükseklik/merkez güncellemelerinden ÖNCEKİ
                     // CharacterController'ın mevcut yüksekliğine ve merkezine göre
@@ -163,13 +160,16 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
                     // Bu adımda yükseklik/merkez değişiklikleri nedeniyle
                     // kapsülün alt kısmının transform'un pozisyonuna GÖRE ne kadar aşağı doğru yer değiştirdiği.
-                    var relativeBottomDisplacement =
-                        bottomOffsetAfterUpdate - bottomOffsetBeforeUpdate;
+                    var relativeBottomDisplacement = bottomOffsetAfterUpdate - bottomOffsetBeforeUpdate;
 
-                    // Transform'u bu miktar kadar YUKARI hareket ettirmek istiyoruz ki
-                    // kapsül altının göreceli batmasını telafi edelim.
-                    // Yani, relativeBottomDisplacement negatifse (aşağı batmışsa), transform'u YUKARI hareket ettiririz.
-                    var compensationMove = Vector3.up * -relativeBottomDisplacement;
+                    // Örnek düzeltme
+                    RaycastHit hit;
+                    var groundNormal = Vector3.up;
+                    if (Physics.Raycast(_characterController.transform.position + Vector3.up * 0.1f, Vector3.down, out hit, 1f, _playerData.groundLayers)) 
+                    {
+                        groundNormal = hit.normal;
+                    }
+                    var compensationMove = -relativeBottomDisplacement * groundNormal;
 
                     // Şimdi topraklama itmesini de uygula
                     var groundingMove = Vector3.zero;
@@ -177,27 +177,22 @@ namespace Epitaph.Scripts.Player.MovementSystem
                     {
                         groundingMove = Vector3.down * (_characterController.skinWidth + 0.01f);
                     }
-
-                    // Hareketleri birleştir ve uygula
+                    
                     _characterController.Move(compensationMove + groundingMove);
+                    
                 }, ease: Ease.OutQuad);
 
             // Kamera pozisyonunu yumuşak bir şekilde ayarla
-            if (_playerCamera != null)
-            {
-                var startCameraY = _playerCamera.transform.localPosition.y;
-                var endCameraY = _initialCameraYLocalPosition +
-                                 (_playerData.isCrouching ? _playerData.crouchCameraYOffset :
-                                     _playerData.standingCameraYOffset);
+            var startCameraY = _playerCameraTransform.localPosition.y;
+            var endCameraY = _initialCameraYLocalPosition + (_playerData.isCrouching ? _playerData.crouchCameraYOffset : _playerData.standingCameraYOffset);
 
-                _playerCameraTween = Tween.Custom(startCameraY, endCameraY, duration,
-                    onValueChange: newCameraY =>
-                    {
-                        var camPos = _playerCamera.transform.localPosition;
-                        camPos.y = newCameraY;
-                        _playerCamera.transform.localPosition = camPos;
-                    }, ease: Ease.OutQuad);
-            }
+            _playerCameraTween = Tween.Custom(startCameraY, endCameraY, duration,
+                onValueChange: newCameraY =>
+                {
+                    var camPos = _playerCameraTransform.localPosition;
+                    camPos.y = newCameraY;
+                    _playerCameraTransform.localPosition = camPos;
+                }, ease: Ease.OutQuad);
         }
 
 #if UNITY_EDITOR
@@ -206,6 +201,38 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             if (_characterController == null) return;
 
+            // Slope raycast'ini burada gösterelim:
+            var rayOrigin = _characterController.transform.position + Vector3.up * 0.1f;
+            var rayDirection = Vector3.down;
+            var rayLength = 1f;
+
+            // Ground layer mask'i alalım (null kontrolü var sayılıyor)
+            int groundMask = _playerData != null ? _playerData.groundLayers : ~0;
+            
+            // Raycast sonucu ve ground normal çizimi
+            RaycastHit hit;
+            if (Physics.Raycast(rayOrigin, rayDirection, out hit, rayLength, groundMask))
+            {
+                // Ray'i mavi çiz
+                Gizmos.color = Color.blue;
+                Gizmos.DrawLine(rayOrigin, rayOrigin + rayDirection * rayLength);
+
+                // Ground normale bir ok çiz
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawRay(hit.point, hit.normal * 0.5f);
+
+                // Temas noktası için küçük bir küre çiz
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawWireSphere(hit.point, 0.05f);
+            }
+            else
+            {
+                // Ray'i kırmızı çiz (hiçbir şeye çarpmıyorsa)
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(rayOrigin, rayOrigin + rayDirection * rayLength);
+            }
+
+            // Var olan diğer gizmoslarınızı da çizmeye devam edin
             ComputeCeilingRayOrigin(out var radius, out var rayDistance,
                 out var originTip, out var originRoot);
 

@@ -11,6 +11,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private PlayerData _playerData;
         private CharacterController _characterController;
         private Camera _playerCamera;
+        private Transform _playerCameraTransform;
         
         private HealthController _healthController;
 
@@ -32,14 +33,17 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         public MovementController(PlayerController playerController, 
             PlayerData playerData,
-            CharacterController characterController, Camera playerCamera,
-            HealthController healthController) 
+            CharacterController characterController, 
+            Transform playerCameraTransform,
+            HealthController healthController,
+            Camera playerCamera) 
             : base(playerController)
         {
             _playerController = playerController;
             _playerData = playerData;
             _characterController = characterController;
             _playerCamera = playerCamera;
+            _playerCameraTransform = playerCameraTransform;
             _healthController = healthController;
         }
 
@@ -63,7 +67,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             // Diğer hareket davranışları
             PlayerGravity = AddMovementBehaviour(new PlayerGravity(_playerController, _playerData, _characterController));
             PlayerSprint = AddMovementBehaviour(new PlayerSprint(_playerController, _playerData, _healthController, PlayerMove)); // HealthController ve PlayerMove bağımlılığı
-            PlayerCrouch = AddMovementBehaviour(new PlayerCrouch(_playerController, _playerData, _characterController, PlayerMove, _playerCamera)); // PlayerMove bağımlılığı
+            PlayerCrouch = AddMovementBehaviour(new PlayerCrouch(_playerController, _playerData, _characterController, PlayerMove, _playerCameraTransform)); // PlayerMove bağımlılığı
             PlayerJump = AddMovementBehaviour(new PlayerJump(_playerController, _playerData));
             
             // NOT: PlayerLook ve PlayerHeadBob ViewController'a taşınacak.
