@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.ViewSystem
 {
-    public class ViewController : IPlayerSubController
+    public class ViewController : PlayerBehaviour
     {
         private PlayerController _playerController;
         private PlayerData _playerData;
@@ -19,12 +19,17 @@ namespace Epitaph.Scripts.Player.ViewSystem
         public PlayerLook PlayerLook { get; private set; }
         public PlayerHeadBob PlayerHeadBob { get; private set; }
 
-        public ViewController(Camera playerCamera, CinemachineCamera fpCamera, 
-            Transform playerCameraTransform)
+        public ViewController(PlayerController playerController, PlayerData playerData,
+            Camera playerCamera, CinemachineCamera fpCamera,
+            Transform playerCameraTransform) : base(playerController)
         {
+            _playerController = playerController;
+            _playerData = playerData;
             _playerCamera = playerCamera;
             _fpCamera = fpCamera;
             _playerCameraTransform = playerCameraTransform;
+            
+            InitializeBehaviours();
         }
 
         private T AddViewBehaviour<T>(T behaviour) where T : PlayerBehaviour
@@ -33,67 +38,63 @@ namespace Epitaph.Scripts.Player.ViewSystem
             return behaviour;
         }
 
-        public void InitializeBehaviours(PlayerController playerController, PlayerData playerData)
+        public void InitializeBehaviours()
         {
-            _playerController = playerController;
-            _playerData = playerData;
-
-            // PlayerLook ve PlayerHeadBob sınıflarının var olduğundan 
-            // ve constructor imzalarının eşleştiğinden emin olun.
-            if (_playerCameraTransform != null) // _playerCameraTransform null değilse devam et
+            if (_playerCameraTransform != null)
             {
-                // fpCamera null olabilir, PlayerLook constructor'ınız buna göre ayarlanmış olmalı
                 PlayerLook = AddViewBehaviour(new PlayerLook(_playerController, _playerData, _playerCameraTransform, _fpCamera)); 
                 PlayerHeadBob = AddViewBehaviour(new PlayerHeadBob(_playerController, _playerData, _playerCameraTransform));
             }
             else
             {
-                Debug.LogError("PlayerCameraTransform is null in ViewController.InitializeBehaviours. View behaviours cannot be initialized.", _playerController);
+                Debug.LogError("PlayerCameraTransform is null in ViewController." +
+                               "InitializeBehaviours. View behaviours cannot be " +
+                               "initialized.", _playerController);
             }
         }
 
-        public void PlayerAwake()
+        public override void Awake()
         {
             foreach (var behaviour in _viewBehaviours) behaviour.Awake();
         }
 
-        public void PlayerOnEnable()
+        public override void OnEnable()
         {
             foreach (var behaviour in _viewBehaviours) behaviour.OnEnable();
         }
 
-        public void PlayerStart()
+        public override void Start()
         {
             foreach (var behaviour in _viewBehaviours) behaviour.Start();
         }
 
-        public void PlayerUpdate()
+        public override void Update()
         {
             foreach (var behaviour in _viewBehaviours) behaviour.Update();
         }
 
-        public void PlayerLateUpdate()
+        public override void LateUpdate()
         {
             foreach (var behaviour in _viewBehaviours) behaviour.LateUpdate();
         }
 
-        public void PlayerFixedUpdate()
+        public override void FixedUpdate()
         {
             foreach (var behaviour in _viewBehaviours) behaviour.FixedUpdate();
         }
 
-        public void PlayerOnDisable()
+        public override void OnDisable()
         {
             foreach (var behaviour in _viewBehaviours) behaviour.OnDisable();
         }
 
-        public void PlayerOnDestroy()
+        public override void OnDestroy()
         {
             foreach (var behaviour in _viewBehaviours) behaviour.OnDestroy();
         }
 
 #if UNITY_EDITOR
-        public void PlayerOnDrawGizmos()
+        public override void OnDrawGizmos()
         {
             foreach (var behaviour in _viewBehaviours) behaviour.OnDrawGizmos();
         }

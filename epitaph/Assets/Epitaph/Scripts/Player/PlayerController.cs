@@ -152,22 +152,19 @@ namespace Epitaph.Scripts.Player
             
             HealthController = AddSubController(new HealthController(this, playerData));
             MovementController = AddSubController(new MovementController(this, playerData, characterController, playerCamera, HealthController));
-            // MovementController.InjectDependencies(HealthController); 
-            // MovementController.InitializeBehaviours(this, playerData);
             
             // InteractionController = AddSubController(new InteractionController(playerCamera));
             // InteractionController.InitializeBehaviours(this, playerData);
             
-            // if (playerCamera != null && playerCameraTransform != null)
-            // {
-            //     ViewController = AddSubController(new ViewController(playerCamera, fpCamera, playerCameraTransform));
-            //     ViewController.InitializeBehaviours(this, playerData);
-            // }
-            // else
-            // {
-            //     Debug.LogError("Cannot initialize ViewController because playerCamera " +
-            //                    "or playerCameraTransform is missing!", this);
-            // }
+            if (playerCamera != null && playerCameraTransform != null)
+            {
+                ViewController = AddSubController(new ViewController(this, playerData, playerCamera, fpCamera, playerCameraTransform));
+            }
+            else
+            {
+                Debug.LogError("Cannot initialize ViewController because playerCamera " +
+                               "or playerCameraTransform is missing!", this);
+            }
         }
         #endregion
         
