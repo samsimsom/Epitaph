@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
 {
-    public class MovementController : IPlayerSubController
+    public class MovementController : PlayerBehaviour
     {
         private PlayerController _playerController;
         private PlayerData _playerData;
@@ -24,17 +24,30 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public PlayerGravity PlayerGravity { get; private set; }
         // Diğer hareketle ilgili davranışlar buraya eklenebilir (örn: PlayerSlide)
 
-        public MovementController(CharacterController characterController, Camera playerCamera)
+        // public MovementController(CharacterController characterController, Camera playerCamera)
+        // {
+        //     _characterController = characterController;
+        //     _playerCamera = playerCamera;
+        // }
+        
+        public MovementController(PlayerController playerController, 
+            PlayerData playerData,
+            CharacterController characterController, Camera playerCamera,
+            HealthController healthController) 
+            : base(playerController)
         {
+            _playerController = playerController;
+            _playerData = playerData;
             _characterController = characterController;
             _playerCamera = playerCamera;
+            _healthController = healthController;
         }
 
         // Bu metot, HealthController gibi diğer sistemlere olan bağımlılıkları set etmek için kullanılabilir.
-        public void InjectDependencies(HealthController healthController)
-        {
-            _healthController = healthController;
-        }
+        // public void InjectDependencies(HealthController healthController)
+        // {
+        //     _healthController = healthController;
+        // }
 
         private T AddMovementBehaviour<T>(T behaviour) where T : PlayerBehaviour
         {
@@ -42,11 +55,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             return behaviour;
         }
 
-        public void InitializeBehaviours(PlayerController playerController, PlayerData playerData)
+        public void InitializeBehaviours()
         {
-            _playerController = playerController;
-            _playerData = playerData;
-
             // PlayerMove (diğerlerine bağımlılık oluşturabilir)
             PlayerMove = AddMovementBehaviour(new PlayerMove(_playerController, _playerData, _characterController, _playerCamera));
             
@@ -60,48 +70,49 @@ namespace Epitaph.Scripts.Player.MovementSystem
             // NOT: PlayerInteraction InteractionController'a taşınacak.
         }
 
-        public void PlayerAwake()
+        public override void Awake()
         {
+            InitializeBehaviours();
             foreach (var behaviour in _movementBehaviours) behaviour.Awake();
         }
 
-        public void PlayerOnEnable()
+        public override void OnEnable()
         {
             foreach (var behaviour in _movementBehaviours) behaviour.OnEnable();
         }
 
-        public void PlayerStart()
+        public override void Start()
         {
             foreach (var behaviour in _movementBehaviours) behaviour.Start();
         }
 
-        public void PlayerUpdate()
+        public override void Update()
         {
             foreach (var behaviour in _movementBehaviours) behaviour.Update();
         }
 
-        public void PlayerLateUpdate()
+        public override void LateUpdate()
         {
             foreach (var behaviour in _movementBehaviours) behaviour.LateUpdate();
         }
 
-        public void PlayerFixedUpdate()
+        public override void FixedUpdate()
         {
             foreach (var behaviour in _movementBehaviours) behaviour.FixedUpdate();
         }
 
-        public void PlayerOnDisable()
+        public override void OnDisable()
         {
             foreach (var behaviour in _movementBehaviours) behaviour.OnDisable();
         }
 
-        public void PlayerOnDestroy()
+        public override void OnDestroy()
         {
             foreach (var behaviour in _movementBehaviours) behaviour.OnDestroy();
         }
         
 #if UNITY_EDITOR
-        public void PlayerOnDrawGizmos()
+        public override void OnDrawGizmos()
         {
             foreach (var behaviour in _movementBehaviours) behaviour.OnDrawGizmos();
         }

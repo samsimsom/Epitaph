@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.HealthSystem
 {
-    public class HealthController : IPlayerSubController
+    public class HealthController : PlayerBehaviour
     {
         private PlayerController _playerController;
         private PlayerData _playerData; // Assume this holds all configuration values
@@ -20,24 +20,24 @@ namespace Epitaph.Scripts.Player.HealthSystem
         private List<ICondition> _allStats;
         private int _lastMinute = -1;
         private bool _isUpdating;
-
-        public void InitializeBehaviours(PlayerController playerController, PlayerData playerData)
+        
+        public HealthController(PlayerController playerController, PlayerData playerData) 
+            : base(playerController)
         {
-            _playerController = playerController;
             _playerData = playerData;
         }
 
-        public void PlayerAwake()
+        public override void Awake()
         {
             InitializeConditions();
         }
         
-        public void PlayerStart()
+        public override void Start()
         {
             StartUpdates();
         }
 
-        public void PlayerOnEnable()
+        public override void OnEnable()
         {
             _isUpdating = true;
             if (GameTime.Instance != null)
@@ -52,10 +52,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
             }
         }
 
-        public void PlayerUpdate() { /* No continuous calls needed if async updates handle their logic */ }
-        public void PlayerLateUpdate() { }
-        public void PlayerFixedUpdate() { }
-        public void PlayerOnDisable()
+        public override void OnDisable()
         {
             _isUpdating = false; 
             if (GameTime.Instance != null)
@@ -70,7 +67,7 @@ namespace Epitaph.Scripts.Player.HealthSystem
         public void PlayerOnDestroy() { /* Cleanup if necessary */ }
 
 #if UNITY_EDITOR
-        public void PlayerOnDrawGizmos() { }
+        public override void OnDrawGizmos() { }
 #endif
         
         private void InitializeConditions()

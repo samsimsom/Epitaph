@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Epitaph.Scripts.Player.MovementSystem;
 using Epitaph.Scripts.Player.ScriptableObjects;
 using UnityEngine;
 

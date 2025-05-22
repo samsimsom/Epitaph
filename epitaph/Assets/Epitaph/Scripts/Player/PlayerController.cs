@@ -24,7 +24,7 @@ namespace Epitaph.Scripts.Player
         #endregion
         
         #region Player SubControllers
-        private readonly List<IPlayerSubController> _subControllers = new();
+        private readonly List<PlayerBehaviour> _subControllers = new();
         
         public MovementController MovementController { get; private set; }
         public HealthController HealthController { get; private set; } 
@@ -35,10 +35,10 @@ namespace Epitaph.Scripts.Player
         #region Unity Lifecycle Methods
         private void Awake()
         {
-            InitializeSubControllersAndBehaviours();
+            InitializeBehaviours();
             foreach (var subController in _subControllers)
             {
-                subController.PlayerAwake();
+                subController.Awake();
             }
         }
         
@@ -46,7 +46,7 @@ namespace Epitaph.Scripts.Player
         {
             foreach (var subController in _subControllers)
             {
-                subController.PlayerOnEnable();
+                subController.OnEnable();
             }
         }
         
@@ -54,7 +54,7 @@ namespace Epitaph.Scripts.Player
         {
             foreach (var subController in _subControllers)
             {
-                subController.PlayerStart();
+                subController.Start();
             }
         }
         
@@ -62,7 +62,7 @@ namespace Epitaph.Scripts.Player
         {
             foreach (var subController in _subControllers)
             {
-                subController.PlayerUpdate();
+                subController.Update();
             }
         }
         
@@ -70,7 +70,7 @@ namespace Epitaph.Scripts.Player
         {
             foreach (var subController in _subControllers)
             {
-                subController.PlayerLateUpdate();
+                subController.LateUpdate();
             }
         }
         
@@ -78,7 +78,7 @@ namespace Epitaph.Scripts.Player
         {
             foreach (var subController in _subControllers)
             {
-                subController.PlayerFixedUpdate();
+                subController.FixedUpdate();
             }
         }
         
@@ -86,7 +86,7 @@ namespace Epitaph.Scripts.Player
         {
             foreach (var subController in _subControllers)
             {
-                subController.PlayerOnDisable();
+                subController.OnDisable();
             }
         }
         
@@ -94,7 +94,7 @@ namespace Epitaph.Scripts.Player
         {
             foreach (var subController in _subControllers)
             {
-                subController.PlayerOnDestroy();
+                subController.OnDestroy();
             }
         }
 
@@ -106,20 +106,20 @@ namespace Epitaph.Scripts.Player
             if (_subControllers == null) return;
             foreach (var subController in _subControllers)
             {
-                subController?.PlayerOnDrawGizmos();
+                subController?.OnDrawGizmos();
             }
         }
 #endif
         #endregion
 
         #region Initialization
-        private T AddSubController<T>(T subController) where T : IPlayerSubController
+        private T AddSubController<T>(T subController) where T : PlayerBehaviour
         {
             _subControllers.Add(subController);
             return subController;
         }
         
-        private void InitializeSubControllersAndBehaviours()
+        private void InitializeBehaviours()
         {
             #region Inspector Objects
             if (characterController == null) 
@@ -150,27 +150,24 @@ namespace Epitaph.Scripts.Player
             }
             #endregion
             
-            // HealthController'ı oluştur ve listeye ekle
-            HealthController = AddSubController(new HealthController()); 
-            HealthController.InitializeBehaviours(this, playerData);
-
-            MovementController = AddSubController(new MovementController(characterController, playerCamera));
-            MovementController.InjectDependencies(HealthController); 
-            MovementController.InitializeBehaviours(this, playerData);
+            HealthController = AddSubController(new HealthController(this, playerData));
+            MovementController = AddSubController(new MovementController(this, playerData, characterController, playerCamera, HealthController));
+            // MovementController.InjectDependencies(HealthController); 
+            // MovementController.InitializeBehaviours(this, playerData);
             
-            InteractionController = AddSubController(new InteractionController(playerCamera)); 
-            InteractionController.InitializeBehaviours(this, playerData);
+            // InteractionController = AddSubController(new InteractionController(playerCamera));
+            // InteractionController.InitializeBehaviours(this, playerData);
             
-            if (playerCamera != null && playerCameraTransform != null)
-            {
-                ViewController = AddSubController(new ViewController(playerCamera, fpCamera, playerCameraTransform));
-                ViewController.InitializeBehaviours(this, playerData);
-            }
-            else
-            {
-                Debug.LogError("Cannot initialize ViewController because playerCamera " +
-                               "or playerCameraTransform is missing!", this);
-            }
+            // if (playerCamera != null && playerCameraTransform != null)
+            // {
+            //     ViewController = AddSubController(new ViewController(playerCamera, fpCamera, playerCameraTransform));
+            //     ViewController.InitializeBehaviours(this, playerData);
+            // }
+            // else
+            // {
+            //     Debug.LogError("Cannot initialize ViewController because playerCamera " +
+            //                    "or playerCameraTransform is missing!", this);
+            // }
         }
         #endregion
         
