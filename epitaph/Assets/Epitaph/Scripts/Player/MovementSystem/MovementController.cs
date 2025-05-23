@@ -7,30 +7,16 @@ namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class MovementController : PlayerBehaviour
     {
-        private PlayerController _playerController;
-        private PlayerData _playerData;
+        private readonly List<PlayerBehaviour> _movementBehaviours = new();
+        
         private CharacterController _characterController;
+        private HealthController _healthController;
         private Camera _playerCamera;
         private Transform _playerCameraTransform;
-        
-        private HealthController _healthController;
+        private PlayerController _playerController;
 
-        private readonly List<PlayerBehaviour> _movementBehaviours = new();
+        private PlayerData _playerData;
 
-        // Hareket Davranışları
-        public PlayerMove PlayerMove { get; private set; }
-        public PlayerJump PlayerJump { get; private set; }
-        public PlayerCrouch PlayerCrouch { get; private set; }
-        public PlayerSprint PlayerSprint { get; private set; }
-        public PlayerGravity PlayerGravity { get; private set; }
-        // Diğer hareketle ilgili davranışlar buraya eklenebilir (örn: PlayerSlide)
-
-        // public MovementController(CharacterController characterController, Camera playerCamera)
-        // {
-        //     _characterController = characterController;
-        //     _playerCamera = playerCamera;
-        // }
-        
         public MovementController(PlayerController playerController, 
             PlayerData playerData,
             CharacterController characterController, 
@@ -47,11 +33,12 @@ namespace Epitaph.Scripts.Player.MovementSystem
             _healthController = healthController;
         }
 
-        // Bu metot, HealthController gibi diğer sistemlere olan bağımlılıkları set etmek için kullanılabilir.
-        // public void InjectDependencies(HealthController healthController)
-        // {
-        //     _healthController = healthController;
-        // }
+        // Hareket Davranışları
+        public PlayerMove PlayerMove { get; private set; }
+        public PlayerJump PlayerJump { get; private set; }
+        public PlayerCrouch PlayerCrouch { get; private set; }
+        public PlayerSprint PlayerSprint { get; private set; }
+        public PlayerGravity PlayerGravity { get; private set; }
 
         private T AddMovementBehaviour<T>(T behaviour) where T : PlayerBehaviour
         {
@@ -61,17 +48,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public void InitializeBehaviours()
         {
-            // PlayerMove (diğerlerine bağımlılık oluşturabilir)
             PlayerMove = AddMovementBehaviour(new PlayerMove(_playerController, _playerData, _characterController, _playerCamera));
-            
-            // Diğer hareket davranışları
-            PlayerGravity = AddMovementBehaviour(new PlayerGravity(_playerController, _playerData, _characterController));
-            PlayerSprint = AddMovementBehaviour(new PlayerSprint(_playerController, _playerData, _healthController, PlayerMove)); // HealthController ve PlayerMove bağımlılığı
-            PlayerCrouch = AddMovementBehaviour(new PlayerCrouch(_playerController, _playerData, _characterController, PlayerMove, _playerCameraTransform)); // PlayerMove bağımlılığı
-            PlayerJump = AddMovementBehaviour(new PlayerJump(_playerController, _playerData));
-            
-            // NOT: PlayerLook ve PlayerHeadBob ViewController'a taşınacak.
-            // NOT: PlayerInteraction InteractionController'a taşınacak.
+            // PlayerSprint = AddMovementBehaviour(new PlayerSprint(_playerController, _playerData, _healthController, PlayerMove)); // HealthController ve PlayerMove bağımlılığı
+            // PlayerCrouch = AddMovementBehaviour(new PlayerCrouch(_playerController, _playerData, _characterController, PlayerMove, _playerCameraTransform)); // PlayerMove bağımlılığı
+            // PlayerJump = AddMovementBehaviour(new PlayerJump(_playerController, _playerData));
+            // PlayerGravity = AddMovementBehaviour(new PlayerGravity(_playerController, _playerData, _characterController));
         }
 
         public override void Awake()
@@ -114,12 +95,13 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             foreach (var behaviour in _movementBehaviours) behaviour.OnDestroy();
         }
-        
+
 #if UNITY_EDITOR
         public override void OnDrawGizmos()
         {
             foreach (var behaviour in _movementBehaviours) behaviour.OnDrawGizmos();
         }
 #endif
+        
     }
 }
