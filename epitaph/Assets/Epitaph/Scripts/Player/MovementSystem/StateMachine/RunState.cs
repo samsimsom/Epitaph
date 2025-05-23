@@ -2,14 +2,14 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 {
-    public class WalkState : BaseState
+    public class RunState : BaseState
     {
-        public WalkState(MovementBehaviour currentContext, StateFactory stateFactory) 
+        public RunState(MovementBehaviour currentContext, StateFactory stateFactory) 
             : base(currentContext, stateFactory) { }
-
+        
         public override void EnterState()
         {
-            Debug.Log("WALK: Enter");
+            Debug.Log("RUN: Enter");
         }
 
         public override void UpdateState()
@@ -17,12 +17,12 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             HandleMovementInput();
             CheckSwitchStates();
         }
-        
         public override void FixedUpdateState() { }
-        
+
+
         public override void ExitState()
         {
-            Debug.Log("WALK: Exit");
+            Debug.Log("RUN: Exit");
         }
 
         public override void InitializeSubState() { }
@@ -31,10 +31,11 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         {
             if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame)
             {
-                Debug.Log("Crouch");
+                // Koşarken crouch'a geçince ne olacağına karar verin.
+                // Belki direkt crouch walk veya slide? Şimdilik normal crouch.
                 // SwitchState(Factory.Crouch());
             }
-            else if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame && Ctx.PlayerController.CharacterController.isGrounded)
+            else if (Ctx.PlayerController.PlayerInput.IsJumpPressed && Ctx.PlayerController.CharacterController.isGrounded)
             {
                 SwitchState(Factory.Jump());
             }
@@ -42,17 +43,17 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             {
                 SwitchState(Factory.Idle());
             }
-            else if (Ctx.PlayerController.PlayerInput.IsMoveInput && Ctx.PlayerController.PlayerInput.IsRunPressed)
+            else if (Ctx.PlayerController.PlayerInput.IsMoveInput && !Ctx.PlayerController.PlayerInput.IsRunPressed)
             {
-                SwitchState(Factory.Run());
+                SwitchState(Factory.Walk());
             }
         }
 
         private void HandleMovementInput()
         {
             var input = Ctx.PlayerController.PlayerInput.MoveInput;
-            Ctx.AppliedMovementX = input.x * Ctx.WalkSpeed;
-            Ctx.AppliedMovementZ = input.y * Ctx.WalkSpeed;
+            Ctx.AppliedMovementX = input.x * Ctx.RunSpeed;
+            Ctx.AppliedMovementZ = input.y * Ctx.RunSpeed;
         }
 
         private void SwitchState(BaseState newState)

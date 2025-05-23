@@ -14,8 +14,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             Ctx.CurrentMovementY = Ctx.JumpForce;
             Ctx.AppliedMovementX = Ctx.PlayerController.PlayerInput.MoveInput.x * Ctx.WalkSpeed;
             Ctx.AppliedMovementZ = Ctx.PlayerController.PlayerInput.MoveInput.y * Ctx.WalkSpeed;
-            
-            // Ctx.IsJumpPressed = false;
         }
 
         public override void UpdateState()
@@ -44,13 +42,13 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             // Yere değdiğinde ve dikey hız negatif veya sıfıra yakınsa
             if (Ctx.PlayerController.CharacterController.isGrounded && Ctx.CurrentMovementY <= 0)
             {
-                if (Ctx.IsCrouchPressedThisFrame || Ctx.IsCrouching) // Zıplamadan sonra crouch'a düşebilir
+                if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame || Ctx.IsCrouching)
                 {
                     // SwitchState(Factory.Crouch());
                 }
-                else if (Ctx.PlayerController.PlayerInput.IsMoveInput && Ctx.IsRunPressed)
+                else if (Ctx.PlayerController.PlayerInput.IsMoveInput && Ctx.PlayerController.PlayerInput.IsRunPressed)
                 {
-                    // SwitchState(Factory.Run());
+                    SwitchState(Factory.Run());
                 }
                 else if (Ctx.PlayerController.PlayerInput.IsMoveInput)
                 {

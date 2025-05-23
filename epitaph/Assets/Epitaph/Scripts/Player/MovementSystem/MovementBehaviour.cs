@@ -73,7 +73,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         public override void Update()
         {
-            HandleInput();
             _currentState.UpdateState(); // Mevcut durumun Update'ini çağır
             HandleMovement();
             HandleGravity();
@@ -82,16 +81,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public override void FixedUpdate()
         {
             _currentState.FixedUpdateState();
-        }
-
-        private void HandleInput()
-        {
-            // Örnek Input Sistemi (Yeni Input System veya eski Input Manager kullanılabilir)
-            // _currentMovementInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-            // _isMovementPressed = _currentMovementInput.x != 0 || _currentMovementInput.y != 0;
-            // _isRunPressed = Input.GetKey(KeyCode.LeftShift);
-            // IsJumpPressed = PlayerController.PlayerInput.IsJumpPressed;
-            // _isCrouchPressedThisFrame = Input.GetKeyDown(KeyCode.LeftControl); // Crouch için anlık basım
         }
 
         private void HandleMovement()

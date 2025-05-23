@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,6 +13,12 @@ namespace Epitaph.Scripts.Player.Input
         public bool IsLookInput { get; private set; }
         
         public bool IsJumpPressed { get; private set; }
+        public bool IsJumpPressedThisFrame { get; private set; }
+
+        public bool IsCrouchPressed { get; private set; }
+        public bool IsCrouchPressedThisFrame { get; private set; }
+
+        public bool IsRunPressed { get; private set; }
         
         private PlayerInputActions _playerInputActions;
 
@@ -20,6 +27,12 @@ namespace Epitaph.Scripts.Player.Input
             if (_playerInputActions != null) return;
             _playerInputActions = new PlayerInputActions();
             _playerInputActions.Player.SetCallbacks(this);
+        }
+
+        private void LateUpdate()
+        {
+            IsJumpPressedThisFrame = false;
+            IsCrouchPressedThisFrame = false;
         }
 
         private void OnEnable()
@@ -74,13 +87,22 @@ namespace Epitaph.Scripts.Player.Input
 
         public void OnCrouch(InputAction.CallbackContext context)
         {
-            
+            if (context.performed)
+            {
+                IsCrouchPressedThisFrame = true;
+                IsCrouchPressed = true;
+            }
+            else if (context.canceled)
+            {
+                IsCrouchPressed = false;
+            }
         }
 
         public void OnJump(InputAction.CallbackContext context)
         {
-            if (context.started)
+            if (context.performed)
             {
+                IsJumpPressedThisFrame = true;
                 IsJumpPressed = true;
             }
             else if (context.canceled)
@@ -99,9 +121,16 @@ namespace Epitaph.Scripts.Player.Input
             
         }
 
-        public void OnSprint(InputAction.CallbackContext context)
+        public void OnRun(InputAction.CallbackContext context)
         {
-            
+            if (context.performed)
+            {
+                IsRunPressed = true;
+            }
+            else if (context.canceled)
+            {
+                IsRunPressed = false;
+            }
         }
         
         // ---------------------------------------------------------------------------- //

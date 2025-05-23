@@ -31,19 +31,18 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void CheckSwitchStates()
         {
-            if (Ctx.IsCrouchPressedThisFrame)
+            if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame)
             {
                 Debug.Log("Crouch");
                 // SwitchState(Factory.Crouch());
             }
-            else if (Ctx.PlayerController.PlayerInput.IsJumpPressed && Ctx.PlayerController.CharacterController.isGrounded)
+            else if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame && Ctx.PlayerController.CharacterController.isGrounded)
             {
                 SwitchState(Factory.Jump());
             }
-            else if (Ctx.PlayerController.PlayerInput.IsMoveInput && Ctx.IsRunPressed)
+            else if (Ctx.PlayerController.PlayerInput.IsMoveInput && Ctx.PlayerController.PlayerInput.IsRunPressed)
             {
-                Debug.Log("Run");
-                // SwitchState(Factory.Run());
+                SwitchState(Factory.Run());
             }
             else if (Ctx.PlayerController.PlayerInput.IsMoveInput)
             {
