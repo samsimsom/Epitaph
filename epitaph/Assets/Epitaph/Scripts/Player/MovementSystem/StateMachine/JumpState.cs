@@ -64,8 +64,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         {
             // Havada bir miktar kontrol sağlamak için
             var input = Ctx.PlayerController.PlayerInput.MoveInput;
-            // Havadaki hızı karadaki hızdan farklı olabilir (örneğin walkspeed'in %80'i)
-            var airControlFactor = 0.8f;
+            var airControlFactor = 1.25f;
             Ctx.AppliedMovementX = input.x * Ctx.WalkSpeed * airControlFactor;
             Ctx.AppliedMovementZ = input.y * Ctx.WalkSpeed * airControlFactor;
         }

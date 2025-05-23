@@ -95,22 +95,43 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         private void HandleMovement()
         {
+            // XZ düzleminde hareket (normalize ile hızlı yön değişimlerinde hız kaybı engellenir)
             var moveDirection = new Vector3(AppliedMovementX, 0, AppliedMovementZ);
+            // if (moveDirection.magnitude > 1)
+            //     moveDirection.Normalize();
+
+            // Kamera yönüne göre döndür
             moveDirection = PlayerController.PlayerCamera.transform.TransformDirection(moveDirection);
-            
+
+            // Dikey hızı hareket vektörüne uygula
             moveDirection.y = _verticalVelocity;
+
+            // Hareket uygula
             PlayerController.CharacterController.Move(moveDirection * Time.deltaTime);
-        }
-        
-        private void HandleGravity()
-        {
+
+            // Yere değerse dikey hızı hafifçe sabitle, böylece character controller'ın "yerde kayma bugı" azalır
             if (PlayerController.CharacterController.isGrounded && _verticalVelocity < 0)
             {
                 _verticalVelocity = -1f;
             }
+        }
+
+        private void HandleGravity()
+        {
+            if (PlayerController.CharacterController.isGrounded)
+            {
+                // Eğer yere yeni değildiysek ve aşağı yönde hareket ediyorsak hızı sıfırla
+                if (_verticalVelocity < 0)
+                    _verticalVelocity = -1f;
+            }
             else
             {
-                _verticalVelocity -= Gravity * Time.deltaTime;
+                // Daha kontrollü bir düşüş eğrisi için gravity factor'u siz ayarlayabilirsiniz.
+                var gravityMultiplier = 1.0f;
+                // Eğer jump tusu bırakıldıysa veya oyuncu alçalmaya başladıysa gravity hızlanabilir
+                if (_verticalVelocity < 0)
+                    gravityMultiplier = 1.5f; // Daha gerçekçi düşüş için
+                _verticalVelocity -= Gravity * gravityMultiplier * Time.deltaTime;
             }
         }
         
