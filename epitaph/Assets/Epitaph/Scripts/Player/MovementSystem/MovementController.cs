@@ -47,7 +47,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public void InitializeBehaviours()
         {
-            PlayerMove = AddMovementBehaviour(new PlayerMove(_playerController, _playerData, _characterController, _playerCamera));
+            // PlayerMove = AddMovementBehaviour(new PlayerMove(_playerController, _playerData, _characterController, _playerCamera));
             // PlayerSprint = AddMovementBehaviour(new PlayerSprint(_playerController, _playerData, _healthController, PlayerMove)); // HealthController ve PlayerMove bağımlılığı
             // PlayerCrouch = AddMovementBehaviour(new PlayerCrouch(_playerController, _playerData, _characterController, PlayerMove, _playerCameraTransform)); // PlayerMove bağımlılığı
             // PlayerJump = AddMovementBehaviour(new PlayerJump(_playerController, _playerData));
