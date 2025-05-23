@@ -120,7 +120,6 @@ namespace Epitaph.Scripts.Player
             else if (context.canceled)
             {
                 isCrouchPressed = false;
-                // Gerekirse burası da güncellenir.
             }
         }
 
@@ -132,6 +131,10 @@ namespace Epitaph.Scripts.Player
                 isJumpPressed = true;
                 // _playerController.MovementController?.PlayerJump?.ProcessJump();
                 StartActionCooldown(actionName);
+            }
+            else if (context.canceled)
+            {
+                isJumpPressed = false;
             }
         }
 

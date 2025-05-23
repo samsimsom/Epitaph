@@ -10,7 +10,7 @@ namespace Epitaph.Scripts.Player.StateMachine
 
         public override void EnterState()
         {
-            // Debug.Log("WALK: Enter");
+            Debug.Log("WALK: Enter");
             // _ctx.Animator.SetBool("IsWalking", true);
             // _ctx.Animator.SetBool("IsRunning", false);
         }
@@ -25,7 +25,7 @@ namespace Epitaph.Scripts.Player.StateMachine
 
         public override void ExitState()
         {
-            // Debug.Log("WALK: Exit");
+            Debug.Log("WALK: Exit");
         }
 
         public override void InitializeSubState() { }

@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace Epitaph.Scripts.Player.StateMachine
 {
     public class PlayerIdleState : PlayerBaseState
@@ -8,7 +10,7 @@ namespace Epitaph.Scripts.Player.StateMachine
 
         public override void EnterState()
         {
-            // Debug.Log("IDLE: Enter");
+            Debug.Log("IDLE: Enter");
             Ctx.AppliedMovementX = 0;
             Ctx.AppliedMovementZ = 0;
             // _ctx.Animator.SetBool("IsWalking", false); // Animasyon
@@ -24,7 +26,7 @@ namespace Epitaph.Scripts.Player.StateMachine
 
         public override void ExitState()
         {
-            // Debug.Log("IDLE: Exit");
+            Debug.Log("IDLE: Exit");
         }
 
         public override void InitializeSubState() { }

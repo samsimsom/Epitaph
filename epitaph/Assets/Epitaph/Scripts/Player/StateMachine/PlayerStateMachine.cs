@@ -5,10 +5,10 @@ namespace Epitaph.Scripts.Player.StateMachine
     public class PlayerStateMachine : PlayerBehaviour
     {
         // Movement Variables
-        public float WalkSpeed = 3.0f;
-        public float RunSpeed = 6.0f;
-        public float CrouchSpeed = 1.5f;
-        private float _rotationSpeed = 720f; // Karakterin dönüş hızı
+        public float WalkSpeed = 1.75f;
+        public float RunSpeed = 4.0f;
+        public float CrouchSpeed = 1.25f;
+        // private float _rotationSpeed = 720f; // Karakterin dönüş hızı
         public float JumpForce = 8.0f;
         public float Gravity = 20.0f;
         public float NormalHeight = 1.8f;
