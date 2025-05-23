@@ -12060,7 +12060,7 @@ MonoBehaviour:
       Enabled: 1
       Input:
         InputAction: {fileID: -5630151704836100654, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-        Gain: 1
+        Gain: 20
         LegacyInput: 
         LegacyGain: 1
         CancelDeltaTime: 0
@@ -12073,7 +12073,7 @@ MonoBehaviour:
       Enabled: 1
       Input:
         InputAction: {fileID: -5630151704836100654, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-        Gain: -1
+        Gain: -20
         LegacyInput: 
         LegacyGain: 1
         CancelDeltaTime: 0

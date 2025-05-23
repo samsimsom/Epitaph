@@ -70,5 +70,42 @@ namespace Epitaph.Scripts.Player.MovementSystem
             _currentState = _states.Idle();
             _currentState.EnterState();
         }
+        
+        public override void Update()
+        {
+            _currentState.UpdateState(); // Mevcut durumun Update'ini çağır
+            HandleMovement();
+            HandleGravity();
+        }
+        
+        public override void FixedUpdate()
+        {
+            _currentState.FixedUpdateState();
+        }
+
+        private void HandleMovement()
+        {
+            // Move
+            var moveDirection = new Vector3(AppliedMovementX, 0, AppliedMovementZ);
+            moveDirection = PlayerController.PlayerCamera.transform.TransformDirection(moveDirection);
+
+            // Yerçekimi ve zıplama
+            moveDirection.y = _verticalVelocity;
+            PlayerController.CharacterController.Move(moveDirection * Time.deltaTime);
+            
+        }
+
+        private void HandleGravity()
+        {
+            if (PlayerController.CharacterController.isGrounded && _verticalVelocity < 0)
+            {
+                _verticalVelocity = -2f; // Yere yapışması için küçük bir negatif kuvvet
+            }
+            else
+            {
+                _verticalVelocity -= Gravity * Time.deltaTime;
+            }
+        }
+        
     }
 }

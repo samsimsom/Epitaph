@@ -37,7 +37,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             {
                 // SwitchState(Factory.Jump());
             }
-            else if (!Ctx.IsMovementPressed)
+            else if (!Ctx.PlayerController.PlayerInput.IsMoveInput)
             {
                 SwitchState(Factory.Idle());
             }
@@ -49,9 +49,9 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         private void HandleMovementInput()
         {
-            // var input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-            // Ctx.AppliedMovementX = input.x * Ctx.WalkSpeed;
-            // Ctx.AppliedMovementZ = input.y * Ctx.WalkSpeed;
+            var input = Ctx.PlayerController.PlayerInput.MoveInput;
+            Ctx.AppliedMovementX = input.x * Ctx.WalkSpeed;
+            Ctx.AppliedMovementZ = input.y * Ctx.WalkSpeed;
         }
 
         private void SwitchState(BaseState newState)

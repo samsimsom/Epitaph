@@ -43,7 +43,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             {
                 // SwitchState(Factory.Run());
             }
-            else if (Ctx.IsMovementPressed)
+            else if (Ctx.PlayerController.PlayerInput.IsMoveInput)
             {
                 SwitchState(Factory.Walk());
             }
