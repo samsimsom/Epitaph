@@ -18,10 +18,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // Jump Variables
         public float JumpForce = 6.0f;
         public float Gravity = 20.0f;
-        private float _verticalVelocity;
-        public float coyoteTime = 0.2f; // Saniye cinsinden coyote süresi
-        public float coyoteTimeCounter = 0f;
+        public float CoyoteTime = 0.2f; // Saniye cinsinden coyote süresi
+        public float CoyoteTimeCounter;
 
+        private float _verticalVelocity;
 
         // Crouch Variables
         public float NormalHeight = 1.8f;
@@ -30,6 +30,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public Vector3 CrouchControllerCenter = new(0, 0.45f, 0);
         public float NormalCameraHeight = 1.5f;
         public float CrouchCameraHeight = 0.7f;
+        public float CrouchTransitionDuration = 0.2f;
         private bool _isCrouching;
 
         // Input Variables
@@ -54,10 +55,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float AppliedMovementX { get; set; }
         public float AppliedMovementZ { get; set; }
 
-        // Crouch için coroutine süresi ve coroutine referansları burada tanımlı olacak
-        // ama mantık CrouchState'e taşındı.
-        public float CrouchTransitionDuration = 0.2f;
-
         // ---------------------------------------------------------------------------- //
         
         public MovementBehaviour(PlayerController playerController)
@@ -81,11 +78,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
             // Coyote time yönetimi
             if (PlayerController.CharacterController.isGrounded)
             {
-                coyoteTimeCounter = coyoteTime; // Yere değince yenile
+                CoyoteTimeCounter = CoyoteTime; // Yere değince yenile
             }
             else
             {
-                coyoteTimeCounter -= Time.deltaTime;
+                CoyoteTimeCounter -= Time.deltaTime;
             }
         }
         
@@ -100,6 +97,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             var moveDirection = new Vector3(AppliedMovementX, 0, AppliedMovementZ);
             moveDirection = PlayerController.PlayerCamera.transform.TransformDirection(moveDirection);
+            
             moveDirection.y = _verticalVelocity;
             PlayerController.CharacterController.Move(moveDirection * Time.deltaTime);
         }
