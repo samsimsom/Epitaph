@@ -126,11 +126,17 @@ namespace Epitaph.Scripts.Player
         private void InitializeBehaviours()
         {
             MovementBehaviour = AddBehaviour(new MovementBehaviour(this));
+            LockCursor();
         }
 
         #endregion
         
         // ---------------------------------------------------------------------------- //
         
+        private static void LockCursor()
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 }

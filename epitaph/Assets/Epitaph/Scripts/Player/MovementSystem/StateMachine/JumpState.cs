@@ -9,7 +9,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void EnterState()
         {
-            Debug.Log("JUMP: Enter");
+            // Debug.Log("JUMP: Enter");
             
             Ctx.CurrentMovementY = Ctx.JumpForce;
             Ctx.AppliedMovementX = Ctx.PlayerController.PlayerInput.MoveInput.x * Ctx.WalkSpeed;
@@ -29,8 +29,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void ExitState()
         {
-            Debug.Log("JUMP: Exit");
-            // Eğer zıplama animasyonu bool ise burada false yapın
+            // Debug.Log("JUMP: Exit");
         }
 
         public override void InitializeSubState()

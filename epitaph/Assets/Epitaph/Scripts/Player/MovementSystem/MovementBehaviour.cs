@@ -26,7 +26,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public Vector3 NormalControllerCenter = new(0, 0.9f, 0);
         public Vector3 CrouchControllerCenter = new(0, 0.45f, 0);
         public float NormalCameraHeight = 1.5f;
-        public float CrouchCameraHeight = 0.6f;
+        public float CrouchCameraHeight = 0.7f;
         private bool _isCrouching;
 
         // Input Variables

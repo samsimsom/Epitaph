@@ -9,7 +9,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         
         public override void EnterState()
         {
-            Debug.Log("RUN: Enter");
+            // Debug.Log("RUN: Enter");
         }
 
         public override void UpdateState()
@@ -22,7 +22,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void ExitState()
         {
-            Debug.Log("RUN: Exit");
+            // Debug.Log("RUN: Exit");
         }
 
         public override void InitializeSubState() { }

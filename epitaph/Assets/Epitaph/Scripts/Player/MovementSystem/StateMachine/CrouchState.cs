@@ -60,12 +60,13 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 return;
             }
 
-            // Crouch'tayken hareket ediyorsa ve koşma tuşuna basılırsa ne olacağı (örneğin normal koşuya geçebilir)
-            if (Ctx.PlayerController.PlayerInput.IsMoveInput && Ctx.PlayerController.PlayerInput.IsRunPressed && Ctx.CanStandUp())
-            {
-                Ctx.IsCrouching = false;
-                SwitchState(Factory.Run());
-            }
+            // Crouch'tayken hareket ediyorsa ve koşma tuşuna basılırsa ne olacağı
+            // if (Ctx.PlayerController.PlayerInput.IsMoveInput && 
+            //     Ctx.PlayerController.PlayerInput.IsRunPressed && Ctx.CanStandUp())
+            // {
+            //     Ctx.IsCrouching = false;
+            //     SwitchState(Factory.Run());
+            // }
         }
 
         private void HandleMovementInput()
