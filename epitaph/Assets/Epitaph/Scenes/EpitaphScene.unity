@@ -11904,7 +11904,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1463293868324311596}
   m_Layer: 3
-  m_Name: FPCameraTransform
+  m_Name: FpCameraTransform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11960,6 +11960,7 @@ GameObject:
   - component: {fileID: 1858777798685317456}
   - component: {fileID: 7711096113604129950}
   - component: {fileID: 7711096113604129951}
+  - component: {fileID: 7711096113604129952}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -12004,6 +12005,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3588ddc92517481e971144a0ce5ec5be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7711096113604129952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7711096113604129949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 805553766e164977a796a81c58e2144a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerInput: {fileID: 7711096113604129951}
+  characterController: {fileID: 7711096113604129950}
+  playerCamera: {fileID: 97344946005274002}
+  cameraTransform: {fileID: 1463293868324311596}
 --- !u!114 &8013291525098416263
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12101,7 +12118,7 @@ GameObject:
   - component: {fileID: 8028412716506133049}
   - component: {fileID: 8013291525098416263}
   m_Layer: 3
-  m_Name: FPCamera
+  m_Name: FpCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
