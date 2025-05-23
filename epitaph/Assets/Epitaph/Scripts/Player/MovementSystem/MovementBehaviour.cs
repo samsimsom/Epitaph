@@ -77,6 +77,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             _currentState.FixedUpdateState();
         }
 
+        // ---------------------------------------------------------------------------- //
+        
         private void HandleMovement()
         {
             // Move
