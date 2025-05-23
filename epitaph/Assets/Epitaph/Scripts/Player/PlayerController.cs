@@ -3,6 +3,7 @@ using Epitaph.Scripts.Player.HealthSystem;
 using Epitaph.Scripts.Player.InteractionSystem;
 using Epitaph.Scripts.Player.MovementSystem;
 using Epitaph.Scripts.Player.ScriptableObjects;
+using Epitaph.Scripts.Player.StateMachine;
 using Epitaph.Scripts.Player.ViewSystem;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -30,10 +31,12 @@ namespace Epitaph.Scripts.Player
         #region Player SubControllers
 
         private readonly List<PlayerBehaviour> _subControllers = new();
+
+        public PlayerStateMachine PlayerStateMachine { get; private set; }
+        public ViewController ViewController { get; private set; }
         public MovementController MovementController { get; private set; }
         public HealthController HealthController { get; private set; }
         public InteractionController InteractionController { get; private set; }
-        public ViewController ViewController { get; private set; }
 
         #endregion
 
@@ -167,6 +170,8 @@ namespace Epitaph.Scripts.Player
             // }
             #endregion
 
+            PlayerStateMachine = AddSubController(new PlayerStateMachine(this, characterController, playerInput, playerCamera));
+            
             ViewController = AddSubController(new ViewController(this,
                 CurrentPlayerData,
                 playerCamera,

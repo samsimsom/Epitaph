@@ -10,7 +10,11 @@ namespace Epitaph.Scripts.Player
     {
         public Vector2 mouseDelta;
         public Vector2 moveInput;
+        
         public bool isMoveInput;
+        public bool isRunPressed;
+        public bool isJumpPressed;
+        public bool isCrouchPressed;
         
         private Dictionary<string, float> _actionCooldownDurations = new();
         private Dictionary<string, float> _nextActionTimestamps = new();
@@ -109,11 +113,13 @@ namespace Epitaph.Scripts.Player
             var actionName = context.action.name; // "Crouch"
             if (context.started && CanPerformAction(actionName))
             {
-                _playerController.MovementController?.PlayerCrouch?.ToggleCrouch();
+                isCrouchPressed = true;
+                // _playerController.MovementController?.PlayerCrouch?.ToggleCrouch();
                 StartActionCooldown(actionName);
             }
             else if (context.canceled)
             {
+                isCrouchPressed = false;
                 // Gerekirse burası da güncellenir.
             }
         }
@@ -123,7 +129,8 @@ namespace Epitaph.Scripts.Player
             var actionName = context.action.name; // "Jump"
             if (context.performed && CanPerformAction(actionName))
             {
-                _playerController.MovementController?.PlayerJump?.ProcessJump();
+                isJumpPressed = true;
+                // _playerController.MovementController?.PlayerJump?.ProcessJump();
                 StartActionCooldown(actionName);
             }
         }
@@ -149,11 +156,13 @@ namespace Epitaph.Scripts.Player
             // Bu cooldown sistemi daha çok tek seferlik basışlar (performed, started) için uygundur.
             if (context.performed)
             {
-                _playerController.MovementController?.PlayerSprint?.TryStartSprint();
+                isRunPressed = true;
+                // _playerController.MovementController?.PlayerSprint?.TryStartSprint();
             }
             else if (context.canceled)
             {
-                _playerController.MovementController?.PlayerSprint?.StopSprint();
+                isRunPressed = false;
+                // _playerController.MovementController?.PlayerSprint?.StopSprint();
             }
         }
 
