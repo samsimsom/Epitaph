@@ -1,6 +1,4 @@
-using UnityEngine;
-
-namespace Epitaph.Scripts.Interaction
+namespace Epitaph.Scripts.Interactables
 {
     public interface IInteractable
     {

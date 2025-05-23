@@ -1,4 +1,3 @@
-using Epitaph.Scripts.Interaction;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Interactables
