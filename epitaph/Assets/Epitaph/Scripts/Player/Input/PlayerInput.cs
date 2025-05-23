@@ -87,7 +87,7 @@ namespace Epitaph.Scripts.Player.Input
 
         public void OnCrouch(InputAction.CallbackContext context)
         {
-            if (context.performed)
+            if (context.started)
             {
                 IsCrouchPressedThisFrame = true;
                 IsCrouchPressed = true;
