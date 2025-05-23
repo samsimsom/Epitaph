@@ -14,7 +14,7 @@ namespace Epitaph.Scripts.Player
         public PlayerData CurrentPlayerData { get; private set; }
 
         #region Inspector Fields
-
+        
         [Header("Data")]
         [SerializeField] private PlayerData playerData;
 

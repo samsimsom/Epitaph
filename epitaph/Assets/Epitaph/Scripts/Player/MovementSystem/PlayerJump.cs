@@ -30,10 +30,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         public bool CanJump()
         {
-            ComputeCeilingRayOrigin(out var radius, out var rayDistance, 
-                out var originTip, out var originRoot);
-            var cannotHitCeiling = !Physics.Raycast(originRoot, Vector3.up, rayDistance,
-                _playerData.ceilingLayers);
+            ComputeCeilingRayOrigin(out var radius, out var rayDistance, out var originTip, out var originRoot);
+            var cannotHitCeiling = !Physics.Raycast(originRoot, Vector3.up, rayDistance, _playerData.ceilingLayers);
             var isInCoyoteTime = _playerData.useCoyoteTime && _coyoteTimeCounter > 0;
             
             return !_playerData.isCrouching && _canJump && (_playerData.isGrounded || isInCoyoteTime) && cannotHitCeiling;

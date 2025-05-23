@@ -1,3 +1,4 @@
+using Epitaph.Scripts.Player.MovementSystem;
 using Epitaph.Scripts.Player.ScriptableObjects;
 using UnityEngine;
 
@@ -24,6 +25,7 @@ namespace Epitaph.Scripts.Player.StateMachine
         private Vector2 _currentMovementInput;
         private Camera _playerCamera;
         private PlayerData _playerData;
+        private PlayerCrouch _playerCrouch;
 
         // State Variables
         private PlayerBaseState _currentState;
@@ -40,12 +42,14 @@ namespace Epitaph.Scripts.Player.StateMachine
             CharacterController characterController,
             PlayerInput playerInput,
             Camera playerCamera,
-            PlayerData playerData) : base(playerController)
+            PlayerData playerData,
+            PlayerCrouch playerCrouch) : base(playerController)
         {
             _characterController = characterController;
             _playerInput = playerInput;
             _playerCamera = playerCamera;
             _playerData = playerData;
+            _playerCrouch = playerCrouch;
         }
 
         public CharacterController CharacterController => _characterController;
@@ -57,6 +61,7 @@ namespace Epitaph.Scripts.Player.StateMachine
         public bool IsCrouchPressedThisFrame => _isCrouchPressedThisFrame;
         public bool IsCrouching { get => _isCrouching; set => _isCrouching = value; }
         public float CurrentMovementY { get => _verticalVelocity; set => _verticalVelocity = value; }
+        public PlayerCrouch PlayerCrouch => _playerCrouch;
         
         // X ve Z hareketini state'ler ayarlar
         public float AppliedMovementX { get; set; }
@@ -136,51 +141,6 @@ namespace Epitaph.Scripts.Player.StateMachine
             {
                 _verticalVelocity -= Gravity * Time.deltaTime;
             }
-        }
-
-        public void ChangeCharacterControllerDimensions(bool crouch)
-        {
-            if (crouch)
-            {
-                _characterController.height = CrouchHeight;
-                _characterController.center = CrouchControllerCenter;
-            }
-            else
-            {
-                // Ayağa kalkmadan önce üstte engel var mı kontrolü yapılmalı!
-                if (CanStandUp())
-                {
-                    _characterController.height = NormalHeight;
-                    _characterController.center = NormalControllerCenter;
-                    _isCrouching = false;
-                }
-                else
-                {
-                    // Engel varsa, crouch'ta kal
-                    _isCrouching = true; // State'in tekrar crouch'a dönmesini sağlayabilir
-                }
-            }
-        }
-
-        public bool CanStandUp()
-        {
-            // Karakterin başının üstünü kontrol et
-            // Biraz yukarıdan başlayıp normal boy kadar bir kapsül/sphere cast yap
-            var radius = _characterController.radius;
-            var castDistance =
-                NormalHeight - CrouchHeight; // Ayağa kalkarken ne kadar yukarı çıkacak
-            var castStartPoint = _characterController.transform.position + CrouchControllerCenter + Vector3.up * (CrouchHeight / 2 - radius); // Kapsülün tepesi
-
-            // Raycast veya SphereCast daha iyi olabilir
-            // Debug.DrawRay(castStartPoint, Vector3.up * castDistance, Color.red, 2f);
-            if (Physics.SphereCast(castStartPoint, radius, Vector3.up, out var hit, castDistance, ~LayerMask.GetMask("Player"))) // Player katmanını hariç tut
-            {
-                // Bir şeye çarptı, ayağa kalkamaz
-                // Debug.Log("Cannot stand up, hit: " + hit.collider.name);
-                return false;
-            }
-
-            return true;
         }
     }
 }

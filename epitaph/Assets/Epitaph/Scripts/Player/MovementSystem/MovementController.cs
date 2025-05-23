@@ -39,7 +39,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public PlayerStateMachine PlayerStateMachine { get; private set; }
         // public PlayerMove PlayerMove { get; private set; }
         // public PlayerJump PlayerJump { get; private set; }
-        // public PlayerCrouch PlayerCrouch { get; private set; }
+        public PlayerCrouch PlayerCrouch { get; private set; }
         // public PlayerSprint PlayerSprint { get; private set; }
         // public PlayerGravity PlayerGravity { get; private set; }
 
@@ -51,13 +51,14 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public void InitializeBehaviours()
         {
-            PlayerStateMachine = AddMovementBehaviour(new PlayerStateMachine(_playerController, _characterController, _playerInput, _playerCamera, _playerData));
             
             // PlayerMove = AddMovementBehaviour(new PlayerMove(_playerController, _playerData, _characterController, _playerCamera));
             // PlayerSprint = AddMovementBehaviour(new PlayerSprint(_playerController, _playerData, _healthController, PlayerMove)); // HealthController ve PlayerMove bağımlılığı
-            // PlayerCrouch = AddMovementBehaviour(new PlayerCrouch(_playerController, _playerData, _characterController, PlayerMove, _playerCameraTransform)); // PlayerMove bağımlılığı
             // PlayerJump = AddMovementBehaviour(new PlayerJump(_playerController, _playerData));
             // PlayerGravity = AddMovementBehaviour(new PlayerGravity(_playerController, _playerData, _characterController));
+            
+            PlayerCrouch = AddMovementBehaviour(new PlayerCrouch(_playerController, _playerData, _characterController, _playerCameraTransform));
+            PlayerStateMachine = AddMovementBehaviour(new PlayerStateMachine(_playerController, _characterController, _playerInput, _playerCamera, _playerData, PlayerCrouch));
         }
 
         #region MonoBehaviour Methods

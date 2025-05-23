@@ -14,7 +14,7 @@ namespace Epitaph.Scripts.Player.StateMachine
         {
             Debug.Log("CROUCH: Enter");
             Ctx.IsCrouching = true;
-            Ctx.ChangeCharacterControllerDimensions(true);
+            Ctx.PlayerCrouch.ToggleCrouch();
             // Ctx.Animator.SetBool("IsCrouching", true);
         }
 
@@ -27,15 +27,16 @@ namespace Epitaph.Scripts.Player.StateMachine
         public override void ExitState()
         {
             Debug.Log("CROUCH: Exit");
-            // Ayağa kalkmadan önce CanStandUp kontrolü PlayerStateMachine'de yapılıyor
-            Ctx.ChangeCharacterControllerDimensions(false); // Bu metot zaten IsCrouching'i false yapar (eğer kalkabilirse)
+            
+            Ctx.PlayerCrouch.ToggleCrouch();
             // Ctx.Animator.SetBool("IsCrouching", false);
         }
-        
+
+#if true
         public override void CheckSwitchStates()
         {
             // Crouch'tan çıkma
-            if (Ctx.IsCrouchPressedThisFrame && Ctx.CanStandUp())
+            if (Ctx.IsCrouchPressedThisFrame && Ctx.PlayerCrouch.CanStandUp())
             {
                 Ctx.IsCrouching = false; // State machine'e artık crouch'ta olmadığımızı bildir.
                 
@@ -57,7 +58,7 @@ namespace Epitaph.Scripts.Player.StateMachine
             }
 
             // Crouch'tayken zıplama (eğer izin veriliyorsa)
-            if (Ctx.IsJumpPressed && Ctx.CharacterController.isGrounded && Ctx.CanStandUp())
+            if (Ctx.IsJumpPressed && Ctx.CharacterController.isGrounded && Ctx.PlayerCrouch.CanStandUp())
             {
                 Ctx.IsCrouching = false;
                 SwitchState(Factory.Jump());
@@ -72,6 +73,7 @@ namespace Epitaph.Scripts.Player.StateMachine
             //    return;
             // }
         }
+#endif
 
         private void HandleMovementInput()
         {

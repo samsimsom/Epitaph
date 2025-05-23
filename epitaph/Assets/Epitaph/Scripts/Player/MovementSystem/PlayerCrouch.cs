@@ -9,7 +9,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // Private Instance Fields
         private PlayerData _playerData;
         private CharacterController _characterController;
-        private PlayerMove _playerMove;
+        // private PlayerMove _playerMove;
         // private Camera _playerCamera;
         private Transform _playerCameraTransform;
         private float _initialCameraYLocalPosition;
@@ -22,13 +22,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public PlayerCrouch(PlayerController playerController,
             PlayerData playerData,
             CharacterController characterController,
-            PlayerMove playerMove,
             Transform playerCameraTransform) : base(playerController)
         {
             _playerData = playerData;
             _characterController = characterController;
-            _playerMove = playerMove;
-            // _playerCamera = playerCamera;
             _playerCameraTransform = playerCameraTransform;
 
             Initialize();
@@ -72,16 +69,16 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
             _playerData.isCrouching = newCrouchState;
             
-            _playerMove.SetCrouchingSpeed();
-            
-            if (newCrouchState)
-            {
-                _playerMove.SetCrouchingSpeed();
-            }
-            else
-            {
-                _playerMove.SetWalkingSpeed();
-            }
+            // _playerMove.SetCrouchingSpeed();
+            //
+            // if (newCrouchState)
+            // {
+            //     _playerMove.SetCrouchingSpeed();
+            // }
+            // else
+            // {
+            //     _playerMove.SetWalkingSpeed();
+            // }
 
             _wasGroundedBeforeTransition = _characterController.isGrounded; // Mevcut yer durumu sakla
             SmoothCrouchTransition(); // Animasyonlu geçişi başlat
@@ -90,13 +87,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // Private Methods
         private void Initialize()
         {
-            _initialCameraYLocalPosition = _playerCameraTransform != null ?
-                _playerCameraTransform.localPosition.y : 0f;
-
+            _initialCameraYLocalPosition = _playerCameraTransform != null ? _playerCameraTransform.localPosition.y : 0f;
             _playerData.standingHeight = _characterController.height;
         }
 
-        private bool CanStandUp()
+        public bool CanStandUp()
         {
             if (_characterController == null) return false;
 
