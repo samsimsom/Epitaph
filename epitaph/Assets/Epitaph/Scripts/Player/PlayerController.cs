@@ -11,29 +11,35 @@ namespace Epitaph.Scripts.Player
 {
     public class PlayerController : MonoBehaviour
     {
+        public PlayerData CurrentPlayerData { get; private set; }
+
         #region Inspector Fields
+
         [Header("Data")]
         [SerializeField] private PlayerData playerData;
-        
+
         [Header("Components")]
         [SerializeField] private CharacterController characterController;
+
         [SerializeField] private PlayerInput playerInput;
-        [SerializeField] private Camera playerCamera; 
-        [SerializeField] private CinemachineCamera fpCamera; 
-        [SerializeField] private Transform playerCameraTransform; 
+        [SerializeField] private Camera playerCamera;
+        [SerializeField] private CinemachineCamera fpCamera;
+        [SerializeField] private Transform playerCameraTransform;
+
         #endregion
-        
-        public PlayerData CurrentPlayerData { get; private set; }
-        
+
         #region Player SubControllers
+
         private readonly List<PlayerBehaviour> _subControllers = new();
         public MovementController MovementController { get; private set; }
-        public HealthController HealthController { get; private set; } 
-        public InteractionController InteractionController { get; private set; } 
-        public ViewController ViewController { get; private set; } 
+        public HealthController HealthController { get; private set; }
+        public InteractionController InteractionController { get; private set; }
+        public ViewController ViewController { get; private set; }
+
         #endregion
 
         #region Unity Lifecycle Methods
+
         private void Awake()
         {
             if (playerData != null)
@@ -53,7 +59,7 @@ namespace Epitaph.Scripts.Player
                 subController.Awake();
             }
         }
-        
+
         private void OnEnable()
         {
             foreach (var subController in _subControllers)
@@ -61,7 +67,7 @@ namespace Epitaph.Scripts.Player
                 subController.OnEnable();
             }
         }
-        
+
         private void Start()
         {
             foreach (var subController in _subControllers)
@@ -69,7 +75,7 @@ namespace Epitaph.Scripts.Player
                 subController.Start();
             }
         }
-        
+
         private void Update()
         {
             foreach (var subController in _subControllers)
@@ -77,7 +83,7 @@ namespace Epitaph.Scripts.Player
                 subController.Update();
             }
         }
-        
+
         private void LateUpdate()
         {
             foreach (var subController in _subControllers)
@@ -85,7 +91,7 @@ namespace Epitaph.Scripts.Player
                 subController.LateUpdate();
             }
         }
-        
+
         private void FixedUpdate()
         {
             foreach (var subController in _subControllers)
@@ -93,7 +99,7 @@ namespace Epitaph.Scripts.Player
                 subController.FixedUpdate();
             }
         }
-        
+
         private void OnDisable()
         {
             foreach (var subController in _subControllers)
@@ -101,7 +107,7 @@ namespace Epitaph.Scripts.Player
                 subController.OnDisable();
             }
         }
-        
+
         private void OnDestroy()
         {
             foreach (var subController in _subControllers)
@@ -113,8 +119,6 @@ namespace Epitaph.Scripts.Player
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
-            // OnDrawGizmos çağrısı her subcontroller için null kontrolü yapmalı
-            // veya _subControllers listesi null eleman içermemeli.
             if (_subControllers == null) return;
             foreach (var subController in _subControllers)
             {
@@ -122,15 +126,17 @@ namespace Epitaph.Scripts.Player
             }
         }
 #endif
+
         #endregion
 
         #region Initialization
+
         private T AddSubController<T>(T subController) where T : PlayerBehaviour
         {
             _subControllers.Add(subController);
             return subController;
         }
-        
+
         private void InitializeBehaviours()
         {
             #region Inspector Objects
@@ -182,15 +188,18 @@ namespace Epitaph.Scripts.Player
                 CurrentPlayerData,
                 playerCamera));
         }
+
         #endregion
-        
+
         #region Public Accessor Methods
+
         public CharacterController GetCharacterController() => characterController;
-        public PlayerData GetPlayerData() => playerData; 
+        public PlayerData GetPlayerData() => playerData;
         public PlayerInput GetPlayerInput() => playerInput;
         public Camera GetPlayerCamera() => playerCamera;
         public CinemachineCamera GetFpCamera() => fpCamera;
         public Transform GetPlayerCameraTransform() => playerCameraTransform;
+
         #endregion
     }
 }
