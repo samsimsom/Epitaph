@@ -27,21 +27,19 @@ namespace Epitaph.Scripts.Player.StateMachine
             Debug.Log("IDLE: Exit");
         }
 
-        public override void InitializeSubState() { }
-
         public override void CheckSwitchStates()
         {
-            if (Ctx.IsCrouchPressed)
+            if (Ctx.IsCrouchPressedThisFrame)
             {
-                // SwitchState(_factory.Crouch());
+                SwitchState(Factory.Crouch());
             }
             else if (Ctx.IsJumpPressed && Ctx.CharacterController.isGrounded)
             {
-                // SwitchState(_factory.Jump());
+                SwitchState(Factory.Jump());
             }
             else if (Ctx.IsMovementPressed && Ctx.IsRunPressed)
             {
-                // SwitchState(_factory.Run());
+                SwitchState(Factory.Run());
             }
             else if (Ctx.IsMovementPressed)
             {

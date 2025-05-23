@@ -1,3 +1,4 @@
+using Epitaph.Scripts.Player.ScriptableObjects;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.StateMachine
@@ -5,17 +6,16 @@ namespace Epitaph.Scripts.Player.StateMachine
     public class PlayerStateMachine : PlayerBehaviour
     {
         // Movement Variables
-        public float WalkSpeed = 1.75f;
+        public float WalkSpeed = 3.0f;
         public float RunSpeed = 4.0f;
-        public float CrouchSpeed = 1.25f;
+        public float CrouchSpeed = 2.0f;
         // private float _rotationSpeed = 720f; // Karakterin dönüş hızı
-        public float JumpForce = 8.0f;
+        public float JumpForce = 5.0f;
         public float Gravity = 20.0f;
         public float NormalHeight = 1.8f;
         public float CrouchHeight = 0.9f;
         public Vector3 NormalControllerCenter = new Vector3(0, 0.9f, 0);
         public Vector3 CrouchControllerCenter = new Vector3(0, 0.45f, 0);
-
         // private Animator _animator; // Opsiyonel, animasyonlar için
 
         // Referanslar
@@ -23,11 +23,12 @@ namespace Epitaph.Scripts.Player.StateMachine
         private PlayerInput _playerInput;
         private Vector2 _currentMovementInput;
         private Camera _playerCamera;
+        private PlayerData _playerData;
 
         // State Variables
         private PlayerBaseState _currentState;
         private bool _isCrouching;
-        private bool _isCrouchPressed; // Crouch için anlık basım
+        private bool _isCrouchPressedThisFrame; // Crouch için anlık basım
         private bool _isJumpPressed;
         private bool _isMovementPressed;
         private bool _isRunPressed;
@@ -38,22 +39,27 @@ namespace Epitaph.Scripts.Player.StateMachine
         public PlayerStateMachine(PlayerController playerController,
             CharacterController characterController,
             PlayerInput playerInput,
-            Camera playerCamera) : base(playerController)
+            Camera playerCamera,
+            PlayerData playerData) : base(playerController)
         {
             _characterController = characterController;
             _playerInput = playerInput;
             _playerCamera = playerCamera;
+            _playerData = playerData;
         }
 
         public CharacterController CharacterController => _characterController;
         public PlayerBaseState CurrentState { get => _currentState; set => _currentState = value; }
+        public Vector2 CurrentMovementInput => _currentMovementInput;
         public bool IsMovementPressed => _isMovementPressed;
         public bool IsRunPressed => _isRunPressed;
         public bool IsJumpPressed => _isJumpPressed;
-        public bool IsCrouchPressed => _isCrouchPressed;
+        public bool IsCrouchPressedThisFrame => _isCrouchPressedThisFrame;
         public bool IsCrouching { get => _isCrouching; set => _isCrouching = value; }
         public float CurrentMovementY { get => _verticalVelocity; set => _verticalVelocity = value; }
-        public float AppliedMovementX { get; set; } // X ve Z hareketini state'ler ayarlar
+        
+        // X ve Z hareketini state'ler ayarlar
+        public float AppliedMovementX { get; set; }
         public float AppliedMovementZ { get; set; }
 
         public override void Awake()
@@ -83,7 +89,7 @@ namespace Epitaph.Scripts.Player.StateMachine
 
             _isRunPressed = _playerInput.isRunPressed;
             _isJumpPressed = _playerInput.isJumpPressed;
-            _isCrouchPressed = _playerInput.isCrouchPressed;
+            _isCrouchPressedThisFrame = _playerInput.isCrouchPressed;
         }
 
         private void HandleMovement()

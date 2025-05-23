@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Epitaph.Scripts.Player.HealthSystem;
 using Epitaph.Scripts.Player.ScriptableObjects;
+using Epitaph.Scripts.Player.StateMachine;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
@@ -14,7 +15,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private Camera _playerCamera;
         private Transform _playerCameraTransform;
         private PlayerController _playerController;
-
+        private PlayerInput _playerInput;
         private PlayerData _playerData;
 
         public MovementController(PlayerController playerController, 
@@ -22,7 +23,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             CharacterController characterController, 
             Transform playerCameraTransform,
             HealthController healthController,
-            Camera playerCamera) 
+            Camera playerCamera,
+            PlayerInput playerInput) 
             : base(playerController)
         {
             _playerController = playerController;
@@ -31,13 +33,15 @@ namespace Epitaph.Scripts.Player.MovementSystem
             _playerCamera = playerCamera;
             _playerCameraTransform = playerCameraTransform;
             _healthController = healthController;
+            _playerInput = playerInput;
         }
         
-        public PlayerMove PlayerMove { get; private set; }
-        public PlayerJump PlayerJump { get; private set; }
-        public PlayerCrouch PlayerCrouch { get; private set; }
-        public PlayerSprint PlayerSprint { get; private set; }
-        public PlayerGravity PlayerGravity { get; private set; }
+        public PlayerStateMachine PlayerStateMachine { get; private set; }
+        // public PlayerMove PlayerMove { get; private set; }
+        // public PlayerJump PlayerJump { get; private set; }
+        // public PlayerCrouch PlayerCrouch { get; private set; }
+        // public PlayerSprint PlayerSprint { get; private set; }
+        // public PlayerGravity PlayerGravity { get; private set; }
 
         private T AddMovementBehaviour<T>(T behaviour) where T : PlayerBehaviour
         {
@@ -47,6 +51,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public void InitializeBehaviours()
         {
+            PlayerStateMachine = AddMovementBehaviour(new PlayerStateMachine(_playerController, _characterController, _playerInput, _playerCamera, _playerData));
+            
             // PlayerMove = AddMovementBehaviour(new PlayerMove(_playerController, _playerData, _characterController, _playerCamera));
             // PlayerSprint = AddMovementBehaviour(new PlayerSprint(_playerController, _playerData, _healthController, PlayerMove)); // HealthController ve PlayerMove bağımlılığı
             // PlayerCrouch = AddMovementBehaviour(new PlayerCrouch(_playerController, _playerData, _characterController, PlayerMove, _playerCameraTransform)); // PlayerMove bağımlılığı

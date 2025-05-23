@@ -12,11 +12,11 @@ namespace Epitaph.Scripts.Player.StateMachine
             Factory = playerStateFactory;
         }
 
-        public abstract void EnterState();
-        public abstract void UpdateState();
+        public virtual void EnterState() {  }
+        public virtual void UpdateState() {  }
         public virtual void FixedUpdateState() {  } // Fizik güncellemeleri için
-        public abstract void ExitState();
-        public abstract void CheckSwitchStates(); // Durum geçişlerini kontrol et
-        public abstract void InitializeSubState(); // Alt durumları başlatmak için (opsiyonel)
+        public virtual void ExitState() {  }
+        public virtual void CheckSwitchStates() {  } // Durum geçişlerini kontrol et
+        public virtual void InitializeSubState() {  } // Alt durumları başlatmak için (opsiyonel)
     }
 }

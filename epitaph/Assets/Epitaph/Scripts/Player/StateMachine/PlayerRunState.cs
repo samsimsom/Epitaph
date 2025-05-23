@@ -1,18 +1,17 @@
 using UnityEngine;
-    
+
 namespace Epitaph.Scripts.Player.StateMachine
 {
-    public class PlayerWalkState : PlayerBaseState
+    public class PlayerRunState : PlayerBaseState
     {
-        public PlayerWalkState(PlayerStateMachine currentContext, 
-            PlayerStateFactory playerStateFactory)
+        public PlayerRunState(PlayerStateMachine currentContext, PlayerStateFactory playerStateFactory)
             : base(currentContext, playerStateFactory) { }
 
         public override void EnterState()
         {
-            Debug.Log("WALK: Enter");
-            // _ctx.Animator.SetBool("IsWalking", true);
-            // _ctx.Animator.SetBool("IsRunning", false);
+            Debug.Log("RUN: Enter");
+            // Ctx.Animator.SetBool("IsWalking", false); // veya IsWalking'i de true yapıp hızı artırabilirsiniz
+            // Ctx.Animator.SetBool("IsRunning", true);
         }
 
         public override void UpdateState()
@@ -20,20 +19,18 @@ namespace Epitaph.Scripts.Player.StateMachine
             HandleMovementInput();
             CheckSwitchStates();
         }
-        public override void FixedUpdateState() { }
-
 
         public override void ExitState()
         {
-            Debug.Log("WALK: Exit");
+            Debug.Log("RUN: Exit");
         }
-
-        public override void InitializeSubState() { }
 
         public override void CheckSwitchStates()
         {
             if (Ctx.IsCrouchPressedThisFrame)
             {
+                // Koşarken crouch'a geçince ne olacağına karar verin.
+                // Belki direkt crouch walk veya slide? Şimdilik normal crouch.
                 SwitchState(Factory.Crouch());
             }
             else if (Ctx.IsJumpPressed && Ctx.CharacterController.isGrounded)
@@ -44,17 +41,17 @@ namespace Epitaph.Scripts.Player.StateMachine
             {
                 SwitchState(Factory.Idle());
             }
-            else if (Ctx.IsMovementPressed && Ctx.IsRunPressed)
+            else if (Ctx.IsMovementPressed && !Ctx.IsRunPressed)
             {
-                SwitchState(Factory.Run());
+                SwitchState(Factory.Walk());
             }
         }
 
         private void HandleMovementInput()
         {
             var input = Ctx.CurrentMovementInput;
-            Ctx.AppliedMovementX = input.x * Ctx.WalkSpeed;
-            Ctx.AppliedMovementZ = input.y * Ctx.WalkSpeed;
+            Ctx.AppliedMovementX = input.x * Ctx.RunSpeed;
+            Ctx.AppliedMovementZ = input.y * Ctx.RunSpeed;
         }
 
         private void SwitchState(PlayerBaseState newState)
