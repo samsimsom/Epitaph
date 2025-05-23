@@ -20,7 +20,6 @@ namespace Epitaph.Scripts.Player
 
         [Header("Components")]
         [SerializeField] private CharacterController characterController;
-
         [SerializeField] private PlayerInput playerInput;
         [SerializeField] private Camera playerCamera;
         [SerializeField] private CinemachineCamera fpCamera;
