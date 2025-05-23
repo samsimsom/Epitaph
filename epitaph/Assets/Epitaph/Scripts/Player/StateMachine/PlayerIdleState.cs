@@ -22,8 +22,6 @@ namespace Epitaph.Scripts.Player.StateMachine
             CheckSwitchStates();
         }
 
-        public override void FixedUpdateState() { }
-
         public override void ExitState()
         {
             Debug.Log("IDLE: Exit");

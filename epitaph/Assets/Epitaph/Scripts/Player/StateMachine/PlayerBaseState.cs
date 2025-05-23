@@ -14,7 +14,7 @@ namespace Epitaph.Scripts.Player.StateMachine
 
         public abstract void EnterState();
         public abstract void UpdateState();
-        public abstract void FixedUpdateState(); // Fizik güncellemeleri için
+        public virtual void FixedUpdateState() {  } // Fizik güncellemeleri için
         public abstract void ExitState();
         public abstract void CheckSwitchStates(); // Durum geçişlerini kontrol et
         public abstract void InitializeSubState(); // Alt durumları başlatmak için (opsiyonel)

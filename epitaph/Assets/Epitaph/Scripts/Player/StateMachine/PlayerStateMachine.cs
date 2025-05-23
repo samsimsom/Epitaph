@@ -89,15 +89,12 @@ namespace Epitaph.Scripts.Player.StateMachine
         private void HandleMovement()
         {
             var moveDirection = new Vector3(AppliedMovementX, 0, AppliedMovementZ);
-            // Kameraya göre hareket için (eğer kamera karakteri takip ediyorsa)
-            // moveDirection = Camera.main.transform.TransformDirection(moveDirection);
-            // moveDirection.y = 0; // Y ekseninde kamera dönüşünden kaynaklı hareketi engelle
-            
-            // Dünya eksenlerine göre hareket (basit bir örnek)
+
             // Eğer karakterin baktığı yöne gitmesini istiyorsanız:
             moveDirection = _playerCamera.transform.TransformDirection(moveDirection);
             
-            moveDirection.y = _verticalVelocity; // Yerçekimi ve zıplama
+            // Yerçekimi ve zıplama
+            moveDirection.y = _verticalVelocity;
             _characterController.Move(moveDirection * Time.deltaTime);
             
             // // Karakteri hareket yönüne döndürme (sadece yatay hareket varsa)
