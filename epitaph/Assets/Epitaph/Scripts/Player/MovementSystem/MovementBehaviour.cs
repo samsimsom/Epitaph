@@ -16,7 +16,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float CrouchSpeed = 1.5f;
 
         // Jump Variables
-        public float JumpForce = 8.0f;
+        public float JumpForce = 6.0f;
         public float Gravity = 20.0f;
         private float _verticalVelocity;
 
@@ -42,7 +42,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         }
         public bool IsMovementPressed => _isMovementPressed;
         public bool IsRunPressed => _isRunPressed;
-        public bool IsJumpPressed => _isJumpPressed;
+        public bool IsJumpPressed { get; set; }
         public bool IsCrouchPressedThisFrame => _isCrouchPressedThisFrame;
         public bool IsCrouching
         {
@@ -73,6 +73,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         public override void Update()
         {
+            HandleInput();
             _currentState.UpdateState(); // Mevcut durumun Update'ini çağır
             HandleMovement();
             HandleGravity();
@@ -81,6 +82,16 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public override void FixedUpdate()
         {
             _currentState.FixedUpdateState();
+        }
+
+        private void HandleInput()
+        {
+            // Örnek Input Sistemi (Yeni Input System veya eski Input Manager kullanılabilir)
+            // _currentMovementInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+            // _isMovementPressed = _currentMovementInput.x != 0 || _currentMovementInput.y != 0;
+            // _isRunPressed = Input.GetKey(KeyCode.LeftShift);
+            // IsJumpPressed = PlayerController.PlayerInput.IsJumpPressed;
+            // _isCrouchPressedThisFrame = Input.GetKeyDown(KeyCode.LeftControl); // Crouch için anlık basım
         }
 
         private void HandleMovement()

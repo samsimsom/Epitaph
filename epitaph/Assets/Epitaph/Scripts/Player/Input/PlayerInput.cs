@@ -11,6 +11,7 @@ namespace Epitaph.Scripts.Player.Input
         public Vector2 LookInput { get; private set; }
         public bool IsLookInput { get; private set; }
         
+        public bool IsJumpPressed { get; private set; }
         
         private PlayerInputActions _playerInputActions;
 
@@ -78,7 +79,14 @@ namespace Epitaph.Scripts.Player.Input
 
         public void OnJump(InputAction.CallbackContext context)
         {
-            
+            if (context.started)
+            {
+                IsJumpPressed = true;
+            }
+            else if (context.canceled)
+            {
+                IsJumpPressed = false;
+            }
         }
 
         public void OnPrevious(InputAction.CallbackContext context)
