@@ -10,7 +10,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         }
 
         public BaseState Idle() => new IdleState(_context, this);
-        // public PlayerBaseState Walk() => new PlayerWalkState(_context, this);
+        public BaseState Walk() => new WalkState(_context, this);
         // public PlayerBaseState Run() => new PlayerRunState(_context, this);
         // public PlayerBaseState Jump() => new PlayerJumpState(_context, this);
         // public PlayerBaseState Crouch() => new PlayerCrouchState(_context, this);

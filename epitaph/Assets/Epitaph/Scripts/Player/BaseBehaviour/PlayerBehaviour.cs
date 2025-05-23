@@ -2,11 +2,11 @@ namespace Epitaph.Scripts.Player.BaseBehaviour
 {
     public abstract class PlayerBehaviour
     {
-        protected PlayerController PlayerController;
+        public PlayerController PlayerController;
         
-        protected PlayerBehaviour(PlayerController controller)
+        protected PlayerBehaviour(PlayerController playerController)
         {
-            PlayerController = controller;
+            PlayerController = playerController;
         }
         
         public virtual void Awake() { }

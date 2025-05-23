@@ -2,29 +2,27 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 {
-    public class IdleState : BaseState
+    public class WalkState : BaseState
     {
-        public IdleState(MovementBehaviour currentContext, StateFactory stateFactory) 
+        public WalkState(MovementBehaviour currentContext, StateFactory stateFactory) 
             : base(currentContext, stateFactory) { }
-        
+
         public override void EnterState()
         {
-            Debug.Log("IDLE: Enter");
-            
-            Ctx.AppliedMovementX = 0;
-            Ctx.AppliedMovementZ = 0;
+            Debug.Log("WALK: Enter");
         }
 
         public override void UpdateState()
         {
+            HandleMovementInput();
             CheckSwitchStates();
         }
-
+        
         public override void FixedUpdateState() { }
-
+        
         public override void ExitState()
         {
-            Debug.Log("IDLE: Exit");
+            Debug.Log("WALK: Exit");
         }
 
         public override void InitializeSubState() { }
@@ -39,14 +37,21 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             {
                 // SwitchState(Factory.Jump());
             }
+            else if (!Ctx.IsMovementPressed)
+            {
+                SwitchState(Factory.Idle());
+            }
             else if (Ctx.IsMovementPressed && Ctx.IsRunPressed)
             {
                 // SwitchState(Factory.Run());
             }
-            else if (Ctx.IsMovementPressed)
-            {
-                SwitchState(Factory.Walk());
-            }
+        }
+
+        private void HandleMovementInput()
+        {
+            // var input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+            // Ctx.AppliedMovementX = input.x * Ctx.WalkSpeed;
+            // Ctx.AppliedMovementZ = input.y * Ctx.WalkSpeed;
         }
 
         private void SwitchState(BaseState newState)
