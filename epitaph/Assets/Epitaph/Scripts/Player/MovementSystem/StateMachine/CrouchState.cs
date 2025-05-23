@@ -9,8 +9,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void EnterState()
         {
-            Debug.Log("CROUCH: Enter");
-            
             Ctx.IsCrouching = true;
             Ctx.ChangeCharacterControllerDimensions(true);
         }
@@ -25,15 +23,10 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         
         public override void ExitState()
         {
-            // Debug.Log("CROUCH: Exit");
-            // Ayağa kalkmadan önce CanStandUp kontrolü PlayerStateMachine'de yapılıyor
-            Ctx.ChangeCharacterControllerDimensions(false); // Bu metot zaten IsCrouching'i false yapar (eğer kalkabilirse)
-            // Ctx.Animator.SetBool("IsCrouching", false);
+            Ctx.ChangeCharacterControllerDimensions(false);
         }
 
-        public override void InitializeSubState()
-        {
-        }
+        public override void InitializeSubState() { }
 
         public override void CheckSwitchStates()
         {
