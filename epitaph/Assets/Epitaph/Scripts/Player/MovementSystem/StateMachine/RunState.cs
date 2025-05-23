@@ -33,7 +33,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             {
                 SwitchState(Factory.Crouch());
             }
-            else if (Ctx.PlayerController.PlayerInput.IsJumpPressed && Ctx.PlayerController.CharacterController.isGrounded)
+            else if (Ctx.PlayerController.PlayerInput.IsJumpPressed 
+                     && Ctx.coyoteTimeCounter > 0f)
             {
                 SwitchState(Factory.Jump());
             }
@@ -41,7 +42,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             {
                 SwitchState(Factory.Idle());
             }
-            else if (Ctx.PlayerController.PlayerInput.IsMoveInput && !Ctx.PlayerController.PlayerInput.IsRunPressed)
+            else if (Ctx.PlayerController.PlayerInput.IsMoveInput 
+                     && !Ctx.PlayerController.PlayerInput.IsRunPressed)
             {
                 SwitchState(Factory.Walk());
             }

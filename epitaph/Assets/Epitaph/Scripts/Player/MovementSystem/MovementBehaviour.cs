@@ -19,6 +19,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float JumpForce = 6.0f;
         public float Gravity = 20.0f;
         private float _verticalVelocity;
+        public float coyoteTime = 0.2f; // Saniye cinsinden coyote süresi
+        public float coyoteTimeCounter = 0f;
+
 
         // Crouch Variables
         public float NormalHeight = 1.8f;
@@ -74,6 +77,16 @@ namespace Epitaph.Scripts.Player.MovementSystem
             _currentState.UpdateState();
             HandleMovement();
             HandleGravity();
+            
+            // Coyote time yönetimi
+            if (PlayerController.CharacterController.isGrounded)
+            {
+                coyoteTimeCounter = coyoteTime; // Yere değince yenile
+            }
+            else
+            {
+                coyoteTimeCounter -= Time.deltaTime;
+            }
         }
         
         public override void FixedUpdate()

@@ -1,4 +1,3 @@
-using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 {
@@ -45,7 +44,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 {
                     SwitchState(Factory.Crouch());
                 }
-                else if (Ctx.PlayerController.PlayerInput.IsMoveInput && Ctx.PlayerController.PlayerInput.IsRunPressed)
+                else if (Ctx.PlayerController.PlayerInput.IsMoveInput 
+                         && Ctx.PlayerController.PlayerInput.IsRunPressed)
                 {
                     SwitchState(Factory.Run());
                 }
