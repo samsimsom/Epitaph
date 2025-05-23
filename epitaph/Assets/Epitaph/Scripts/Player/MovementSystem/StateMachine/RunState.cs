@@ -31,9 +31,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         {
             if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame)
             {
-                // Koşarken crouch'a geçince ne olacağına karar verin.
-                // Belki direkt crouch walk veya slide? Şimdilik normal crouch.
-                // SwitchState(Factory.Crouch());
+                SwitchState(Factory.Crouch());
             }
             else if (Ctx.PlayerController.PlayerInput.IsJumpPressed && Ctx.PlayerController.CharacterController.isGrounded)
             {

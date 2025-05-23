@@ -31,8 +31,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         {
             if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame)
             {
-                Debug.Log("Crouch");
-                // SwitchState(Factory.Crouch());
+                SwitchState(Factory.Crouch());
             }
             else if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame && Ctx.PlayerController.CharacterController.isGrounded)
             {

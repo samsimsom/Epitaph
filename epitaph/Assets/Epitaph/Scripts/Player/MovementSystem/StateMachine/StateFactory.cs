@@ -13,7 +13,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         public BaseState Walk() => new WalkState(_context, this);
         public BaseState Run() => new RunState(_context, this);
         public BaseState Jump() => new JumpState(_context, this);
-        // public PlayerBaseState Crouch() => new PlayerCrouchState(_context, this);
+        public BaseState Crouch() => new CrouchState(_context, this);
+        
         // Gelecekte eklenebilecek diğer state'ler için metotlar...
     }
 }
