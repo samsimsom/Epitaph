@@ -32,8 +32,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             _playerCameraTransform = playerCameraTransform;
             _healthController = healthController;
         }
-
-        // Hareket Davranışları
+        
         public PlayerMove PlayerMove { get; private set; }
         public PlayerJump PlayerJump { get; private set; }
         public PlayerCrouch PlayerCrouch { get; private set; }
@@ -54,6 +53,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             // PlayerJump = AddMovementBehaviour(new PlayerJump(_playerController, _playerData));
             // PlayerGravity = AddMovementBehaviour(new PlayerGravity(_playerController, _playerData, _characterController));
         }
+
+        #region MonoBehaviour Methods
 
         public override void Awake()
         {
@@ -102,6 +103,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             foreach (var behaviour in _movementBehaviours) behaviour.OnDrawGizmos();
         }
 #endif
+
+        #endregion
         
     }
 }
