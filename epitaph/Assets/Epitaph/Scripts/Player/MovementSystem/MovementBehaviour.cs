@@ -1,3 +1,4 @@
+using System.Collections;
 using Epitaph.Scripts.Player.BaseBehaviour;
 using Epitaph.Scripts.Player.MovementSystem.StateMachine;
 using UnityEngine;
@@ -51,6 +52,13 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float AppliedMovementX { get; set; }
         public float AppliedMovementZ { get; set; }
 
+        // Yeni eklenen alanlar
+        private Coroutine _crouchTransitionCoroutine;
+        public float CrouchTransitionDuration = 0.2f; // Geçiş süresi (saniye)
+        
+        // Kamera hareketi de yumuşak olsun istiyorsan:
+        private Coroutine _cameraTransitionCoroutine;
+
         // ---------------------------------------------------------------------------- //
         
         public MovementBehaviour(PlayerController playerController)
@@ -78,7 +86,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
         }
 
         // ---------------------------------------------------------------------------- //
-        
+
+        #region Movement
+
         private void HandleMovement()
         {
             // Move
@@ -91,60 +101,60 @@ namespace Epitaph.Scripts.Player.MovementSystem
             
         }
 
+        #endregion
+        
+        // ---------------------------------------------------------------------------- //
+
+        #region Gravity
+
         private void HandleGravity()
         {
             if (PlayerController.CharacterController.isGrounded && _verticalVelocity < 0)
             {
-                _verticalVelocity = -2f; // Yere yapışması için küçük bir negatif kuvvet
+                _verticalVelocity = -1f;
             }
             else
             {
                 _verticalVelocity -= Gravity * Time.deltaTime;
             }
         }
+
+        #endregion
         
+        // ---------------------------------------------------------------------------- //
+
+        #region Crouching
+
         public void ChangeCharacterControllerDimensions(bool crouch)
         {
+            if (_crouchTransitionCoroutine != null)
+                PlayerController.StopCoroutine(_crouchTransitionCoroutine);
+
             if (crouch)
             {
-                UpdateCameraHeight(true);
-                PlayerController.CharacterController.height = CrouchHeight;
-                PlayerController.CharacterController.center = CrouchControllerCenter;
-                IsCrouching = true;
+                UpdateCameraHeightSmooth(true);
+                _crouchTransitionCoroutine = PlayerController.StartCoroutine(SmoothCrouchTransition(
+                    PlayerController.CharacterController.height, CrouchHeight,
+                    PlayerController.CharacterController.center, CrouchControllerCenter,
+                    CrouchTransitionDuration, true));
             }
             else
             {
                 // Ayağa kalkmadan önce üstte engel var mı kontrolü yapılmalı!
                 if (CanStandUp())
                 {
-                    UpdateCameraHeight(false);
-                    PlayerController.CharacterController.height = NormalHeight;
-                    PlayerController.CharacterController.center = NormalControllerCenter;
-                    _isCrouching = false;
+                    UpdateCameraHeightSmooth(false);
+                    _crouchTransitionCoroutine = PlayerController.StartCoroutine(SmoothCrouchTransition(
+                        PlayerController.CharacterController.height, NormalHeight,
+                        PlayerController.CharacterController.center, NormalControllerCenter,
+                        CrouchTransitionDuration, false));
                 }
                 else
                 {
-                    _isCrouching = true; // State'in tekrar crouch'a dönmesini sağlayabilir
-                    UpdateCameraHeight(true);
+                    _isCrouching = true;
+                    UpdateCameraHeightSmooth(true);
                 }
             }
-        }
-        
-        public void UpdateCameraHeight(bool crouch)
-        {
-            var cameraTransform = PlayerController.CameraTransform;
-            var newY = crouch ? CrouchCameraHeight : NormalCameraHeight;
-
-            var targetPosition = new Vector3(
-                cameraTransform.localPosition.x,
-                newY,
-                cameraTransform.localPosition.z);
-
-            cameraTransform.localPosition = targetPosition;
-
-            // Eğer yumuşak geçiş istiyorsan:
-            // cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, 
-            //     targetPosition, Time.deltaTime * 10f);
         }
 
         public bool CanStandUp()
@@ -171,6 +181,60 @@ namespace Epitaph.Scripts.Player.MovementSystem
             }
             return true;
         }
+        
+        public void UpdateCameraHeightSmooth(bool crouch)
+        {
+            if (_cameraTransitionCoroutine != null)
+                PlayerController.StopCoroutine(_cameraTransitionCoroutine);
+
+            var targetY = crouch ? CrouchCameraHeight : NormalCameraHeight;
+            _cameraTransitionCoroutine = PlayerController.StartCoroutine(
+                SmoothCameraTransition(targetY, CrouchTransitionDuration));
+        }
+
+        #endregion
+
+        // ---------------------------------------------------------------------------- //
+        
+        #region Crouch Transition Coroutines
+        
+        private IEnumerator SmoothCrouchTransition(float fromHeight, float toHeight,
+            Vector3 fromCenter, Vector3 toCenter, float duration, bool crouching)
+        {
+            var elapsed = 0f;
+            while (elapsed < duration)
+            {
+                var t = elapsed / duration;
+                PlayerController.CharacterController.height = Mathf.Lerp(fromHeight, toHeight, t);
+                PlayerController.CharacterController.center = Vector3.Lerp(fromCenter, toCenter, t);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+            PlayerController.CharacterController.height = toHeight;
+            PlayerController.CharacterController.center = toCenter;
+            IsCrouching = crouching;
+        }
+        
+        private IEnumerator SmoothCameraTransition(float targetY, float duration)
+        {
+            var cameraTransform = PlayerController.CameraTransform;
+            var startPos = cameraTransform.localPosition;
+            var endPos = new Vector3(startPos.x, targetY, startPos.z);
+
+            var elapsed = 0f;
+            while (elapsed < duration)
+            {
+                var t = elapsed / duration;
+                cameraTransform.localPosition = Vector3.Lerp(startPos, endPos, t);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+            cameraTransform.localPosition = endPos;
+        }
+
+        #endregion
+        
+        // ---------------------------------------------------------------------------- //
         
     }
 }
