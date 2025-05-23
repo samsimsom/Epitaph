@@ -12,7 +12,7 @@ namespace Epitaph.Scripts.HealPoint
 
         private void OnTriggerEnter(Collider other)
         {
-            Debug.Log("Food Point Triggered!");
+            Debug.Log("Food Point Entered!");
             if (other.gameObject.TryGetComponent<PlayerController>(out var playerController))
             {
                 foodMaterial.color = Color.white;
@@ -22,7 +22,6 @@ namespace Epitaph.Scripts.HealPoint
 
         private void OnTriggerExit(Collider other)
         {
-            Debug.Log("Food Point Triggered!");
             foodMaterial.color = Color.red;
         }
     }

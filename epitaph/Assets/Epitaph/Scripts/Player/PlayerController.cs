@@ -23,11 +23,10 @@ namespace Epitaph.Scripts.Player
         [SerializeField] private Transform playerCameraTransform; 
         #endregion
         
-        public static PlayerData CurrentPlayerData { get; private set; }
+        public PlayerData CurrentPlayerData { get; private set; }
         
         #region Player SubControllers
         private readonly List<PlayerBehaviour> _subControllers = new();
-        
         public MovementController MovementController { get; private set; }
         public HealthController HealthController { get; private set; } 
         public InteractionController InteractionController { get; private set; } 
@@ -135,47 +134,53 @@ namespace Epitaph.Scripts.Player
         private void InitializeBehaviours()
         {
             #region Inspector Objects
-            if (characterController == null) 
-                characterController = GetComponent<CharacterController>();
-
-            if (playerInput == null) 
-                playerInput = GetComponent<PlayerInput>();
-            
-            if (playerCamera == null)
-            {
-                var camComponent = GetComponentInChildren<Camera>();
-                if (camComponent != null && camComponent.CompareTag("MainCamera"))
-                    playerCamera = camComponent;
-                else
-                    Debug.LogError("PlayerCamera is not assigned in PlayerController " +
-                                   "and could not be found automatically.", this);
-            }
-
-            if (fpCamera == null && playerCamera != null)
-            {
-                if (playerCameraTransform != null)
-                    fpCamera = playerCameraTransform.GetComponentInChildren<CinemachineCamera>();
-            }
-
-            if (playerCameraTransform == null)
-            {
-                playerCameraTransform = transform.Find("FPCameraTransform");
-            }
+            // if (characterController == null) 
+            //     characterController = GetComponent<CharacterController>();
+            //
+            // if (playerInput == null) 
+            //     playerInput = GetComponent<PlayerInput>();
+            //
+            // if (playerCamera == null)
+            // {
+            //     var camComponent = GetComponentInChildren<Camera>();
+            //     if (camComponent != null && camComponent.CompareTag("MainCamera"))
+            //         playerCamera = camComponent;
+            //     else
+            //         Debug.LogError("PlayerCamera is not assigned in PlayerController " +
+            //                        "and could not be found automatically.", this);
+            // }
+            //
+            // if (fpCamera == null && playerCamera != null)
+            // {
+            //     if (playerCameraTransform != null)
+            //         fpCamera = playerCameraTransform.GetComponentInChildren<CinemachineCamera>();
+            // }
+            //
+            // if (playerCameraTransform == null)
+            // {
+            //     playerCameraTransform = transform.Find("FPCameraTransform");
+            // }
             #endregion
+
+            ViewController = AddSubController(new ViewController(this,
+                CurrentPlayerData,
+                playerCamera,
+                fpCamera,
+                playerCameraTransform));
             
-            HealthController = AddSubController(new HealthController(this, CurrentPlayerData));
-            MovementController = AddSubController(new MovementController(this, CurrentPlayerData, characterController, playerCameraTransform, HealthController, playerCamera));
-            InteractionController = AddSubController(new InteractionController(this, CurrentPlayerData, playerCamera));
-            
-            if (playerCamera != null && playerCameraTransform != null)
-            {
-                ViewController = AddSubController(new ViewController(this, CurrentPlayerData, playerCamera, fpCamera, playerCameraTransform));
-            }
-            else
-            {
-                Debug.LogError("Cannot initialize ViewController because playerCamera " +
-                               "or playerCameraTransform is missing!", this);
-            }
+            HealthController = AddSubController(new HealthController(this,
+                CurrentPlayerData));
+
+            MovementController = AddSubController(new MovementController(this,
+                CurrentPlayerData,
+                characterController,
+                playerCameraTransform,
+                HealthController,
+                playerCamera));
+
+            InteractionController = AddSubController(new InteractionController(this,
+                CurrentPlayerData,
+                playerCamera));
         }
         #endregion
         
