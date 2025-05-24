@@ -25,7 +25,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void EnterState()
         {
-            Ctx.IsCrouching = true;
             TransitionCrouchState(true);
         }
 
@@ -137,7 +136,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 }
                 else
                 {
-                    Ctx.IsCrouching = true;
                     UpdateCameraHeightSmooth(true);
                 }
             }
@@ -213,6 +211,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 elapsed += Time.deltaTime;
                 yield return null;
             }
+            
+            endPos.y = cameraTransform.localPosition.y;
             cameraTransform.localPosition = endPos;
         }
 

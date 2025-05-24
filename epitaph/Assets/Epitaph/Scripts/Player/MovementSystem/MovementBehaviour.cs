@@ -8,7 +8,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
     public class MovementBehaviour : PlayerBehaviour
     {
         // State Variables
-        private BaseState _currentState;
         private StateFactory _states;
         
         // Movement Variables
@@ -34,23 +33,15 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float NormalCameraHeight = 1.5f;
         public float CrouchCameraHeight = 0.7f;
         public float CrouchTransitionDuration = 0.2f;
-        private bool _isCrouching;
+        
 
         // Input Variables
         private Vector2 _currentMovementInput;
 
         // Getters & Setters
-        public BaseState CurrentState 
-        { 
-            get => _currentState;
-            set => _currentState = value;
-        }
-        public bool IsCrouching
-        {
-            get => _isCrouching;
-            set => _isCrouching = value;
-        }
-        
+        public BaseState CurrentState { get; set; }
+        public bool IsCrouching { get; set; }
+        public bool IsCrouchingDone { get; set; }
         public Vector3 CurrentVelocity { get; set; }
         
         public float CurrentMovementY
@@ -71,13 +62,13 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public override void Awake()
         {
             _states = new StateFactory(this);
-            _currentState = _states.Idle();
-            _currentState.EnterState();
+            CurrentState = _states.Idle();
+            CurrentState.EnterState();
         }
         
         public override void Update()
         {
-            _currentState.UpdateState();
+            CurrentState.UpdateState();
             HandleMovement();
             HandleGravity();
             
@@ -94,7 +85,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         public override void FixedUpdate()
         {
-            _currentState.FixedUpdateState();
+            CurrentState.FixedUpdateState();
         }
 
         // ---------------------------------------------------------------------------- //

@@ -127,8 +127,8 @@ namespace Epitaph.Scripts.Player
 
         private void InitializeBehaviours()
         {
+            ViewBehaviour = AddBehaviour(new ViewBehaviour(this));
             MovementBehaviour = AddBehaviour(new MovementBehaviour(this));
-            // ViewBehaviour = AddBehaviour(new ViewBehaviour(this));
             LockCursor();
         }
 
