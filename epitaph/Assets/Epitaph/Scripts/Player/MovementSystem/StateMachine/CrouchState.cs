@@ -195,31 +195,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             Ctx.IsCrouching = crouching;
         }
 
-        private IEnumerator SmoothCameraTransition(float targetY, float duration)
-        {
-            var cameraTransform = Ctx.PlayerController.CameraTransform;
-            var startPos = cameraTransform.localPosition;
-
-            var elapsed = 0f;
-            while (elapsed < duration)
-            {
-                var t = elapsed / duration;
-                // Sadece y pozisyonunu değiştir, x ve z'yi koru
-                var newPos = cameraTransform.localPosition;
-                newPos.y = Mathf.Lerp(startPos.y, targetY, t);
-                cameraTransform.localPosition = newPos;
-        
-                elapsed += Time.deltaTime;
-                yield return null;
-
-            }
-            
-            // Sadece y değerini hedef değere ayarla
-            var finalPos = cameraTransform.localPosition;
-            finalPos.y = targetY;
-            cameraTransform.localPosition = finalPos;
-        }
-
         #endregion
         
         // ---------------------------------------------------------------------------- //

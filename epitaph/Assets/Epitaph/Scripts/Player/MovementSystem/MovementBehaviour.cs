@@ -34,16 +34,13 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float CrouchCameraHeight = 0.7f;
         public float CrouchTransitionDuration = 0.2f;
         
-
         // Input Variables
         private Vector2 _currentMovementInput;
 
         // Getters & Setters
         public BaseState CurrentState { get; set; }
         public bool IsCrouching { get; set; }
-        public bool IsCrouchingDone { get; set; }
         public Vector3 CurrentVelocity { get; set; }
-        
         public float CurrentMovementY
         {
             get => _verticalVelocity;
