@@ -42,7 +42,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         public override void CheckSwitchStates()
         {
             // Yere değdiğinde ve dikey hız negatif veya sıfıra yakınsa
-            if (Ctx.PlayerController.CharacterController.isGrounded && 
+            if (Ctx.IsCustomGrounded && 
                 Ctx.CurrentMovementY <= 0)
             {
                 if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame || 

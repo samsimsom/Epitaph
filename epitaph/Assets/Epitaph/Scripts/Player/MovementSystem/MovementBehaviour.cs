@@ -49,6 +49,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float AppliedMovementX { get; set; }
         public float AppliedMovementZ { get; set; }
 
+        // Sınıfın değişkenler bölümüne ekleyin
+        public bool IsCustomGrounded { get; private set; }
+        public float GroundCheckDistance = 0.2f;
+
         // ---------------------------------------------------------------------------- //
         
         public MovementBehaviour(PlayerController playerController)
@@ -63,14 +67,17 @@ namespace Epitaph.Scripts.Player.MovementSystem
             CurrentState.EnterState();
         }
         
+        // Update metodunda çağırın
         public override void Update()
         {
+            Debug.Log(IsCustomGrounded);
+            CheckCustomGrounded();
             CurrentState.UpdateState();
             HandleMovement();
             HandleGravity();
             
             // Coyote time yönetimi
-            if (PlayerController.CharacterController.isGrounded)
+            if (IsCustomGrounded)
             {
                 CoyoteTimeCounter = CoyoteTime; // Yere değince yenile
             }
@@ -98,6 +105,17 @@ namespace Epitaph.Scripts.Player.MovementSystem
             var right = Vector3.ProjectOnPlane(cam.right, Vector3.up).normalized;
             moveDirection = moveDirection.z * forward + moveDirection.x * right;
 
+            // Zeminin normalini bul ve hareket yönünü buna göre ayarla (eğimde zıplama sorununu çözer)
+            if (IsCustomGrounded)
+            {
+                RaycastHit hit;
+                if (Physics.Raycast(PlayerController.CharacterController.transform.position, Vector3.down, out hit, 1.5f))
+                {
+                    // Hareket vektörünü zemin normaline göre ayarla
+                    moveDirection = Vector3.ProjectOnPlane(moveDirection, hit.normal).normalized * moveDirection.magnitude;
+                }
+            }
+
             // Dikey hızı hareket vektörüne uygula
             moveDirection.y = _verticalVelocity;
 
@@ -106,7 +124,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
             // Yere değerse dikey hızı hafifçe sabitle, böylece character controller'ın
             // "yerde kayma bugı" azalır
-            if (PlayerController.CharacterController.isGrounded && _verticalVelocity < 0)
+            if (IsCustomGrounded && _verticalVelocity < 0)
             {
                 _verticalVelocity = -1f;
             }
@@ -116,8 +134,29 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         private void HandleGravity()
         {
-            if (PlayerController.CharacterController.isGrounded)
+            if (IsCustomGrounded)
             {
+                // Zemin normal açısını kontrol et
+                RaycastHit hit;
+                var origin = PlayerController.CharacterController.transform.position +
+                            PlayerController.CharacterController.center -
+                            Vector3.up * (PlayerController.CharacterController.height / 2f);
+        
+                if (Physics.Raycast(origin, Vector3.down, out hit, 0.5f))
+                {
+                    var groundAngle = Vector3.Angle(hit.normal, Vector3.up);
+                    var slopeLimit = PlayerController.CharacterController.slopeLimit;
+            
+                    // Eğer eğim varsa ve geçerli bir eğimse, eğime göre yerçekimi uygula
+                    if (groundAngle > 0 && groundAngle <= slopeLimit)
+                    {
+                        // Eğim yönünde küçük bir kuvvet uygula (eğimde aşağı kayma efekti)
+                        var slopeForce = 2.0f; // Bu değeri eğimde kayma hızına göre ayarlayabilirsiniz
+                        _verticalVelocity = -slopeForce * (groundAngle / slopeLimit);
+                        return;
+                    }
+                }
+        
                 // Eğer yere yeni değildiyse ve aşağı
                 // yönde hareket ediyorsak hızı sıfırla
                 if (_verticalVelocity < 0)
@@ -132,7 +171,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 if (_verticalVelocity < 0)
                     gravityMultiplier = 1.5f; // Daha gerçekçi düşüş için
                 _verticalVelocity -= Gravity * gravityMultiplier * Time.deltaTime;
-                
+        
                 // Terminal velocity uygulanıyor
                 _verticalVelocity = Mathf.Max(_verticalVelocity, TerminalVelocity);
             }
@@ -189,6 +228,64 @@ namespace Epitaph.Scripts.Player.MovementSystem
         }
         
         // ---------------------------------------------------------------------------- //
+        
+        private void CheckCustomGrounded()
+        {
+            // CharacterController pozisyonundan aşağıya doğru raycast at
+            var controller = PlayerController.CharacterController;
+            var origin = controller.transform.position + controller.center - Vector3.up * (controller.height / 2f - 0.1f);
+    
+            // Çoklu raycast ile daha hassas kontrol
+            var hitGround = false;
+    
+            // Merkez raycast
+            if (Physics.Raycast(origin, Vector3.down, out var hit, GroundCheckDistance))
+            {
+                hitGround = true;
+            }
+    
+            // İleri raycast
+            if (!hitGround)
+            {
+                var forwardOrigin = origin + controller.transform.forward * (controller.radius * 0.8f);
+                if (Physics.Raycast(forwardOrigin, Vector3.down, GroundCheckDistance))
+                {
+                    hitGround = true;
+                }
+            }
+    
+            // Geri raycast
+            if (!hitGround)
+            {
+                var backwardOrigin = origin - controller.transform.forward * (controller.radius * 0.8f);
+                if (Physics.Raycast(backwardOrigin, Vector3.down, GroundCheckDistance))
+                {
+                    hitGround = true;
+                }
+            }
+    
+            // Sağ raycast
+            if (!hitGround)
+            {
+                var rightOrigin = origin + controller.transform.right * (controller.radius * 0.8f);
+                if (Physics.Raycast(rightOrigin, Vector3.down, GroundCheckDistance))
+                {
+                    hitGround = true;
+                }
+            }
+    
+            // Sol raycast
+            if (!hitGround)
+            {
+                var leftOrigin = origin - controller.transform.right * (controller.radius * 0.8f);
+                if (Physics.Raycast(leftOrigin, Vector3.down, GroundCheckDistance))
+                {
+                    hitGround = true;
+                }
+            }
+    
+            IsCustomGrounded = hitGround;
+        }
         
 #if UNITY_EDITOR
         public override void OnDrawGizmos()
