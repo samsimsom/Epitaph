@@ -17,7 +17,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float CrouchSpeed = 1.5f;
 
         // Jump Variables
-        public float JumpForce = 6.0f;
+        public float JumpForce = 5.0f;
         public float AirControlFactor = 1.25f;
         public float Gravity = 20.0f;
         public float CoyoteTime = 0.2f; // Saniye cinsinden coyote süresi
