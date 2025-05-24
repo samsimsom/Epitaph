@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Epitaph.Scripts.Player.BaseBehaviour;
 using Epitaph.Scripts.Player.Input;
 using Epitaph.Scripts.Player.MovementSystem;
+using Epitaph.Scripts.Player.ViewSystem;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player
@@ -27,6 +28,7 @@ namespace Epitaph.Scripts.Player
         private readonly List<PlayerBehaviour> _playerBehaviours = new();
         
         public MovementBehaviour MovementBehaviour { get; private set; }
+        public ViewBehaviour ViewBehaviour { get; private set; }
 
         #endregion
         
@@ -126,6 +128,7 @@ namespace Epitaph.Scripts.Player
         private void InitializeBehaviours()
         {
             MovementBehaviour = AddBehaviour(new MovementBehaviour(this));
+            // ViewBehaviour = AddBehaviour(new ViewBehaviour(this));
             LockCursor();
         }
 

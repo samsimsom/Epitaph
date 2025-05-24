@@ -23,6 +23,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float CoyoteTime = 0.2f; // Saniye cinsinden coyote süresi
         public float CoyoteTimeCounter;
 
+        public float TerminalVelocity = -20.0f;
         private float _verticalVelocity;
 
         // Crouch Variables
@@ -49,6 +50,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
             get => _isCrouching;
             set => _isCrouching = value;
         }
+        
+        public Vector3 CurrentVelocity { get; set; }
+        
         public float CurrentMovementY
         {
             get => _verticalVelocity;
@@ -73,13 +77,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         public override void Update()
         {
-            // Debug.Log("----------------");
-            // Debug.Log($"JUMP BUTTON :{PlayerController.PlayerInput.IsJumpPressedThisFrame}");
-            // Debug.Log($"COYOTE : {CoyoteTimeCounter > 0f}");
-            // Debug.Log($"OBSTACLE : {HasObstacleAboveForJump()}");
-            // Debug.Log($"CAN JUMP : {CanJumpOnCurrentGround()}");
-            // Debug.Log("----------------");
-
             _currentState.UpdateState();
             HandleMovement();
             HandleGravity();
@@ -125,6 +122,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             {
                 _verticalVelocity = -1f;
             }
+            
+            CurrentVelocity = PlayerController.CharacterController.velocity;
         }
 
         private void HandleGravity()
@@ -145,6 +144,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 if (_verticalVelocity < 0)
                     gravityMultiplier = 1.5f; // Daha gerçekçi düşüş için
                 _verticalVelocity -= Gravity * gravityMultiplier * Time.deltaTime;
+                
+                // Terminal velocity uygulanıyor
+                _verticalVelocity = Mathf.Max(_verticalVelocity, TerminalVelocity);
             }
         }
         
