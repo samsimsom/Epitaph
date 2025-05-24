@@ -7,8 +7,8 @@ namespace Epitaph.Scripts.Player.ViewSystem
     public class HeadBob : PlayerBehaviour
     {
         private ViewBehaviour _viewBehaviour;
-        private Vector3 _startPosition;
         private Vector3 _headBobOffset = Vector3.zero;
+        private Vector3 _lastHeadBobOffset = Vector3.zero; // Son offseti izlemek için
 
         public HeadBob(ViewBehaviour viewBehaviour, PlayerController playerController)
             : base(playerController)
@@ -16,18 +16,11 @@ namespace Epitaph.Scripts.Player.ViewSystem
             _viewBehaviour = viewBehaviour;
         }
 
-        public override void Start()
-        {
-            _startPosition = PlayerController.CameraTransform.localPosition;
-        }
+        public override void Start() { }
 
         public override void Update()
         {
             CheckForHeadBobTrigger();
-            // Kamera pozisyonu diğer sınıflar tarafından değiştirilmiş olabileceğinden
-            // başlangıç pozisyonunu sürekli güncelliyoruz, sadece y değerini koruyoruz
-            _startPosition.x = PlayerController.CameraTransform.localPosition.x;
-            _startPosition.z = PlayerController.CameraTransform.localPosition.z;
         }
 
         private void CheckForHeadBobTrigger()
@@ -43,17 +36,28 @@ namespace Epitaph.Scripts.Player.ViewSystem
                 ResetHeadBobOffset();
             }
             
-            // Offseti uygula
-            ApplyHeadBobOffset();
+            // Offset değişmişse sadece o zaman güncelle
+            if (_headBobOffset != _lastHeadBobOffset)
+            {
+                _viewBehaviour.SetHeadBobOffset(_headBobOffset);
+                _lastHeadBobOffset = _headBobOffset;
+            }
         }
         
         private void CalculateHeadBobOffset()
         {
+            // Değişimden önce _headBobOffset'i temizle
             _headBobOffset = Vector3.zero;
-            _headBobOffset.y += Mathf.Lerp(_headBobOffset.y, Mathf.Sin(Time.time * _viewBehaviour.HeadBobFrequency)
-                * _viewBehaviour.HeadBobAmount * 1.4f, _viewBehaviour.HeadBobSmooth * Time.deltaTime);
-            _headBobOffset.x += Mathf.Lerp(_headBobOffset.x, Mathf.Cos(Time.time * _viewBehaviour.HeadBobFrequency / 2f)
-                * _viewBehaviour.HeadBobAmount * 1.6f, _viewBehaviour.HeadBobSmooth * Time.deltaTime);
+            
+            // Yeni değerleri hesapla
+            float bobY = Mathf.Sin(Time.time * _viewBehaviour.HeadBobFrequency) * 
+                         _viewBehaviour.HeadBobAmount * 1.4f;
+            float bobX = Mathf.Cos(Time.time * _viewBehaviour.HeadBobFrequency / 2f) * 
+                         _viewBehaviour.HeadBobAmount * 1.6f;
+            
+            // Lerp yerine doğrudan değer atama - daha temiz hareket için
+            _headBobOffset.y = bobY;
+            _headBobOffset.x = bobX;
         }
 
         private void CalculateHeadBobAmount()
@@ -78,19 +82,17 @@ namespace Epitaph.Scripts.Player.ViewSystem
 
         private void ResetHeadBobOffset()
         {
-            // Debug.Log("Reset Head Bob Offset");
-            _headBobOffset = Vector3.Lerp(_headBobOffset, Vector3.zero, 
-                _viewBehaviour.HeadBobSmooth * Time.deltaTime);
-            // _headBobOffset = Vector3.zero;
-        }
-        
-        private void ApplyHeadBobOffset()
-        {
-            // Mevcut pozisyonu al ve sadece head bob offsetlerini uygula
-            var currentPos = PlayerController.CameraTransform.localPosition;
-            currentPos.x += _headBobOffset.x;
-            currentPos.y += _headBobOffset.y;
-            PlayerController.CameraTransform.localPosition = currentPos;
+            // Daha hızlı sıfırlanma için çarpan
+            var resetSpeed = _viewBehaviour.HeadBobSmooth * 2f * Time.deltaTime;
+            
+            // Lerp ile yumuşatma
+            _headBobOffset = Vector3.Lerp(_headBobOffset, Vector3.zero, resetSpeed);
+            
+            // Çok küçük değerleri tamamen sıfırla
+            if (_headBobOffset.magnitude < 0.001f)
+            {
+                _headBobOffset = Vector3.zero;
+            }
         }
     }
 }

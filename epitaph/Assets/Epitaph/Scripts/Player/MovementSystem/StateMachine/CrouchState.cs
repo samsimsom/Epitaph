@@ -143,12 +143,10 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         private void UpdateCameraHeightSmooth(bool crouch)
         {
-            if (_cameraTransitionCoroutine != null)
-                Ctx.PlayerController.StopCoroutine(_cameraTransitionCoroutine);
-
             var targetY = crouch ? Ctx.CrouchCameraHeight : Ctx.NormalCameraHeight;
-            _cameraTransitionCoroutine = Ctx.PlayerController.StartCoroutine(
-                SmoothCameraTransition(targetY, Ctx.CrouchTransitionDuration));
+            
+            // ViewBehaviour üzerinden kamera yüksekliğini ayarla
+            Ctx.PlayerController.ViewBehaviour.SetCameraHeight(targetY);
         }
 
         #endregion

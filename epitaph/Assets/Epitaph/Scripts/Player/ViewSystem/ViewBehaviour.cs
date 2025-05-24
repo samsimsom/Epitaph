@@ -14,16 +14,68 @@ namespace Epitaph.Scripts.Player.ViewSystem
         public float HeadBobSmooth = 10.0f;
         public float HeadBobThreshold = 1.5f;
         
+        private Vector3 _basePosition;
+        private Vector3 _headBobOffset = Vector3.zero;
+        
+        private float _targetHeight;
+        private float _currentHeight;
+        
         private readonly List<PlayerBehaviour> _viewBehaviours = new();
         
-        
-        // ---------------------------------------------------------------------------- //
-        
-        public ViewBehaviour(PlayerController playerController) 
-            : base(playerController) { }
-
         // ---------------------------------------------------------------------------- //
 
+        public ViewBehaviour(PlayerController playerController)
+            : base(playerController)
+        {
+            _basePosition = playerController.CameraTransform.localPosition;
+            _currentHeight = _basePosition.y;
+            _targetHeight = _currentHeight;
+
+        }
+
+        // ---------------------------------------------------------------------------- //
+        
+        #region Camera Position Methods
+
+        public void SetHeadBobOffset(Vector3 offset)
+        {
+            _headBobOffset = offset;
+            UpdateCameraPosition();
+        }
+
+        public void SetCameraHeight(float height)
+        {
+            _targetHeight = height;
+            UpdateCameraPosition();
+        }
+
+        public void UpdateCameraPosition()
+        {
+            // Yumuşak yükseklik geçişi
+            _currentHeight = Mathf.Lerp(_currentHeight, _targetHeight, Time.deltaTime * 10.0f);
+            
+            // Tüm etkileri birleştir
+            var finalPosition = new Vector3()
+            {
+                x = _basePosition.x + _headBobOffset.x,
+                y = _currentHeight + _headBobOffset.y,
+                z = _basePosition.z + _headBobOffset.z
+            };
+            
+            PlayerController.CameraTransform.localPosition = finalPosition;
+        }
+
+        public void Reset()
+        {
+            _headBobOffset = Vector3.zero;
+            _targetHeight = _basePosition.y;
+            UpdateCameraPosition();
+        }
+
+        #endregion
+
+        // ---------------------------------------------------------------------------- //
+        
         #region MonoBehaviour Methods
         
         public override void Awake()
@@ -50,6 +102,9 @@ namespace Epitaph.Scripts.Player.ViewSystem
         public override void LateUpdate()
         {
             foreach (var behaviour in _viewBehaviours) behaviour.LateUpdate();
+            
+            // Her frame sonunda kamera pozisyonunu güncelle
+            UpdateCameraPosition();
         }
 
         public override void FixedUpdate()
