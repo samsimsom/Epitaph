@@ -6,20 +6,22 @@ namespace Epitaph.Scripts.Player.ViewSystem
 {
     public class ViewBehaviour : PlayerBehaviour
     {
+        // Properties
         public HeadBob HeadBob { get; private set; }
         
-        // Movement Variables
+        // Head Bob Configuration
         public float HeadBobAmount = 0.02f;
         public float HeadBobFrequency = 10.0f;
         public float HeadBobSmooth = 10.0f;
         public float HeadBobThreshold = 1.5f;
         
+        // Camera Position Management
         private Vector3 _basePosition;
         private Vector3 _headBobOffset = Vector3.zero;
-        
         private float _targetHeight;
         private float _currentHeight;
         
+        // Child Behaviours
         private readonly List<PlayerBehaviour> _viewBehaviours = new();
         
         // ---------------------------------------------------------------------------- //
@@ -27,10 +29,14 @@ namespace Epitaph.Scripts.Player.ViewSystem
         public ViewBehaviour(PlayerController playerController)
             : base(playerController)
         {
-            _basePosition = playerController.CameraTransform.localPosition;
+            InitializeBasePositionAndHeight();
+        }
+
+        private void InitializeBasePositionAndHeight()
+        {
+            _basePosition = PlayerController.CameraTransform.localPosition;
             _currentHeight = _basePosition.y;
             _targetHeight = _currentHeight;
-
         }
 
         // ---------------------------------------------------------------------------- //
@@ -51,11 +57,12 @@ namespace Epitaph.Scripts.Player.ViewSystem
 
         public void UpdateCameraPosition()
         {
-            // Yumuşak yükseklik geçişi
-            _currentHeight = Mathf.Lerp(_currentHeight, _targetHeight, Time.deltaTime * 10.0f);
+            // Smooth height transition
+            _currentHeight = Mathf.Lerp(_currentHeight, _targetHeight,
+                Time.deltaTime * 10.0f);
             
-            // Tüm etkileri birleştir
-            var finalPosition = new Vector3()
+            // Combine all effects
+            var finalPosition = new Vector3
             {
                 x = _basePosition.x + _headBobOffset.x,
                 y = _currentHeight + _headBobOffset.y,
@@ -81,51 +88,51 @@ namespace Epitaph.Scripts.Player.ViewSystem
         public override void Awake()
         {
             InitializeBehaviours();
-            foreach (var behaviour in _viewBehaviours) behaviour.Awake();
+            ForEachBehaviour(behaviour => behaviour.Awake());
         }
 
         public override void OnEnable()
         {
-            foreach (var behaviour in _viewBehaviours) behaviour.OnEnable();
+            ForEachBehaviour(behaviour => behaviour.OnEnable());
         }
 
         public override void Start()
         {
-            foreach (var behaviour in _viewBehaviours) behaviour.Start();
+            ForEachBehaviour(behaviour => behaviour.Start());
         }
 
         public override void Update()
         {
-            foreach (var behaviour in _viewBehaviours) behaviour.Update();
+            ForEachBehaviour(behaviour => behaviour.Update());
         }
 
         public override void LateUpdate()
         {
-            foreach (var behaviour in _viewBehaviours) behaviour.LateUpdate();
+            ForEachBehaviour(behaviour => behaviour.LateUpdate());
             
-            // Her frame sonunda kamera pozisyonunu güncelle
+            // Update camera position at the end of each frame
             UpdateCameraPosition();
         }
 
         public override void FixedUpdate()
         {
-            foreach (var behaviour in _viewBehaviours) behaviour.FixedUpdate();
+            ForEachBehaviour(behaviour => behaviour.FixedUpdate());
         }
 
         public override void OnDisable()
         {
-            foreach (var behaviour in _viewBehaviours) behaviour.OnDisable();
+            ForEachBehaviour(behaviour => behaviour.OnDisable());
         }
 
         public override void OnDestroy()
         {
-            foreach (var behaviour in _viewBehaviours) behaviour.OnDestroy();
+            ForEachBehaviour(behaviour => behaviour.OnDestroy());
         }
         
 #if UNITY_EDITOR
         public override void OnDrawGizmos()
         {
-            foreach (var behaviour in _viewBehaviours) behaviour.OnDrawGizmos();
+            ForEachBehaviour(behaviour => behaviour.OnDrawGizmos());
         }
 #endif
 
@@ -142,7 +149,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
             }
             else
             {
-                Debug.LogError("PlayerCameraTransform is null in ViewController." +
+                Debug.LogError("PlayerCameraTransform is null in ViewBehaviour." +
                                "InitializeBehaviours. View behaviours cannot be " +
                                "initialized.", PlayerController);
             }
@@ -154,5 +161,12 @@ namespace Epitaph.Scripts.Player.ViewSystem
             return behaviour;
         }
         
+        private void ForEachBehaviour(System.Action<PlayerBehaviour> action)
+        {
+            foreach (var behaviour in _viewBehaviours)
+            {
+                action(behaviour);
+            }
+        }
     }
 }
