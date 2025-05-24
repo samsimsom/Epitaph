@@ -12,7 +12,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
         public float HeadBobAmount = 0.02f;
         public float HeadBobFrequency = 10.0f;
         public float HeadBobSmooth = 10.0f;
-        public float HeadBobThreshold = 5.0f;
+        public float HeadBobThreshold = 1.5f;
         
         private readonly List<PlayerBehaviour> _viewBehaviours = new();
         

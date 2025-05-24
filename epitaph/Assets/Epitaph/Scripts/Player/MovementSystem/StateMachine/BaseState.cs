@@ -2,6 +2,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 {
     public abstract class BaseState
     {
+        public string StateName => GetType().Name;
         protected MovementBehaviour Ctx;
         protected StateFactory Factory;
 

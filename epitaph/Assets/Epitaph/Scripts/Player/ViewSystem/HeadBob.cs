@@ -1,4 +1,5 @@
 using Epitaph.Scripts.Player.BaseBehaviour;
+using Epitaph.Scripts.Player.MovementSystem.StateMachine;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.ViewSystem
@@ -14,7 +15,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
         {
             _viewBehaviour = viewBehaviour;
         }
-        
+
         public override void Start()
         {
             _startPosition = PlayerController.CameraTransform.localPosition;
@@ -31,8 +32,10 @@ namespace Epitaph.Scripts.Player.ViewSystem
 
         private void CheckForHeadBobTrigger()
         {
-            if (PlayerController.MovementBehaviour.CurrentVelocity.sqrMagnitude >= _viewBehaviour.HeadBobThreshold)
+            if (PlayerController.MovementBehaviour.CurrentVelocity.sqrMagnitude >= 
+                _viewBehaviour.HeadBobThreshold)
             {
+                CalculateHeadBobAmount();
                 CalculateHeadBobOffset();
             }
             else
@@ -53,10 +56,32 @@ namespace Epitaph.Scripts.Player.ViewSystem
                 * _viewBehaviour.HeadBobAmount * 1.6f, _viewBehaviour.HeadBobSmooth * Time.deltaTime);
         }
 
+        private void CalculateHeadBobAmount()
+        {
+            if (PlayerController.MovementBehaviour.CurrentState.StateName == "WalkState")
+            {
+                _viewBehaviour.HeadBobAmount = 0.02f;
+            }
+            else if (PlayerController.MovementBehaviour.CurrentState.StateName == "RunState")
+            {
+                _viewBehaviour.HeadBobAmount = 0.03f;
+            }
+            else if (PlayerController.MovementBehaviour.CurrentState.StateName == "CrouchState")
+            {
+                _viewBehaviour.HeadBobAmount = 0.01f;
+            }
+            else
+            {
+                _viewBehaviour.HeadBobAmount = 0.02f;
+            }
+        }
+
         private void ResetHeadBobOffset()
         {
+            // Debug.Log("Reset Head Bob Offset");
             _headBobOffset = Vector3.Lerp(_headBobOffset, Vector3.zero, 
                 _viewBehaviour.HeadBobSmooth * Time.deltaTime);
+            // _headBobOffset = Vector3.zero;
         }
         
         private void ApplyHeadBobOffset()
