@@ -1,14 +1,23 @@
+using System.Collections.Generic;
 using Epitaph.Scripts.Player.BaseBehaviour;
-using Epitaph.Scripts.Player.MovementSystem.StateMachine;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.ViewSystem
 {
     public class HeadBob : PlayerBehaviour
     {
-        private ViewBehaviour _viewBehaviour;
+        private readonly ViewBehaviour _viewBehaviour;
         private Vector3 _headBobOffset = Vector3.zero;
-        private Vector3 _lastHeadBobOffset = Vector3.zero; // Son offseti izlemek için
+        private Vector3 _lastHeadBobOffset = Vector3.zero;
+
+        // Headbob amounts for different movement states
+        private static readonly Dictionary<string, float> HeadBobAmounts = new()
+        {
+                { "WalkState", 0.02f },
+                { "RunState", 0.03f },
+                { "CrouchState", 0.01f },
+                { "DefaultState", 0.02f }
+            };
 
         public HeadBob(ViewBehaviour viewBehaviour, PlayerController playerController)
             : base(playerController)
@@ -20,15 +29,14 @@ namespace Epitaph.Scripts.Player.ViewSystem
 
         public override void Update()
         {
-            CheckForHeadBobTrigger();
+            UpdateHeadBob();
         }
 
-        private void CheckForHeadBobTrigger()
+        private void UpdateHeadBob()
         {
-            if (PlayerController.MovementBehaviour.CurrentVelocity.sqrMagnitude >= 
-                _viewBehaviour.HeadBobThreshold)
+            if (IsPlayerMovingAboveThreshold())
             {
-                CalculateHeadBobAmount();
+                UpdateHeadBobAmount();
                 CalculateHeadBobOffset();
             }
             else
@@ -36,7 +44,17 @@ namespace Epitaph.Scripts.Player.ViewSystem
                 ResetHeadBobOffset();
             }
             
-            // Offset değişmişse sadece o zaman güncelle
+            ApplyHeadBobIfChanged();
+        }
+
+        private bool IsPlayerMovingAboveThreshold()
+        {
+            return PlayerController.MovementBehaviour.CurrentVelocity.sqrMagnitude >= 
+                   _viewBehaviour.HeadBobThreshold;
+        }
+        
+        private void ApplyHeadBobIfChanged()
+        {
             if (_headBobOffset != _lastHeadBobOffset)
             {
                 _viewBehaviour.SetHeadBobOffset(_headBobOffset);
@@ -46,49 +64,40 @@ namespace Epitaph.Scripts.Player.ViewSystem
         
         private void CalculateHeadBobOffset()
         {
-            // Değişimden önce _headBobOffset'i temizle
             _headBobOffset = Vector3.zero;
             
-            // Yeni değerleri hesapla
-            float bobY = Mathf.Sin(Time.time * _viewBehaviour.HeadBobFrequency) * 
-                         _viewBehaviour.HeadBobAmount * 1.4f;
-            float bobX = Mathf.Cos(Time.time * _viewBehaviour.HeadBobFrequency / 2f) * 
-                         _viewBehaviour.HeadBobAmount * 1.6f;
+            var time = Time.time;
+            var frequency = _viewBehaviour.HeadBobFrequency;
+            var amount = _viewBehaviour.HeadBobAmount;
             
-            // Lerp yerine doğrudan değer atama - daha temiz hareket için
-            _headBobOffset.y = bobY;
-            _headBobOffset.x = bobX;
+            // Calculate vertical and horizontal bob
+            var verticalBob = Mathf.Sin(time * frequency) * amount * 1.4f;
+            var horizontalBob = Mathf.Cos(time * frequency / 2f) * amount * 1.6f;
+            
+            _headBobOffset.y = verticalBob;
+            _headBobOffset.x = horizontalBob;
         }
 
-        private void CalculateHeadBobAmount()
+        private void UpdateHeadBobAmount()
         {
-            if (PlayerController.MovementBehaviour.CurrentState.StateName == "WalkState")
+            var stateName = PlayerController.MovementBehaviour.CurrentState.StateName;
+            
+            if (HeadBobAmounts.TryGetValue(stateName, out var amount))
             {
-                _viewBehaviour.HeadBobAmount = 0.02f;
-            }
-            else if (PlayerController.MovementBehaviour.CurrentState.StateName == "RunState")
-            {
-                _viewBehaviour.HeadBobAmount = 0.03f;
-            }
-            else if (PlayerController.MovementBehaviour.CurrentState.StateName == "CrouchState")
-            {
-                _viewBehaviour.HeadBobAmount = 0.01f;
+                _viewBehaviour.HeadBobAmount = amount;
             }
             else
             {
-                _viewBehaviour.HeadBobAmount = 0.02f;
+                _viewBehaviour.HeadBobAmount = HeadBobAmounts["DefaultState"];
             }
         }
 
         private void ResetHeadBobOffset()
         {
-            // Daha hızlı sıfırlanma için çarpan
             var resetSpeed = _viewBehaviour.HeadBobSmooth * 2f * Time.deltaTime;
-            
-            // Lerp ile yumuşatma
             _headBobOffset = Vector3.Lerp(_headBobOffset, Vector3.zero, resetSpeed);
             
-            // Çok küçük değerleri tamamen sıfırla
+            // Zero out very small values to prevent tiny oscillations
             if (_headBobOffset.magnitude < 0.001f)
             {
                 _headBobOffset = Vector3.zero;
