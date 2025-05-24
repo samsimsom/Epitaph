@@ -11,12 +11,12 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         public override void EnterState()
         {
             // Şimdi zeminin eğimi kontrol ediliyor
-            if (!Ctx.CanJumpOnCurrentGround())
-            {
-                // Eğer eğim fazla ise zıplamayı engelle
-                SwitchState(Factory.Idle());
-                return;
-            }
+            // if (!Ctx.CanJumpOnCurrentGround())
+            // {
+            //     // Eğer eğim fazla ise zıplamayı engelle
+            //     SwitchState(Factory.Idle());
+            //     return;
+            // }
             
             // Debug.Log("JUMP: Enter");
             
