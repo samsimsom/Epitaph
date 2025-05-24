@@ -124,15 +124,17 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             if (PlayerController.CharacterController.isGrounded)
             {
-                // Eğer yere yeni değildiysek ve aşağı yönde hareket ediyorsak hızı sıfırla
+                // Eğer yere yeni değildiysek ve aşağı
+                // yönde hareket ediyorsak hızı sıfırla
                 if (_verticalVelocity < 0)
                     _verticalVelocity = -1f;
             }
             else
             {
-                // Daha kontrollü bir düşüş eğrisi için gravity factor'u siz ayarlayabilirsiniz.
+                // Daha kontrollü bir düşüş eğrisi için gravity factor'u
                 var gravityMultiplier = 1.0f;
-                // Eğer jump tusu bırakıldıysa veya oyuncu alçalmaya başladıysa gravity hızlanabilir
+                // Eğer jump tusu bırakıldıysa veya oyuncu alçalmaya başladıysa
+                // gravity hızlanabilir
                 if (_verticalVelocity < 0)
                     gravityMultiplier = 1.5f; // Daha gerçekçi düşüş için
                 _verticalVelocity -= Gravity * gravityMultiplier * Time.deltaTime;
