@@ -7,6 +7,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
     {
         private ViewBehaviour _viewBehaviour;
         private Vector3 _startPosition;
+        private Vector3 _headBobOffset = Vector3.zero;
 
         public HeadBob(ViewBehaviour viewBehaviour, PlayerController playerController)
             : base(playerController)
@@ -22,51 +23,49 @@ namespace Epitaph.Scripts.Player.ViewSystem
         public override void Update()
         {
             CheckForHeadBobTrigger();
+            // Kamera pozisyonu diğer sınıflar tarafından değiştirilmiş olabileceğinden
+            // başlangıç pozisyonunu sürekli güncelliyoruz, sadece y değerini koruyoruz
+            _startPosition.x = PlayerController.CameraTransform.localPosition.x;
+            _startPosition.z = PlayerController.CameraTransform.localPosition.z;
         }
 
         private void CheckForHeadBobTrigger()
         {
             if (PlayerController.MovementBehaviour.CurrentVelocity.sqrMagnitude >= _viewBehaviour.HeadBobThreshold)
             {
-                StartHeadBob();
+                CalculateHeadBobOffset();
             }
             else
             {
-                // StopHeadBob();
+                ResetHeadBobOffset();
             }
-        }
-
-        private void StartHeadBob()
-        {
-            var pos = Vector3.zero;
-            pos.y += Mathf.Lerp(pos.y, Mathf.Sin(Time.time * _viewBehaviour.HeadBobFrequency) * _viewBehaviour.HeadBobAmount * 1.4f, _viewBehaviour.HeadBobSmooth * Time.deltaTime);
-            pos.x += Mathf.Lerp(pos.x, Mathf.Cos(Time.time * _viewBehaviour.HeadBobFrequency / 2f) * _viewBehaviour.HeadBobAmount * 1.6f, _viewBehaviour.HeadBobSmooth * Time.deltaTime);
-            PlayerController.CameraTransform.localPosition += pos;
-        }
-
-        private void StopHeadBob()
-        {
-            // Debug.Log($"Headbob : {_startPosition} - {PlayerController.CameraTransform.localPosition}");
-            if (PlayerController.CameraTransform.localPosition == _startPosition) return;
-
-            var pos = PlayerController.CameraTransform.localPosition;
-            pos = Vector3.Lerp(pos, _startPosition, _viewBehaviour.HeadBobSmooth * Time.deltaTime);
-            PlayerController.CameraTransform.localPosition = pos;
             
-            // if (PlayerController.MovementBehaviour.IsCrouching)
-            // {
-            //     PlayerController.CameraTransform.localPosition = Vector3.Lerp(PlayerController.CameraTransform.localPosition, 
-            //         new Vector3(_startPosition.x, PlayerController.MovementBehaviour.CrouchCameraHeight, _startPosition.z),
-            //         _viewBehaviour.HeadBobSmooth * Time.deltaTime);
-            // }
-            // else
-            // {
-            //     PlayerController.CameraTransform.localPosition = Vector3.Lerp(PlayerController.CameraTransform.localPosition, 
-            //         new Vector3(_startPosition.x, _startPosition.y, _startPosition.z), 
-            //         _viewBehaviour.HeadBobSmooth * Time.deltaTime);
-            // }
-            
+            // Offseti uygula
+            ApplyHeadBobOffset();
         }
         
+        private void CalculateHeadBobOffset()
+        {
+            _headBobOffset = Vector3.zero;
+            _headBobOffset.y += Mathf.Lerp(_headBobOffset.y, Mathf.Sin(Time.time * _viewBehaviour.HeadBobFrequency)
+                * _viewBehaviour.HeadBobAmount * 1.4f, _viewBehaviour.HeadBobSmooth * Time.deltaTime);
+            _headBobOffset.x += Mathf.Lerp(_headBobOffset.x, Mathf.Cos(Time.time * _viewBehaviour.HeadBobFrequency / 2f)
+                * _viewBehaviour.HeadBobAmount * 1.6f, _viewBehaviour.HeadBobSmooth * Time.deltaTime);
+        }
+
+        private void ResetHeadBobOffset()
+        {
+            _headBobOffset = Vector3.Lerp(_headBobOffset, Vector3.zero, 
+                _viewBehaviour.HeadBobSmooth * Time.deltaTime);
+        }
+        
+        private void ApplyHeadBobOffset()
+        {
+            // Mevcut pozisyonu al ve sadece head bob offsetlerini uygula
+            var currentPos = PlayerController.CameraTransform.localPosition;
+            currentPos.x += _headBobOffset.x;
+            currentPos.y += _headBobOffset.y;
+            PlayerController.CameraTransform.localPosition = currentPos;
+        }
     }
 }

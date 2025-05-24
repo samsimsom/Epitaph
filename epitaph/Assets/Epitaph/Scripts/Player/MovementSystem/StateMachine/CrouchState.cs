@@ -201,19 +201,25 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         {
             var cameraTransform = Ctx.PlayerController.CameraTransform;
             var startPos = cameraTransform.localPosition;
-            var endPos = new Vector3(startPos.x, targetY, startPos.z);
 
             var elapsed = 0f;
             while (elapsed < duration)
             {
                 var t = elapsed / duration;
-                cameraTransform.localPosition = Vector3.Lerp(startPos, endPos, t);
+                // Sadece y pozisyonunu değiştir, x ve z'yi koru
+                var newPos = cameraTransform.localPosition;
+                newPos.y = Mathf.Lerp(startPos.y, targetY, t);
+                cameraTransform.localPosition = newPos;
+        
                 elapsed += Time.deltaTime;
                 yield return null;
+
             }
             
-            endPos.y = cameraTransform.localPosition.y;
-            cameraTransform.localPosition = endPos;
+            // Sadece y değerini hedef değere ayarla
+            var finalPos = cameraTransform.localPosition;
+            finalPos.y = targetY;
+            cameraTransform.localPosition = finalPos;
         }
 
         #endregion
