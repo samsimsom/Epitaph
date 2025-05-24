@@ -103,5 +103,6 @@ namespace Epitaph.Scripts.Player.ViewSystem
                 _headBobOffset = Vector3.zero;
             }
         }
+        
     }
 }

@@ -58,8 +58,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
         public void UpdateCameraPosition()
         {
             // Smooth height transition
-            _currentHeight = Mathf.Lerp(_currentHeight, _targetHeight,
-                Time.deltaTime * 10.0f);
+            _currentHeight = Mathf.Lerp(_currentHeight, _targetHeight, Time.deltaTime * 10.0f);
             
             // Combine all effects
             var finalPosition = new Vector3
@@ -88,51 +87,49 @@ namespace Epitaph.Scripts.Player.ViewSystem
         public override void Awake()
         {
             InitializeBehaviours();
-            ForEachBehaviour(behaviour => behaviour.Awake());
+            foreach (var behaviour in _viewBehaviours) behaviour.Awake();
         }
 
         public override void OnEnable()
         {
-            ForEachBehaviour(behaviour => behaviour.OnEnable());
+            foreach (var behaviour in _viewBehaviours) behaviour.OnEnable();
         }
 
         public override void Start()
         {
-            ForEachBehaviour(behaviour => behaviour.Start());
+            foreach (var behaviour in _viewBehaviours) behaviour.Start();
         }
 
         public override void Update()
         {
-            ForEachBehaviour(behaviour => behaviour.Update());
+            foreach (var behaviour in _viewBehaviours) behaviour.Update();
         }
 
         public override void LateUpdate()
         {
-            ForEachBehaviour(behaviour => behaviour.LateUpdate());
-            
-            // Update camera position at the end of each frame
+            foreach (var behaviour in _viewBehaviours) behaviour.LateUpdate();
             UpdateCameraPosition();
         }
 
         public override void FixedUpdate()
         {
-            ForEachBehaviour(behaviour => behaviour.FixedUpdate());
+            foreach (var behaviour in _viewBehaviours) behaviour.FixedUpdate();
         }
 
         public override void OnDisable()
         {
-            ForEachBehaviour(behaviour => behaviour.OnDisable());
+            foreach (var behaviour in _viewBehaviours) behaviour.OnDisable();
         }
 
         public override void OnDestroy()
         {
-            ForEachBehaviour(behaviour => behaviour.OnDestroy());
+            foreach (var behaviour in _viewBehaviours) behaviour.OnDestroy();
         }
-        
+
 #if UNITY_EDITOR
         public override void OnDrawGizmos()
         {
-            ForEachBehaviour(behaviour => behaviour.OnDrawGizmos());
+            foreach (var behaviour in _viewBehaviours) behaviour.OnDrawGizmos();
         }
 #endif
 
@@ -159,14 +156,6 @@ namespace Epitaph.Scripts.Player.ViewSystem
         {
             _viewBehaviours.Add(behaviour);
             return behaviour;
-        }
-        
-        private void ForEachBehaviour(System.Action<PlayerBehaviour> action)
-        {
-            foreach (var behaviour in _viewBehaviours)
-            {
-                action(behaviour);
-            }
         }
     }
 }
