@@ -130,10 +130,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             if (PlayerController.CharacterController.isGrounded)
             {
-                // Eğer yere yeni değildiysek ve aşağı
+                // Eğer yere yeni değildiyse ve aşağı
                 // yönde hareket ediyorsak hızı sıfırla
                 if (_verticalVelocity < 0)
-                    _verticalVelocity = -2.0f;
+                    _verticalVelocity = -0.1f;
             }
             else
             {
