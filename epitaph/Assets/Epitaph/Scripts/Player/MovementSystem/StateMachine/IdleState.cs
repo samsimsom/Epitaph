@@ -9,7 +9,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         
         public override void EnterState()
         {
-            // Debug.Log("IDLE: Enter");
+            Debug.Log("IDLE: Enter");
             
             Ctx.AppliedMovementX = 0;
             Ctx.AppliedMovementZ = 0;
@@ -24,7 +24,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void ExitState()
         {
-            // Debug.Log("IDLE: Exit");
+            Debug.Log("IDLE: Exit");
         }
 
         public override void InitializeSubState() { }

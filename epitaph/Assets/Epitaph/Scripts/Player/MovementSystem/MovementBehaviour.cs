@@ -181,8 +181,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
     
             // Ayak noktasından aşağıya doğru kısa bir ray at
             RaycastHit hit;
-            var origin = PlayerController.CharacterController.transform.position 
-                         + Vector3.up * 0.1f; // Çok hafif yukarıdan başlat
+            var controller = PlayerController.CharacterController;
+            var origin = controller.transform.position + 
+                         controller.center - 
+                         Vector3.up * (controller.height / 2f);
 
             if (Physics.Raycast(origin, Vector3.down, out hit, 0.5f))
             {
@@ -191,8 +193,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 // Eğer eğim slopeLimit'e eşit veya daha dikse, zıplayamaz
                 return groundAngle <= slopeLimit;
             }
-            // Raycast boşluğa denk geldiyse, zıplamaya izin verme
-            return false;
+            
+            // Raycast boşluğa denk geldiyse, zıplamaya izin ver
+            return true;
         }
         
         // ---------------------------------------------------------------------------- //
@@ -203,6 +206,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             if (PlayerController.CharacterController == null) return;
             DrawCharacterControllerGizmo();
             DrawHasObstacleAboveForJumpGizmo();
+            DrawGroundAngleGizmo();
         }
 
         private void DrawCharacterControllerGizmo()
@@ -291,6 +295,19 @@ namespace Epitaph.Scripts.Player.MovementSystem
             Handles.DrawLine(start - Vector3.right * radius, end - Vector3.right * radius);
             Handles.DrawLine(start + Vector3.forward * radius, end + Vector3.forward * radius);
             Handles.DrawLine(start - Vector3.forward * radius, end - Vector3.forward * radius);
+        }
+
+        private void DrawGroundAngleGizmo()
+        {
+            var controller = PlayerController.CharacterController;
+            var origin = controller.transform.position + 
+                         controller.center - 
+                         Vector3.up * (controller.height / 2f);
+            
+            var radius = PlayerController.CharacterController.radius;
+            
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(origin, radius);
         }
 #endif
 

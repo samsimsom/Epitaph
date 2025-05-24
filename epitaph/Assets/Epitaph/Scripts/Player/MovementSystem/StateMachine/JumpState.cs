@@ -1,4 +1,6 @@
 
+using UnityEngine;
+
 namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 {
     public class JumpState : BaseState
@@ -8,8 +10,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void EnterState()
         {
-            // Debug.Log("JUMP: Enter");
-            
             // Şimdi zeminin eğimi kontrol ediliyor
             if (!Ctx.CanJumpOnCurrentGround())
             {
@@ -17,7 +17,9 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 SwitchState(Factory.Idle());
                 return;
             }
-
+            
+            Debug.Log("JUMP: Enter");
+            
             Ctx.CurrentMovementY = Ctx.JumpForce;
             ApplySpeed();
         }
