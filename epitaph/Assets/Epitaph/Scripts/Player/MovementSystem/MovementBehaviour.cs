@@ -152,16 +152,15 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
             // Yalnızca Player layer'ı hariç 
             var layerMask = ~LayerMask.GetMask("Player");
-            
-            return Physics.CapsuleCast(
-                castStart,
-                castStart,
-                radius,
-                Vector3.up,
-                out var hit,
-                checkDistance,
-                layerMask
-            );
+
+            if (Physics.CapsuleCast(castStart, castStart, radius, 
+                    Vector3.up, out var hit, checkDistance, layerMask))
+            {
+                Debug.Log($"<color=orange>Cannot Jump</color>, hit: {hit.collider.name}");
+                return false;
+            }
+
+            return true;
         }
         
         // ---------------------------------------------------------------------------- //

@@ -37,7 +37,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             }
             else if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame && 
                      Ctx.CoyoteTimeCounter > 0f &&
-                     !Ctx.HasObstacleAboveForJump())
+                     Ctx.HasObstacleAboveForJump())
             {
                 SwitchState(Factory.Jump());
             }

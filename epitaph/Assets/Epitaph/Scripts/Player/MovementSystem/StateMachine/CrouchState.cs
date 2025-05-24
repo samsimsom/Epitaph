@@ -166,7 +166,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             if (Physics.SphereCast(castStartPoint, radius, Vector3.up,
                 out var hit, castDistance, ~LayerMask.GetMask("Player")))
             {
-                Debug.Log("Cannot stand up, hit: " + hit.collider.name);
+                Debug.Log($"<color=orange>Cannot stand up</color>, hit: {hit.collider.name}");
                 return false;
             }
             return true;
