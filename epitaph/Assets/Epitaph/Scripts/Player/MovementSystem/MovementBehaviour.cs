@@ -99,11 +99,12 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             // XZ düzleminde hareket (normalize ile hızlı yön değişimlerinde hız kaybı engellenir)
             var moveDirection = new Vector3(AppliedMovementX, 0, AppliedMovementZ);
-            // if (moveDirection.magnitude > 1)
-            //     moveDirection.Normalize();
-
+            
             // Kamera yönüne göre döndür
-            moveDirection = PlayerController.PlayerCamera.transform.TransformDirection(moveDirection);
+            var cam = PlayerController.PlayerCamera.transform;
+            var forward = Vector3.ProjectOnPlane(cam.forward, Vector3.up).normalized;
+            var right = Vector3.ProjectOnPlane(cam.right, Vector3.up).normalized;
+            moveDirection = moveDirection.z * forward + moveDirection.x * right;
 
             // Dikey hızı hareket vektörüne uygula
             moveDirection.y = _verticalVelocity;
@@ -111,7 +112,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             // Hareket uygula
             PlayerController.CharacterController.Move(moveDirection * Time.deltaTime);
 
-            // Yere değerse dikey hızı hafifçe sabitle, böylece character controller'ın "yerde kayma bugı" azalır
+            // Yere değerse dikey hızı hafifçe sabitle, böylece character controller'ın
+            // "yerde kayma bugı" azalır
             if (PlayerController.CharacterController.isGrounded && _verticalVelocity < 0)
             {
                 _verticalVelocity = -1f;
