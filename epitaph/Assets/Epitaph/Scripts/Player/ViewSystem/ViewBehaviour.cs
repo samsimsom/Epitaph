@@ -65,7 +65,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
             PlayerController.CameraTransform.localPosition = finalPosition;
         }
 
-        public void Reset()
+        public void CameraReset()
         {
             _headBobOffset = Vector3.zero;
             _targetHeight = _basePosition.y;
