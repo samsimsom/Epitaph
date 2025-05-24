@@ -57,7 +57,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             {
                 Ctx.IsCrouching = false;
 
-                if (Ctx.PlayerController.PlayerInput.IsMoveInput && Ctx.PlayerController.PlayerInput.IsRunPressed)
+                if (Ctx.PlayerController.PlayerInput.IsMoveInput && 
+                    Ctx.PlayerController.PlayerInput.IsRunPressed)
                 {
                     SwitchState(Factory.Run());
                 }
