@@ -13,10 +13,10 @@ namespace Epitaph.Scripts.Player.ViewSystem
         // Headbob amounts for different movement states
         private static readonly Dictionary<string, float> HeadBobAmounts = new()
         {
-                { "WalkState", 0.02f },
-                { "RunState", 0.03f },
-                { "CrouchState", 0.01f },
-                { "DefaultState", 0.02f }
+                { "WalkState", 0.01f },
+                { "RunState", 0.02f },
+                { "CrouchState", 0.005f },
+                { "DefaultState", 0.01f }
             };
 
         public HeadBob(ViewBehaviour viewBehaviour, PlayerController playerController)

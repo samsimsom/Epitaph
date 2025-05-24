@@ -130,8 +130,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             var gravityMultiplier = _verticalVelocity < 0 ? 1.2f : 1.0f;
             _verticalVelocity -= Gravity * 0.85f * gravityMultiplier * Time.fixedDeltaTime;
             _verticalVelocity = Mathf.Max(_verticalVelocity, TerminalVelocity);
-            
-            Debug.Log(_verticalVelocity);
         }
 
         
