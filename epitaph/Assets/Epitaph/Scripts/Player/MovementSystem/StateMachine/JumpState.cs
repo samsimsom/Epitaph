@@ -18,7 +18,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 return;
             }
             
-            Debug.Log("JUMP: Enter");
+            // Debug.Log("JUMP: Enter");
             
             Ctx.CurrentMovementY = Ctx.JumpForce;
             ApplySpeed();
