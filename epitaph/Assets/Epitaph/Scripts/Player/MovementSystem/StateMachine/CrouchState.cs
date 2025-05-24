@@ -53,7 +53,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         public override void CheckSwitchStates()
         {
             // Çömelmeden çıkma
-            if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame && CanStandUp())
+            if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame && 
+                CanStandUp())
             {
                 Ctx.IsCrouching = false;
 
@@ -74,9 +75,10 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             }
 
             // Çömelirken zıplama
-            if (Ctx.PlayerController.PlayerInput.IsJumpPressed &&
+            if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame &&
                 Ctx.PlayerController.CharacterController.isGrounded && 
-                CanStandUp() && !Ctx.HasObstacleAboveForJump())
+                CanStandUp() && 
+                Ctx.HasObstacleAboveForJump())
             {
                 Ctx.IsCrouching = false;
                 SwitchState(Factory.Jump());
@@ -116,7 +118,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             if (crouch)
             {
                 UpdateCameraHeightSmooth(true);
-                _crouchTransitionCoroutine = Ctx.PlayerController.StartCoroutine(SmoothCrouchTransition(
+                _crouchTransitionCoroutine = Ctx.PlayerController.StartCoroutine(
+                    SmoothCrouchTransition(
                     Ctx.PlayerController.CharacterController.height, Ctx.CrouchHeight,
                     Ctx.PlayerController.CharacterController.center, Ctx.CrouchControllerCenter,
                     Ctx.CrouchTransitionDuration, true));
@@ -126,7 +129,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 if (CanStandUp())
                 {
                     UpdateCameraHeightSmooth(false);
-                    _crouchTransitionCoroutine = Ctx.PlayerController.StartCoroutine(SmoothCrouchTransition(
+                    _crouchTransitionCoroutine = Ctx.PlayerController.StartCoroutine(
+                        SmoothCrouchTransition(
                         Ctx.PlayerController.CharacterController.height, Ctx.NormalHeight,
                         Ctx.PlayerController.CharacterController.center, Ctx.NormalControllerCenter,
                         Ctx.CrouchTransitionDuration, false));

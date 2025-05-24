@@ -73,6 +73,13 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         public override void Update()
         {
+            // Debug.Log("----------------");
+            // Debug.Log($"JUMP BUTTON :{PlayerController.PlayerInput.IsJumpPressedThisFrame}");
+            // Debug.Log($"COYOTE : {CoyoteTimeCounter > 0f}");
+            // Debug.Log($"OBSTACLE : {HasObstacleAboveForJump()}");
+            // Debug.Log($"CAN JUMP : {CanJumpOnCurrentGround()}");
+            // Debug.Log("----------------");
+
             _currentState.UpdateState();
             HandleMovement();
             HandleGravity();
@@ -127,7 +134,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 // Eğer yere yeni değildiysek ve aşağı
                 // yönde hareket ediyorsak hızı sıfırla
                 if (_verticalVelocity < 0)
-                    _verticalVelocity = -1f;
+                    _verticalVelocity = -2.0f;
             }
             else
             {
@@ -165,6 +172,27 @@ namespace Epitaph.Scripts.Player.MovementSystem
             }
 
             return true;
+        }
+        
+        public bool CanJumpOnCurrentGround()
+        {
+            // CharacterController'ın slopeLimit'i degree cinsinden
+            var slopeLimit = PlayerController.CharacterController.slopeLimit;
+    
+            // Ayak noktasından aşağıya doğru kısa bir ray at
+            RaycastHit hit;
+            var origin = PlayerController.CharacterController.transform.position 
+                         + Vector3.up * 0.1f; // Çok hafif yukarıdan başlat
+
+            if (Physics.Raycast(origin, Vector3.down, out hit, 0.5f))
+            {
+                // Yüzey normali ile yukarı vektörü arasındaki açıyı bul
+                var groundAngle = Vector3.Angle(hit.normal, Vector3.up);
+                // Eğer eğim slopeLimit'e eşit veya daha dikse, zıplayamaz
+                return groundAngle <= slopeLimit;
+            }
+            // Raycast boşluğa denk geldiyse, zıplamaya izin verme
+            return false;
         }
         
         // ---------------------------------------------------------------------------- //

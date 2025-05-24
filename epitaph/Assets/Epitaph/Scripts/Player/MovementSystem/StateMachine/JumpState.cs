@@ -10,6 +10,14 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         {
             // Debug.Log("JUMP: Enter");
             
+            // Şimdi zeminin eğimi kontrol ediliyor
+            if (!Ctx.CanJumpOnCurrentGround())
+            {
+                // Eğer eğim fazla ise zıplamayı engelle
+                SwitchState(Factory.Idle());
+                return;
+            }
+
             Ctx.CurrentMovementY = Ctx.JumpForce;
             ApplySpeed();
         }
@@ -20,19 +28,14 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             CheckSwitchStates();
         }
 
-        public override void FixedUpdateState()
-        {
-        }
-
-
+        public override void FixedUpdateState() { }
+        
         public override void ExitState()
         {
             // Debug.Log("JUMP: Exit");
         }
 
-        public override void InitializeSubState()
-        {
-        }
+        public override void InitializeSubState() { }
 
         public override void CheckSwitchStates()
         {
