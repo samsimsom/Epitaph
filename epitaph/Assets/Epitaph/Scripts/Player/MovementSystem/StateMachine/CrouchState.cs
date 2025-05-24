@@ -75,7 +75,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
             // Çömelirken zıplama
             if (Ctx.PlayerController.PlayerInput.IsJumpPressed &&
-                Ctx.PlayerController.CharacterController.isGrounded && CanStandUp())
+                Ctx.PlayerController.CharacterController.isGrounded && 
+                CanStandUp() && !Ctx.HasObstacleAboveForJump())
             {
                 Ctx.IsCrouching = false;
                 SwitchState(Factory.Jump());

@@ -1,5 +1,6 @@
 using Epitaph.Scripts.Player.BaseBehaviour;
 using Epitaph.Scripts.Player.MovementSystem.StateMachine;
+using UnityEditor;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
@@ -138,7 +139,30 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         // ---------------------------------------------------------------------------- //
         
-        
+        // Karakterin üstünde zıplamayı engelleyen bir yüksek engel var mı?
+        public bool HasObstacleAboveForJump()
+        {
+            var controller = PlayerController.CharacterController;
+            var radius = controller.radius;
+            var position = controller.transform.position + controller.center;
+            var height = controller.height;
+            var checkDistance = height * 1.25f - height; // %25 daha yüksek mesafe
+            var castStart = position + Vector3.up * (height / 2f - radius);
+            var castEnd = castStart + Vector3.up * checkDistance;
+
+            // Yalnızca Player layer'ı hariç 
+            var layerMask = ~LayerMask.GetMask("Player");
+
+            return Physics.CapsuleCast(
+                castStart,
+                castStart,
+                radius,
+                Vector3.up,
+                out var hit,
+                checkDistance,
+                layerMask
+            );
+        }
         
         // ---------------------------------------------------------------------------- //
         
@@ -146,7 +170,12 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public override void OnDrawGizmos()
         {
             if (PlayerController.CharacterController == null) return;
+            DrawCharacterControllerGizmo();
+            DrawHasObstacleAboveForJumpGizmo();
+        }
 
+        private void DrawCharacterControllerGizmo()
+        {
             // Renk ve şeffaflık
             Gizmos.color = new Color(0.2f, 0.6f, 1f, 1.0f);
 
@@ -174,6 +203,63 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 + PlayerController.CharacterController.transform.forward * radius);
             Gizmos.DrawLine(top - PlayerController.CharacterController.transform.forward * radius, bottom
                 - PlayerController.CharacterController.transform.forward * radius);
+        }
+
+        private void DrawHasObstacleAboveForJumpGizmo()
+        {
+            // Controller parametreleri
+            var controller = PlayerController.CharacterController;
+            var radius = controller.radius;
+            var position = controller.transform.position + controller.center;
+            var height = controller.height;
+            var checkDistance = height * 1.25f - height; // %25 daha yüksek mesafe
+
+            // Cast başlangıç ve bitiş pozisyonları (HasObstacleAboveForJump() ile aynı)
+            var castStart = position + Vector3.up * (height / 2f - radius);
+            var castEnd = castStart + Vector3.up * checkDistance;
+
+            // Mevcut kapsülü çizer (mavi)
+            Gizmos.color = new Color(0.2f, 0.6f, 1f, 0.6f);
+            DrawWireCapsule(
+                position + Vector3.up * (-(height / 2f - radius)),
+                position + Vector3.up * (height / 2f - radius),
+                radius
+            );
+
+            // Yukarıya yapılacak cast kapsülünü çizer (sarı)
+            Gizmos.color = Color.yellow;
+            DrawWireCapsule(
+                castStart,
+                castStart + Vector3.up * checkDistance,
+                radius
+            );
+
+            // İstenirse çarpışma varsa kırmızı bir nokta gösterebiliriz:
+            var layerMask = ~LayerMask.GetMask("Player");
+            if (Physics.CapsuleCast(
+                    castStart,
+                    castStart,
+                    radius,
+                    Vector3.up,
+                    out var hit,
+                    checkDistance,
+                    layerMask
+                ))
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawSphere(hit.point, 0.06f);
+            }
+        }
+        
+        private void DrawWireCapsule(Vector3 start, Vector3 end, float radius)
+        {
+            // Unity 2020 ve sonrası için kullanışlı bir API yoksa:
+            Handles.DrawWireDisc(start, (end - start).normalized, radius);
+            Handles.DrawWireDisc(end, (end - start).normalized, radius);
+            Handles.DrawLine(start + Vector3.right * radius, end + Vector3.right * radius);
+            Handles.DrawLine(start - Vector3.right * radius, end - Vector3.right * radius);
+            Handles.DrawLine(start + Vector3.forward * radius, end + Vector3.forward * radius);
+            Handles.DrawLine(start - Vector3.forward * radius, end - Vector3.forward * radius);
         }
 #endif
 

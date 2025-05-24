@@ -33,8 +33,9 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             {
                 SwitchState(Factory.Crouch());
             }
-            else if (Ctx.PlayerController.PlayerInput.IsJumpPressed 
-                     && Ctx.CoyoteTimeCounter > 0f)
+            else if (Ctx.PlayerController.PlayerInput.IsJumpPressed && 
+                     Ctx.CoyoteTimeCounter > 0f &&
+                     !Ctx.HasObstacleAboveForJump())
             {
                 SwitchState(Factory.Jump());
             }
