@@ -148,11 +148,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
             var height = controller.height;
             var checkDistance = height * 1.25f - height; // %25 daha yüksek mesafe
             var castStart = position + Vector3.up * (height / 2f - radius);
-            var castEnd = castStart + Vector3.up * checkDistance;
+            // var castEnd = castStart + Vector3.up * checkDistance;
 
             // Yalnızca Player layer'ı hariç 
             var layerMask = ~LayerMask.GetMask("Player");
-
+            
             return Physics.CapsuleCast(
                 castStart,
                 castStart,
@@ -216,7 +216,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
             // Cast başlangıç ve bitiş pozisyonları (HasObstacleAboveForJump() ile aynı)
             var castStart = position + Vector3.up * (height / 2f - radius);
-            var castEnd = castStart + Vector3.up * checkDistance;
+            // var castEnd = castStart + Vector3.up * checkDistance;
 
             // Mevcut kapsülü çizer (mavi)
             Gizmos.color = new Color(0.2f, 0.6f, 1f, 0.6f);
