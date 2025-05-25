@@ -29,11 +29,6 @@ namespace Epitaph.Scripts.Player.ViewSystem
 
         public override void Update()
         {
-            UpdateHeadBob();
-        }
-
-        private void UpdateHeadBob()
-        {
             if (IsPlayerMovingAboveThreshold())
             {
                 UpdateHeadBobAmount();

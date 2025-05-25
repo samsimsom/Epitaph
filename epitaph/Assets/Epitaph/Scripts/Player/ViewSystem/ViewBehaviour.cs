@@ -15,11 +15,17 @@ namespace Epitaph.Scripts.Player.ViewSystem
         public float HeadBobSmooth = 10.0f;
         public float HeadBobThreshold = 1.5f;
         
+        // Crouch Configuration
+        public float CameraTransitonSmooth = 10.0f;
+        
         // Camera Position Management
         private Vector3 _basePosition;
         private Vector3 _headBobOffset = Vector3.zero;
         private float _targetHeight;
         private float _currentHeight;
+        
+        // Random Offset Configuration
+        private Vector3 _randomOffset = Vector3.zero;
         
         // Child Behaviours
         private readonly List<PlayerBehaviour> _viewBehaviours = new();
@@ -29,19 +35,36 @@ namespace Epitaph.Scripts.Player.ViewSystem
         public ViewBehaviour(PlayerController playerController)
             : base(playerController)
         {
-            InitializeBasePositionAndHeight();
+            InitializeCameraBasePosition();
         }
 
-        private void InitializeBasePositionAndHeight()
+        // ---------------------------------------------------------------------------- //
+        
+        #region Camera Position Methods
+        
+        private void OnPreviousEvent()
+        {
+            var random = new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f));;
+            SetRandomHeadBobOffset(random);
+        }
+
+        private void OnNextEvent()
+        {
+            CameraReset();
+        }
+        
+        private void InitializeCameraBasePosition()
         {
             _basePosition = PlayerController.CameraTransform.localPosition;
             _currentHeight = _basePosition.y;
             _targetHeight = _currentHeight;
         }
 
-        // ---------------------------------------------------------------------------- //
-        
-        #region Camera Position Methods
+        public void SetRandomHeadBobOffset(Vector3 offset)
+        {
+            _randomOffset = offset;
+            UpdateCameraPosition();
+        }
 
         public void SetHeadBobOffset(Vector3 offset)
         {
@@ -59,14 +82,14 @@ namespace Epitaph.Scripts.Player.ViewSystem
         {
             // Smooth height transition
             _currentHeight = Mathf.Lerp(_currentHeight, _targetHeight, 
-                Time.deltaTime * 10.0f);
+                Time.deltaTime * CameraTransitonSmooth);
             
             // Combine all effects
             var finalPosition = new Vector3
             {
-                x = _basePosition.x + _headBobOffset.x,
-                y = _currentHeight + _headBobOffset.y,
-                z = _basePosition.z + _headBobOffset.z
+                x = _basePosition.x + _headBobOffset.x + _randomOffset.x,
+                y = _currentHeight + _headBobOffset.y + _randomOffset.y,
+                z = _basePosition.z + _headBobOffset.z + _randomOffset.z
             };
             
             PlayerController.CameraTransform.localPosition = finalPosition;
@@ -75,6 +98,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
         public void CameraReset()
         {
             _headBobOffset = Vector3.zero;
+            _randomOffset = Vector3.zero;
             _targetHeight = _basePosition.y;
             UpdateCameraPosition();
         }
@@ -93,6 +117,8 @@ namespace Epitaph.Scripts.Player.ViewSystem
 
         public override void OnEnable()
         {
+            PlayerController.PlayerInput.OnPreviousEvent += OnPreviousEvent;
+            PlayerController.PlayerInput.OnNextEvent += OnNextEvent;
             foreach (var behaviour in _viewBehaviours) behaviour.OnEnable();
         }
 
@@ -119,6 +145,8 @@ namespace Epitaph.Scripts.Player.ViewSystem
 
         public override void OnDisable()
         {
+            PlayerController.PlayerInput.OnPreviousEvent -= OnPreviousEvent;
+            PlayerController.PlayerInput.OnNextEvent -= OnNextEvent;
             foreach (var behaviour in _viewBehaviours) behaviour.OnDisable();
         }
 
@@ -137,7 +165,6 @@ namespace Epitaph.Scripts.Player.ViewSystem
         #endregion
         
         // ---------------------------------------------------------------------------- //
-
         public void InitializeBehaviours()
         {
             if (PlayerController.CameraTransform != null)
