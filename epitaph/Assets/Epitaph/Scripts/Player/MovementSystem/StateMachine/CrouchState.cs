@@ -75,7 +75,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
             // Çömelirken zıplama
             if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame &&
-                Ctx.IsCustomGrounded && 
+                Ctx.IsGrounded && 
                 CanStandUp() && 
                 Ctx.HasObstacleAboveForJump())
             {

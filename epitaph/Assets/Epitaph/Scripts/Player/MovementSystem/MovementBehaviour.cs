@@ -38,7 +38,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // Getters & Setters
         public BaseState CurrentState { get; set; }
         public bool IsCrouching { get; set; }
-        public bool IsCustomGrounded { get; private set; }
+        public bool IsGrounded { get; private set; }
+        public Vector3 GroundNormal { get; set; }
         
         public Vector3 CapsulVelocity { get; set; }
         public float CurrentSpeed { get; set; }
@@ -74,7 +75,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             HandleMovement();
             
             // Coyote time yönetimi
-            if (IsCustomGrounded)
+            if (IsGrounded)
             {
                 CoyoteTimeCounter = CoyoteTime; // Yere değince yenile
             }
@@ -122,6 +123,13 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         private void HandleGravity()
         {
+            // Eğer yerdeyse ve vertical movement negatifse sıfırla
+            if (IsGrounded && VerticalMovement < 0f)
+            {
+                VerticalMovement = -1.5f;
+                return; // Aşağıdaki yerçekimi uygulaması gereksiz
+            }
+
             var gravityMultiplier = VerticalMovement < 0 ? 1.2f : 1.0f;
             VerticalMovement -= Gravity * 0.85f * gravityMultiplier * Time.fixedDeltaTime;
             VerticalMovement = Mathf.Max(VerticalMovement, TerminalVelocity);
@@ -161,9 +169,88 @@ namespace Epitaph.Scripts.Player.MovementSystem
             var radius = controller.radius;
             var origin = controller.transform.position + controller.center - 
                          Vector3.up * (controller.height / 2f);
-            
             var layerMask = ~LayerMask.GetMask("Player");
-            IsCustomGrounded = Physics.CheckSphere(origin, radius, layerMask);
+            
+            var capsuleGroundCheck = PlayerController.CharacterController.isGrounded;
+            var customGroundCheck = Physics.CheckSphere(origin, radius, layerMask);
+            IsGrounded = customGroundCheck || capsuleGroundCheck;
+            
+            // ------------------------------------------------------------------------ //
+            
+            var rayDistance = controller.radius;
+            var characterBaseWorld = controller.transform.position + controller.center - Vector3.up * (controller.height / 2f);
+            
+            var originLeft = characterBaseWorld + (Vector3.left * controller.radius);
+            var originRight = characterBaseWorld + (Vector3.right * controller.radius);
+            var originFront = characterBaseWorld + (Vector3.forward * controller.radius);
+            var originBack = characterBaseWorld + (Vector3.back * controller.radius);
+            
+            var summedNormals = Vector3.zero;
+            var successfulHits = 0;
+            RaycastHit hitInfo;
+
+            if (TryGroundCheck(originLeft, rayDistance, layerMask, out hitInfo))
+            {
+                summedNormals += hitInfo.normal;
+                successfulHits++;
+            }
+            if (TryGroundCheck(originRight, rayDistance, layerMask, out hitInfo))
+            {
+                summedNormals += hitInfo.normal;
+                successfulHits++;
+            }
+            if (TryGroundCheck(originFront, rayDistance, layerMask, out hitInfo))
+            {
+                summedNormals += hitInfo.normal;
+                successfulHits++;
+            }
+            if (TryGroundCheck(originBack, rayDistance, layerMask, out hitInfo))
+            {
+                summedNormals += hitInfo.normal;
+                successfulHits++;
+            }
+
+            if (successfulHits > 0)
+            {
+                GroundNormal = (summedNormals / successfulHits).normalized;
+            }
+            else
+            {
+                // Eğer hiçbir ışın yere değmiyorsa (veya IsCustomGrounded false ise),
+                // varsayılan olarak dikey normal kullanın.
+                GroundNormal = Vector3.up;
+            }
+
+        }
+
+        private bool TryGroundCheck(Vector3 origin, float rayDistance, LayerMask layerMask, 
+            out RaycastHit hitInfo)
+        {
+            var ray = new Ray(origin, Vector3.down);
+            var groundCheckHits = new RaycastHit[1];
+            
+            var numberOfHits = Physics.RaycastNonAlloc(ray, groundCheckHits, 
+                rayDistance, layerMask);
+
+            if (numberOfHits > 0)
+            {
+                // İlk çarpışma bilgisini out parametresine ata
+                hitInfo = groundCheckHits[0];
+
+                // Debug için ışınları çiz
+                Debug.DrawRay(origin, Vector3.down * hitInfo.distance, Color.green);
+                Debug.DrawRay(hitInfo.point, hitInfo.normal * 0.5f, Color.blue);
+            
+                return true;
+            }
+            else
+            {
+                // Çarpışma yoksa, varsayılan RaycastHit değerini ata ve kırmızı ışın çiz
+                hitInfo = default; // RaycastHit bir struct olduğu için default değeri atanır
+                Debug.DrawRay(origin, Vector3.down * rayDistance, Color.red);
+            
+                return false;
+            }
         }
         
         // ---------------------------------------------------------------------------- //
@@ -182,7 +269,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             if (_myStyle == null)
             {
                 _myStyle = new GUIStyle();
-                _myStyle.fontSize = 16;
+                _myStyle.fontSize = 18;
                 _myStyle.normal.textColor = Color.white;
             }
 
@@ -192,10 +279,14 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 $"Capsul Velocity : {CapsulVelocity}", _myStyle);
             GUI.Label(new Rect(10, 50, 300, 20), 
                 $"Current Movement : {CurrentSpeed:F1}", _myStyle);
+            
             GUI.Label(new Rect(10, 70, 300, 20), 
-                $"Is Grounded Custom: {IsCustomGrounded}", _myStyle);
+                $"Is Grounded Custom: {IsGrounded}", _myStyle);
             GUI.Label(new Rect(10, 90, 300, 20), 
-                $"Is Grounded : {PlayerController.CharacterController.isGrounded}", _myStyle);
+                $"Is Grounded Capsule: {PlayerController.CharacterController.isGrounded}", _myStyle);
+            
+            GUI.Label(new Rect(10, 110, 300, 20), 
+                $"Ground Normal : {GroundNormal}", _myStyle);
         }
 
         private void DrawCharacterControllerGizmo()
@@ -293,7 +384,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             var origin = controller.transform.position + controller.center - 
                          Vector3.up * (controller.height / 2f);
             
-            Gizmos.color = IsCustomGrounded ? Color.green : Color.red;
+            Gizmos.color = IsGrounded ? new Color(0,1,0,0.25f) : 
+                new Color(1,0,0,0.25f);
             Gizmos.DrawWireSphere(origin, radius);
         }
 #endif
