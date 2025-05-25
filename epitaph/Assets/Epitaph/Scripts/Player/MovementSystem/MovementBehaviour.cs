@@ -86,8 +86,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         public override void FixedUpdate()
         {
-            HandleGravity();
             CurrentState.FixedUpdateState();
+            HandleGravity();
         }
 
         // ---------------------------------------------------------------------------- //
@@ -192,6 +192,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 $"Capsul Velocity : {CapsulVelocity}", _myStyle);
             GUI.Label(new Rect(10, 50, 300, 20), 
                 $"Current Movement : {CurrentSpeed:F1}", _myStyle);
+            GUI.Label(new Rect(10, 70, 300, 20), 
+                $"Is Grounded : {IsCustomGrounded}", _myStyle);
         }
 
         private void DrawCharacterControllerGizmo()
