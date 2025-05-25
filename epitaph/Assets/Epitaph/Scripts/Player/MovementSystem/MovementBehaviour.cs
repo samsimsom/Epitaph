@@ -132,7 +132,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             // Eğer yerdeyse ve vertical movement negatifse sıfırla
             if (IsGrounded && VerticalMovement < 0f)
             {
-                VerticalMovement = -1.5f;
+                VerticalMovement = -5.0f;
                 return; // Aşağıdaki yerçekimi uygulaması gereksiz
             }
 
