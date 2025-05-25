@@ -87,8 +87,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         public override void FixedUpdate()
         {
-            CurrentState.FixedUpdateState();
             HandleGravity();
+            CurrentState.FixedUpdateState();
         }
 
         // ---------------------------------------------------------------------------- //
@@ -163,6 +163,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         // ---------------------------------------------------------------------------- //
         
+        // Custom Grounded Check
         private void CheckIsGrounded()
         {
             var controller = PlayerController.CharacterController;
