@@ -71,6 +71,11 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                     SwitchState(Factory.Idle());
                 }
                 return;
+            } else if (!Ctx.PlayerController.PlayerInput.IsMoveInput)
+            {
+                var input = Ctx.PlayerController.PlayerInput.MoveInput;
+                Ctx.AppliedMovementX = input.x * Ctx.CrouchSpeed;
+                Ctx.AppliedMovementZ =input.y * Ctx.CrouchSpeed;
             }
 
             // Çömelirken zıplama
