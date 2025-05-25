@@ -18,6 +18,7 @@ namespace Epitaph.Scripts.Player.BaseBehaviour
         public virtual void OnDisable() { }
         public virtual void OnDestroy() { }
 
+        public virtual void OnGUI() { }
         public virtual void OnDrawGizmos() { }
         
     }

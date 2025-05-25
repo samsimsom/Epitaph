@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Epitaph.Scripts.Player.BaseBehaviour;
 using Epitaph.Scripts.Player.Input;
@@ -103,6 +104,15 @@ namespace Epitaph.Scripts.Player
         }
 
 #if UNITY_EDITOR
+        private void OnGUI()
+        {
+            if (_playerBehaviours == null) return;
+            foreach (var behaviour in _playerBehaviours)
+            {
+                behaviour?.OnGUI();
+            }
+        }
+
         private void OnDrawGizmos()
         {
             if (_playerBehaviours == null) return;

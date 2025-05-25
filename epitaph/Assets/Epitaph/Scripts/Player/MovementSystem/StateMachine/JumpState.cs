@@ -1,4 +1,3 @@
-
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
@@ -10,18 +9,9 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void EnterState()
         {
-            // Şimdi zeminin eğimi kontrol ediliyor
-            // if (!Ctx.CanJumpOnCurrentGround())
-            // {
-            //     // Eğer eğim fazla ise zıplamayı engelle
-            //     SwitchState(Factory.Idle());
-            //     return;
-            // }
-            
             // Debug.Log("JUMP: Enter");
             
-            Ctx.CurrentMovementY = Ctx.JumpForce;
-            ApplySpeed();
+            Ctx.VerticalMovement = Ctx.JumpForce;
         }
 
         public override void UpdateState()
@@ -42,8 +32,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         public override void CheckSwitchStates()
         {
             // Yere değdiğinde ve dikey hız negatif veya sıfıra yakınsa
-            if (Ctx.IsCustomGrounded && 
-                Ctx.CurrentMovementY <= 0)
+            if (Ctx.IsCustomGrounded && Ctx.CapsulVelocity.y <= 0)
             {
                 if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame || 
                     Ctx.IsCrouching)
@@ -66,20 +55,15 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             }
         }
 
-        private void ApplySpeed()
-        {
-            var input = Ctx.PlayerController.PlayerInput.MoveInput;
-            Ctx.AppliedMovementX = input.x * (Ctx.CurrentState is RunState ? Ctx.RunSpeed : Ctx.WalkSpeed);
-            Ctx.AppliedMovementZ = input.y * (Ctx.CurrentState is RunState ? Ctx.RunSpeed : Ctx.WalkSpeed);
-        }
-
         private void HandleAirborneMovement()
         {
-            // Havada bir miktar kontrol sağlamak için
             var input = Ctx.PlayerController.PlayerInput.MoveInput;
             var airControlFactor = Ctx.AirControlFactor;
-            Ctx.AppliedMovementX = input.x * Ctx.WalkSpeed * airControlFactor;
-            Ctx.AppliedMovementZ = input.y * Ctx.WalkSpeed * airControlFactor;
+            
+            Ctx.AppliedMovementX = input.x * (Ctx.CurrentState is RunState ? 
+                Ctx.RunSpeed * airControlFactor : Ctx.WalkSpeed * airControlFactor);
+            Ctx.AppliedMovementZ = input.y * (Ctx.CurrentState is RunState ? 
+                Ctx.RunSpeed * airControlFactor : Ctx.WalkSpeed* airControlFactor);
         }
 
         private void SwitchState(BaseState newState)

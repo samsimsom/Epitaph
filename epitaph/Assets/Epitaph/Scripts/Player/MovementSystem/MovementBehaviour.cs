@@ -7,6 +7,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class MovementBehaviour : PlayerBehaviour
     {
+        private GUIStyle _myStyle;
+        
         // State Variables
         private StateFactory _states;
         
@@ -23,7 +25,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float CoyoteTimeCounter;
 
         public float TerminalVelocity = -10.0f;
-        private float _verticalVelocity;
 
         // Crouch Variables
         public float NormalHeight = 1.8f;
@@ -33,25 +34,18 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float NormalCameraHeight = 1.5f;
         public float CrouchCameraHeight = 0.7f;
         public float CrouchTransitionDuration = 0.2f;
-        
-        // Input Variables
-        private Vector2 _currentMovementInput;
 
         // Getters & Setters
         public BaseState CurrentState { get; set; }
         public bool IsCrouching { get; set; }
-        public Vector3 CurrentVelocity { get; set; }
-        public float CurrentMovementY
-        {
-            get => _verticalVelocity;
-            set => _verticalVelocity = value;
-        }
+        public bool IsCustomGrounded { get; private set; }
+        
+        public Vector3 CapsulVelocity { get; set; }
+        public float CurrentSpeed { get; set; }
+        public float VerticalMovement { get; set; }
+
         public float AppliedMovementX { get; set; }
         public float AppliedMovementZ { get; set; }
-
-        // Sınıfın değişkenler bölümüne ekleyin
-        public bool IsCustomGrounded { get; private set; }
-        public float GroundCheckDistance = 0.2f;
 
         // ---------------------------------------------------------------------------- //
         
@@ -75,7 +69,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // Update metodunda çağırın
         public override void Update()
         {
-            IsCustomGrounded = CheckIsGrounded();
+            CheckIsGrounded();
             CurrentState.UpdateState();
             HandleMovement();
             
@@ -116,20 +110,21 @@ namespace Epitaph.Scripts.Player.MovementSystem
             moveDirection = moveDirection.z * forward + moveDirection.x * right;
             
             // Dikey hızı hareket vektörüne uygula
-            moveDirection.y = _verticalVelocity;
+            moveDirection.y = VerticalMovement;
 
             // Hareket uygula
             PlayerController.CharacterController.Move(moveDirection * Time.deltaTime);
             
             // Update CurrentVelocity
-            CurrentVelocity = PlayerController.CharacterController.velocity;
+            CapsulVelocity = PlayerController.CharacterController.velocity;
+            CurrentSpeed = CapsulVelocity.magnitude;
         }
 
         private void HandleGravity()
         {
-            var gravityMultiplier = _verticalVelocity < 0 ? 1.2f : 1.0f;
-            _verticalVelocity -= Gravity * 0.85f * gravityMultiplier * Time.fixedDeltaTime;
-            _verticalVelocity = Mathf.Max(_verticalVelocity, TerminalVelocity);
+            var gravityMultiplier = VerticalMovement < 0 ? 1.2f : 1.0f;
+            VerticalMovement -= Gravity * 0.85f * gravityMultiplier * Time.fixedDeltaTime;
+            VerticalMovement = Mathf.Max(VerticalMovement, TerminalVelocity);
         }
 
         
@@ -160,7 +155,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         // ---------------------------------------------------------------------------- //
         
-        private bool CheckIsGrounded()
+        private void CheckIsGrounded()
         {
             var controller = PlayerController.CharacterController;
             var radius = controller.radius;
@@ -168,7 +163,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
                          Vector3.up * (controller.height / 2f);
             
             var layerMask = ~LayerMask.GetMask("Player");
-            return Physics.CheckSphere(origin, radius, layerMask);
+            IsCustomGrounded = Physics.CheckSphere(origin, radius, layerMask);
         }
         
         // ---------------------------------------------------------------------------- //
@@ -180,6 +175,23 @@ namespace Epitaph.Scripts.Player.MovementSystem
             DrawCharacterControllerGizmo();
             DrawHasObstacleAboveForJumpGizmo();
             DrawCheckIsGroundedGizmo();
+        }
+
+        public override void OnGUI()
+        {
+            if (_myStyle == null)
+            {
+                _myStyle = new GUIStyle();
+                _myStyle.fontSize = 16;
+                _myStyle.normal.textColor = Color.white;
+            }
+
+            GUI.Label(new Rect(10, 10, 300, 20), 
+                $"Vertical Movement : {VerticalMovement:F1}", _myStyle);
+            GUI.Label(new Rect(10, 30, 300, 20), 
+                $"Capsul Velocity : {CapsulVelocity}", _myStyle);
+            GUI.Label(new Rect(10, 50, 300, 20), 
+                $"Current Movement : {CurrentSpeed:F1}", _myStyle);
         }
 
         private void DrawCharacterControllerGizmo()
@@ -277,7 +289,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             var origin = controller.transform.position + controller.center - 
                          Vector3.up * (controller.height / 2f);
             
-            Gizmos.color = Color.red;
+            Gizmos.color = IsCustomGrounded ? Color.green : Color.red;
             Gizmos.DrawWireSphere(origin, radius);
         }
 #endif
