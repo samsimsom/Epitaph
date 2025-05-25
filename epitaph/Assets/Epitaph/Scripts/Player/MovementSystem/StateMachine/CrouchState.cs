@@ -101,8 +101,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         private void HandleMovementInput()
         {
             var input = Ctx.PlayerController.PlayerInput.MoveInput;
-            // Ctx.AppliedMovementX = input.x * Ctx.CrouchSpeed;
-            // Ctx.AppliedMovementZ = input.y * Ctx.CrouchSpeed;
             Ctx.AppliedMovementX = Mathf.Lerp(Ctx.AppliedMovementX, input.x * Ctx.CrouchSpeed, 0.1f);
             Ctx.AppliedMovementZ = Mathf.Lerp(Ctx.AppliedMovementZ, input.y * Ctx.CrouchSpeed, 0.1f);
         }
@@ -128,38 +126,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
     
             Ctx.IsCrouching = crouch;
         }
-        
-        // private void TransitionCrouchState(bool crouch)
-        // {
-        //     if (_crouchTransitionCoroutine != null)
-        //         Ctx.PlayerController.StopCoroutine(_crouchTransitionCoroutine);
-        //
-        //     if (crouch)
-        //     {
-        //         UpdateCameraHeightSmooth(true);
-        //         _crouchTransitionCoroutine = Ctx.PlayerController.StartCoroutine(
-        //             SmoothCrouchTransition(
-        //             Ctx.PlayerController.CharacterController.height, Ctx.CrouchHeight,
-        //             Ctx.PlayerController.CharacterController.center, Ctx.CrouchControllerCenter,
-        //             Ctx.CrouchTransitionDuration, true));
-        //     }
-        //     else
-        //     {
-        //         if (CanStandUp())
-        //         {
-        //             UpdateCameraHeightSmooth(false);
-        //             _crouchTransitionCoroutine = Ctx.PlayerController.StartCoroutine(
-        //                 SmoothCrouchTransition(
-        //                 Ctx.PlayerController.CharacterController.height, Ctx.NormalHeight,
-        //                 Ctx.PlayerController.CharacterController.center, Ctx.NormalControllerCenter,
-        //                 Ctx.CrouchTransitionDuration, false));
-        //         }
-        //         else
-        //         {
-        //             UpdateCameraHeightSmooth(true);
-        //         }
-        //     }
-        // }
 
         private void UpdateCameraHeightSmooth(bool crouch)
         {
@@ -194,29 +160,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         #endregion
 
-        // ---------------------------------------------------------------------------- //
-        
-        #region Coroutines
-
-        private IEnumerator SmoothCrouchTransition(float fromHeight, float toHeight,
-            Vector3 fromCenter, Vector3 toCenter, float duration, bool crouching)
-        {
-            var elapsed = 0f;
-            while (elapsed < duration)
-            {
-                var t = elapsed / duration;
-                Ctx.PlayerController.CharacterController.height = Mathf.Lerp(fromHeight, toHeight, t);
-                Ctx.PlayerController.CharacterController.center = Vector3.Lerp(fromCenter, toCenter, t);
-                elapsed += Time.deltaTime;
-                yield return null;
-            }
-            Ctx.PlayerController.CharacterController.height = toHeight;
-            Ctx.PlayerController.CharacterController.center = toCenter;
-            Ctx.IsCrouching = crouching;
-        }
-
-        #endregion
-        
         // ---------------------------------------------------------------------------- //
         
     }

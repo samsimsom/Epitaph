@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Epitaph.Scripts.Player.BaseBehaviour;
 using Epitaph.Scripts.Player.Input;
@@ -139,7 +138,8 @@ namespace Epitaph.Scripts.Player
         {
             ViewBehaviour = AddBehaviour(new ViewBehaviour(this));
             MovementBehaviour = AddBehaviour(new MovementBehaviour(this));
-            LockCursor();
+            
+            LockCursor(); // TODO: Remove this line
         }
 
         #endregion

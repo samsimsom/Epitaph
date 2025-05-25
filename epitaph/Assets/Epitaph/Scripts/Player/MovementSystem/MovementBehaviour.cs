@@ -7,8 +7,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class MovementBehaviour : PlayerBehaviour
     {
-        private GUIStyle _myStyle;
-        
         // State Variables
         private StateFactory _states;
         
@@ -21,25 +19,25 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float JumpForce = 5.0f;
         public float AirControlFactor = 1.5f;
         public float Gravity = 20.0f;
-        public float CoyoteTime = 0.2f; // Saniye cinsinden coyote süresi
+        public float CoyoteTime = 0.2f;
         public float CoyoteTimeCounter;
 
-        public float TerminalVelocity = -10.0f;
+        // Gravity Variables
+        public float VerticalMovementLimit = -10.0f;
 
         // Crouch Variables
         public float NormalHeight = 1.8f;
         public float CrouchHeight = 0.9f;
-        public Vector3 NormalControllerCenter = new(0, 0.9f, 0);
-        public Vector3 CrouchControllerCenter = new(0, 0.45f, 0);
         public float NormalCameraHeight = 1.5f;
         public float CrouchCameraHeight = 0.7f;
-        public float CrouchTransitionDuration = 0.2f;
+        public Vector3 NormalControllerCenter = new(0, 0.9f, 0);
+        public Vector3 CrouchControllerCenter = new(0, 0.45f, 0);
 
         // Getters & Setters
         public BaseState CurrentState { get; set; }
         public bool IsCrouching { get; set; }
         public bool IsGrounded { get; private set; }
-        public Vector3 GroundNormal { get; set; }
+        public Vector3 GroundNormal { get; private set; }
         
         public Vector3 CapsulVelocity { get; set; }
         public float CurrentSpeed { get; set; }
@@ -47,6 +45,12 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public float AppliedMovementX { get; set; }
         public float AppliedMovementZ { get; set; }
+
+        #region Gizmo & GUI Variables
+
+        private GUIStyle _myStyle;
+
+        #endregion
 
         // ---------------------------------------------------------------------------- //
         
@@ -134,7 +138,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
             var gravityMultiplier = VerticalMovement < 0 ? 1.2f : 1.0f;
             VerticalMovement -= Gravity * 0.85f * gravityMultiplier * Time.fixedDeltaTime;
-            VerticalMovement = Mathf.Max(VerticalMovement, TerminalVelocity);
+            VerticalMovement = Mathf.Max(VerticalMovement, VerticalMovementLimit);
         }
 
         
@@ -290,6 +294,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
             
             GUI.Label(new Rect(10, 110, 300, 20), 
                 $"Ground Normal : {GroundNormal}", _myStyle);
+            
+            GUI.Label(new Rect(10, 130, 300, 20), 
+                $"Movement State : {CurrentState.StateName}", _myStyle);
         }
 
         private void DrawCharacterControllerGizmo()

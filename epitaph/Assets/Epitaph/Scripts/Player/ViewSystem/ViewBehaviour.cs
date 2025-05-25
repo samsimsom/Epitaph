@@ -11,7 +11,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
         
         // Head Bob Configuration
         public float HeadBobAmount = 0.02f;
-        public float HeadBobFrequency = 10.0f;
+        public float HeadBobFrequency = 7.5f;
         public float HeadBobSmooth = 10.0f;
         public float HeadBobThreshold = 1.5f;
         
@@ -142,7 +142,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
             if (PlayerController.CameraTransform != null)
             {
                 // PlayerLook = AddViewBehaviour(new PlayerLook()); 
-                // HeadBob = AddViewBehaviour(new HeadBob(this, PlayerController));
+                HeadBob = AddViewBehaviour(new HeadBob(this, PlayerController));
             }
             else
             {
