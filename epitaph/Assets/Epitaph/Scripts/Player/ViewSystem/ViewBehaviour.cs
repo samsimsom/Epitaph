@@ -142,7 +142,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
             if (PlayerController.CameraTransform != null)
             {
                 // PlayerLook = AddViewBehaviour(new PlayerLook()); 
-                HeadBob = AddViewBehaviour(new HeadBob(this, PlayerController));
+                // HeadBob = AddViewBehaviour(new HeadBob(this, PlayerController));
             }
             else
             {

@@ -19,7 +19,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         // Jump Variables
         public float JumpForce = 5.0f;
-        public float AirControlFactor = 1.25f;
+        public float AirControlFactor = 1.5f;
         public float Gravity = 20.0f;
         public float CoyoteTime = 0.2f; // Saniye cinsinden coyote süresi
         public float CoyoteTimeCounter;
@@ -106,8 +106,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
             
             // Kamera yönüne göre döndür
             var cam = PlayerController.PlayerCamera.transform;
-            var forward = Vector3.ProjectOnPlane(cam.forward, Vector3.up).normalized;
-            var right = Vector3.ProjectOnPlane(cam.right, Vector3.up).normalized;
+            var forward = Vector3.ProjectOnPlane(cam.forward, 
+                Vector3.up).normalized;
+            var right = Vector3.ProjectOnPlane(cam.right, 
+                Vector3.up).normalized;
             moveDirection = moveDirection.z * forward + moveDirection.x * right;
             
             // Dikey hızı hareket vektörüne uygula
