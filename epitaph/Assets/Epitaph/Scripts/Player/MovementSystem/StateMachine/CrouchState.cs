@@ -100,6 +100,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         // ---------------------------------------------------------------------------- //
         
         // ---------------------------------------------------------------------------- //
+        
         #region Input Handling
 
         private void HandleMovementInput()
@@ -136,6 +137,15 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             var targetY = crouch ? Ctx.CrouchCameraHeight : Ctx.NormalCameraHeight;
             
             // ViewBehaviour üzerinden kamera yüksekliğini ayarla
+            var viewBehaviour = Ctx.PlayerController.ViewBehaviour;
+
+            if (viewBehaviour == null)
+            {
+                Debug.LogError($"PlayerController ViewBehaviour is null in CrouchState. " +
+                               $"UpdateCameraHeightSmooth | {viewBehaviour}");
+                return;
+            }
+            
             Ctx.PlayerController.ViewBehaviour.SetCameraHeight(targetY);
         }
 

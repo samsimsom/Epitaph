@@ -58,7 +58,8 @@ namespace Epitaph.Scripts.Player.ViewSystem
         public void UpdateCameraPosition()
         {
             // Smooth height transition
-            _currentHeight = Mathf.Lerp(_currentHeight, _targetHeight, Time.deltaTime * 10.0f);
+            _currentHeight = Mathf.Lerp(_currentHeight, _targetHeight, 
+                Time.deltaTime * 10.0f);
             
             // Combine all effects
             var finalPosition = new Vector3
