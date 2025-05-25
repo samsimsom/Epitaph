@@ -111,35 +111,53 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         private void TransitionCrouchState(bool crouch)
         {
-            if (_crouchTransitionCoroutine != null)
-                Ctx.PlayerController.StopCoroutine(_crouchTransitionCoroutine);
-
+            UpdateCameraHeightSmooth(crouch);
+    
             if (crouch)
             {
-                UpdateCameraHeightSmooth(true);
-                _crouchTransitionCoroutine = Ctx.PlayerController.StartCoroutine(
-                    SmoothCrouchTransition(
-                    Ctx.PlayerController.CharacterController.height, Ctx.CrouchHeight,
-                    Ctx.PlayerController.CharacterController.center, Ctx.CrouchControllerCenter,
-                    Ctx.CrouchTransitionDuration, true));
+                Ctx.PlayerController.CharacterController.height = Ctx.CrouchHeight;
+                Ctx.PlayerController.CharacterController.center = Ctx.CrouchControllerCenter;
             }
-            else
+            else if (CanStandUp())
             {
-                if (CanStandUp())
-                {
-                    UpdateCameraHeightSmooth(false);
-                    _crouchTransitionCoroutine = Ctx.PlayerController.StartCoroutine(
-                        SmoothCrouchTransition(
-                        Ctx.PlayerController.CharacterController.height, Ctx.NormalHeight,
-                        Ctx.PlayerController.CharacterController.center, Ctx.NormalControllerCenter,
-                        Ctx.CrouchTransitionDuration, false));
-                }
-                else
-                {
-                    UpdateCameraHeightSmooth(true);
-                }
+                Ctx.PlayerController.CharacterController.height = Ctx.NormalHeight;
+                Ctx.PlayerController.CharacterController.center = Ctx.NormalControllerCenter;
             }
+    
+            Ctx.IsCrouching = crouch;
         }
+        
+        // private void TransitionCrouchState(bool crouch)
+        // {
+        //     if (_crouchTransitionCoroutine != null)
+        //         Ctx.PlayerController.StopCoroutine(_crouchTransitionCoroutine);
+        //
+        //     if (crouch)
+        //     {
+        //         UpdateCameraHeightSmooth(true);
+        //         _crouchTransitionCoroutine = Ctx.PlayerController.StartCoroutine(
+        //             SmoothCrouchTransition(
+        //             Ctx.PlayerController.CharacterController.height, Ctx.CrouchHeight,
+        //             Ctx.PlayerController.CharacterController.center, Ctx.CrouchControllerCenter,
+        //             Ctx.CrouchTransitionDuration, true));
+        //     }
+        //     else
+        //     {
+        //         if (CanStandUp())
+        //         {
+        //             UpdateCameraHeightSmooth(false);
+        //             _crouchTransitionCoroutine = Ctx.PlayerController.StartCoroutine(
+        //                 SmoothCrouchTransition(
+        //                 Ctx.PlayerController.CharacterController.height, Ctx.NormalHeight,
+        //                 Ctx.PlayerController.CharacterController.center, Ctx.NormalControllerCenter,
+        //                 Ctx.CrouchTransitionDuration, false));
+        //         }
+        //         else
+        //         {
+        //             UpdateCameraHeightSmooth(true);
+        //         }
+        //     }
+        // }
 
         private void UpdateCameraHeightSmooth(bool crouch)
         {
