@@ -13,19 +13,24 @@ namespace Epitaph.Scripts.Player.ViewSystem
         // Headbob amounts for different movement states
         private static readonly Dictionary<string, float> HeadBobAmounts = new()
         {
-                { "WalkState", 0.01f },
-                { "RunState", 0.02f },
-                { "CrouchState", 0.005f },
-                { "DefaultState", 0.01f }
-            };
+            { "WalkState", 0.02f },
+            { "RunState", 0.03f },
+            { "CrouchState", 0.01f },
+            { "DefaultState", 0.01f }
+        };
+
+        // Constants for HeadBob calculations
+        private const float VerticalBobMultiplier = 1.4f;
+        private const float HorizontalBobMultiplier = 1.6f;
+        private const float BobInterpolationSpeed = 15f;
+        private const float ResetSpeedMultiplier = 2f;
+        private const float MinOffsetMagnitudeToZero = 0.001f;
 
         public HeadBob(ViewBehaviour viewBehaviour, PlayerController playerController)
             : base(playerController)
         {
             _viewBehaviour = viewBehaviour;
         }
-
-        public override void Start() { }
 
         public override void Update()
         {
@@ -59,18 +64,30 @@ namespace Epitaph.Scripts.Player.ViewSystem
         
         private void CalculateHeadBobOffset()
         {
-            _headBobOffset = Vector3.zero;
-            
             var time = Time.time;
+
             var frequency = _viewBehaviour.HeadBobFrequency;
             var amount = _viewBehaviour.HeadBobAmount;
-            
-            // Calculate vertical and horizontal bob
-            var verticalBob = Mathf.Sin(time * frequency) * amount * 1.4f;
-            var horizontalBob = Mathf.Cos(time * frequency / 2f) * amount * 1.6f;
-            
-            _headBobOffset.y = verticalBob;
-            _headBobOffset.x = horizontalBob;
+
+            var targetVerticalBob = 0f;
+            var targetHorizontalBob = 0f;
+
+            // Calculate bobbing only if amount and frequency are meaningful
+            if (amount > Mathf.Epsilon && frequency > Mathf.Epsilon)
+            {
+                // Calculate vertical and horizontal bobbing
+                targetVerticalBob = Mathf.Sin(time * frequency) * amount * VerticalBobMultiplier;
+                targetHorizontalBob = Mathf.Cos(time * frequency / 2f) * amount * HorizontalBobMultiplier;
+            }
+            // If amount or frequency is zero, targetVerticalBob and targetHorizontalBob will remain 0,
+            // allowing the head bob to smoothly return to center.
+
+            // Create the target head bob offset
+            var currentTargetBobOffset = new Vector3(targetHorizontalBob, targetVerticalBob, 0f);
+
+            // Smoothly interpolate the current _headBobOffset towards the calculated target
+            _headBobOffset = Vector3.Lerp(_headBobOffset, currentTargetBobOffset,
+                Time.deltaTime * BobInterpolationSpeed);
         }
 
         private void UpdateHeadBobAmount()
@@ -89,15 +106,15 @@ namespace Epitaph.Scripts.Player.ViewSystem
 
         private void ResetHeadBobOffset()
         {
-            var resetSpeed = _viewBehaviour.HeadBobSmooth * 2f * Time.deltaTime;
+            var resetSpeed = _viewBehaviour.HeadBobSmooth * ResetSpeedMultiplier * 
+                             Time.deltaTime;
             _headBobOffset = Vector3.Lerp(_headBobOffset, Vector3.zero, resetSpeed);
             
             // Zero out very small values to prevent tiny oscillations
-            if (_headBobOffset.magnitude < 0.001f)
+            if (_headBobOffset.magnitude < MinOffsetMagnitudeToZero)
             {
                 _headBobOffset = Vector3.zero;
             }
         }
-        
     }
 }
