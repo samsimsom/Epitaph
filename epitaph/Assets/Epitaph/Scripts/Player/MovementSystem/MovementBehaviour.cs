@@ -34,7 +34,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public Vector3 CrouchControllerCenter = new(0, 0.45f, 0);
 
         // Getters & Setters
-        public BaseState CurrentState { get; set; }
+        public StateBase Current { get; set; }
         public bool IsCrouching { get; set; }
         public bool IsGrounded { get; private set; }
         public Vector3 GroundNormal { get; private set; }
@@ -56,8 +56,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public override void Awake()
         {
             _states = new StateFactory(this);
-            CurrentState = _states.Idle();
-            CurrentState.EnterState();
+            Current = _states.Idle();
+            Current.EnterState();
         }
 
         public override void Start()
@@ -69,7 +69,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public override void Update()
         {
             CheckIsGrounded();
-            CurrentState.UpdateState();
+            Current.UpdateState();
             HandleMovement();
             
             // Coyote time yönetimi
@@ -86,7 +86,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public override void FixedUpdate()
         {
             HandleGravity();
-            CurrentState.FixedUpdateState();
+            Current.FixedUpdateState();
         }
 
         // ---------------------------------------------------------------------------- //
@@ -178,8 +178,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
             
             // ------------------------------------------------------------------------ //
             
-            var rayDistance = controller.radius;
-            var characterBaseWorld = controller.transform.position + controller.center - Vector3.up * (controller.height / 2f);
+            // TODO : Bu hesaplari yenidne yap kesin daha basiti vardir :)
+            var rayDistance = controller.radius * 2f;
+            var characterBaseWorld = controller.transform.position + controller.center - Vector3.up * (controller.height / 3f);
             
             var originLeft = characterBaseWorld + (Vector3.left * controller.radius);
             var originRight = characterBaseWorld + (Vector3.right * controller.radius);

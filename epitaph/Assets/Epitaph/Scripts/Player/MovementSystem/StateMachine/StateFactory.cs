@@ -9,11 +9,11 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             _context = currentContext;
         }
 
-        public BaseState Idle() => new IdleState(_context, this);
-        public BaseState Walk() => new WalkState(_context, this);
-        public BaseState Run() => new RunState(_context, this);
-        public BaseState Jump() => new JumpState(_context, this);
-        public BaseState Crouch() => new CrouchState(_context, this);
+        public StateBase Idle() => new Idle(_context, this);
+        public StateBase Walk() => new Walk(_context, this);
+        public StateBase Run() => new Run(_context, this);
+        public StateBase Jump() => new Jump(_context, this);
+        public StateBase Crouch() => new Crouch(_context, this);
         
         // Gelecekte eklenebilecek diğer state'ler için metotlar...
     }

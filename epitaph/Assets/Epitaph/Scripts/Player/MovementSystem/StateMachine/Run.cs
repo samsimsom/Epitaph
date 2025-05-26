@@ -2,14 +2,14 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 {
-    public class WalkState : BaseState
+    public class Run : StateBase
     {
-        public WalkState(MovementBehaviour currentContext, StateFactory stateFactory) 
+        public Run(MovementBehaviour currentContext, StateFactory stateFactory) 
             : base(currentContext, stateFactory) { }
-
+        
         public override void EnterState()
         {
-            // Debug.Log("WALK: Enter");
+            // Debug.Log("RUN: Enter");
         }
 
         public override void UpdateState()
@@ -17,12 +17,12 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             HandleMovementInput();
             CheckSwitchStates();
         }
-        
         public override void FixedUpdateState() { }
-        
+
+
         public override void ExitState()
         {
-            // Debug.Log("WALK: Exit");
+            // Debug.Log("RUN: Exit");
         }
 
         public override void InitializeSubState() { }
@@ -43,25 +43,28 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             {
                 SwitchState(Factory.Idle());
             }
-            else if (Ctx.PlayerController.PlayerInput.IsMoveInput && 
-                     Ctx.PlayerController.PlayerInput.IsRunPressed)
+            else if (Ctx.PlayerController.PlayerInput.IsMoveInput 
+                     && !Ctx.PlayerController.PlayerInput.IsRunPressed)
             {
-                SwitchState(Factory.Run());
+                SwitchState(Factory.Walk());
             }
         }
 
         private void HandleMovementInput()
         {
             var input = Ctx.PlayerController.PlayerInput.MoveInput;
-            Ctx.AppliedMovementX = Mathf.Lerp(Ctx.AppliedMovementX, input.x * Ctx.WalkSpeed, 0.1f);
-            Ctx.AppliedMovementZ = Mathf.Lerp(Ctx.AppliedMovementZ, input.y * Ctx.WalkSpeed, 0.1f);
+            // Ctx.AppliedMovementX = input.x * Ctx.RunSpeed;
+            // Ctx.AppliedMovementZ = input.y * Ctx.RunSpeed;
+
+            Ctx.AppliedMovementX = Mathf.Lerp(Ctx.AppliedMovementX, input.x * Ctx.RunSpeed, 0.1f);
+            Ctx.AppliedMovementZ = Mathf.Lerp(Ctx.AppliedMovementZ, input.y * Ctx.RunSpeed, 0.1f);
         }
 
-        private void SwitchState(BaseState newState)
+        private void SwitchState(StateBase @new)
         {
             ExitState();
-            newState.EnterState();
-            Ctx.CurrentState = newState;
+            @new.EnterState();
+            Ctx.Current = @new;
         }
     }
 }

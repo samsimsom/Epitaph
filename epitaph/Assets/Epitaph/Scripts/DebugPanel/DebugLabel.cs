@@ -38,7 +38,7 @@ namespace Epitaph.Scripts.DebugPanel
                 $"Ground Normal : {playerController.MovementBehaviour.GroundNormal}", _labelStyle);
             
             GUI.Label(new Rect(10, 150, 300, 20), 
-                $"Movement State : {playerController.MovementBehaviour.CurrentState.StateName}", _labelStyle);
+                $"Movement State : {playerController.MovementBehaviour.Current.StateName}", _labelStyle);
         }
     }
 }

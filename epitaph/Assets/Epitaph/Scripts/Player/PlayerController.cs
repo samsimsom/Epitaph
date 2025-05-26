@@ -4,6 +4,7 @@ using Epitaph.Scripts.Player.BaseBehaviour;
 using Epitaph.Scripts.Player.InteractionSystem;
 using Epitaph.Scripts.Player.MovementSystem;
 using Epitaph.Scripts.Player.ViewSystem;
+using Epitaph.Scripts.Player.VitalSystem;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player
@@ -31,6 +32,7 @@ namespace Epitaph.Scripts.Player
         public MovementBehaviour MovementBehaviour { get; private set; }
         public ViewBehaviour ViewBehaviour { get; private set; }
         public InteractionBehaviour InteractionBehaviour { get; private set; }
+        public VitalBehaviour VitalBehaviour { get; private set; }
 
         #endregion
         
@@ -141,6 +143,7 @@ namespace Epitaph.Scripts.Player
             ViewBehaviour = AddBehaviour(new ViewBehaviour(this));
             MovementBehaviour = AddBehaviour(new MovementBehaviour(this));
             InteractionBehaviour = AddBehaviour(new InteractionBehaviour(this));
+            VitalBehaviour = AddBehaviour(new VitalBehaviour(this));
         }
 
         #endregion

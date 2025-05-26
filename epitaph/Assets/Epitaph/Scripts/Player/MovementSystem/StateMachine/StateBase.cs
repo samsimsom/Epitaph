@@ -1,13 +1,14 @@
 namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 {
-    public abstract class BaseState
+    public abstract class StateBase
     {
         public string StateName => GetType().Name;
         
         protected MovementBehaviour Ctx;
         protected StateFactory Factory;
 
-        public BaseState(MovementBehaviour currentContext, StateFactory stateFactory)
+        public StateBase(MovementBehaviour currentContext, 
+            StateFactory stateFactory)
         {
             Ctx = currentContext;
             Factory = stateFactory;
@@ -17,6 +18,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         
         public virtual void UpdateState() {  }
         public virtual void FixedUpdateState() {  }
+        public virtual void LateUpdateState() {  }
         
         public virtual void ExitState() {  }
         

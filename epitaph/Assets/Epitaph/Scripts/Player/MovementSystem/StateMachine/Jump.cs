@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 {
-    public class JumpState : BaseState
+    public class Jump : StateBase
     {
-        public JumpState(MovementBehaviour currentContext, StateFactory stateFactory) 
+        public Jump(MovementBehaviour currentContext, StateFactory stateFactory) 
             : base(currentContext, stateFactory) { }
 
         public override void EnterState()
@@ -60,17 +60,17 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             var input = Ctx.PlayerController.PlayerInput.MoveInput;
             var airControlFactor = Ctx.AirControlFactor;
             
-            Ctx.AppliedMovementX = input.x * (Ctx.CurrentState is RunState ? 
+            Ctx.AppliedMovementX = input.x * (Ctx.Current is Run ? 
                 Ctx.RunSpeed * airControlFactor : Ctx.WalkSpeed * airControlFactor);
-            Ctx.AppliedMovementZ = input.y * (Ctx.CurrentState is RunState ? 
+            Ctx.AppliedMovementZ = input.y * (Ctx.Current is Run ? 
                 Ctx.RunSpeed * airControlFactor : Ctx.WalkSpeed* airControlFactor);
         }
 
-        private void SwitchState(BaseState newState)
+        private void SwitchState(StateBase @new)
         {
             ExitState();
-            newState.EnterState();
-            Ctx.CurrentState = newState;
+            @new.EnterState();
+            Ctx.Current = @new;
         }
     }
 }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 {
-    public class CrouchState : BaseState
+    public class Crouch : StateBase
     {
         #region Fields
 
@@ -13,7 +13,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         #region Constructor
 
-        public CrouchState(MovementBehaviour currentContext, StateFactory stateFactory)
+        public Crouch(MovementBehaviour currentContext, StateFactory stateFactory)
             : base(currentContext, stateFactory) { }
 
         #endregion
@@ -88,11 +88,11 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             }
         }
 
-        private void SwitchState(BaseState newState)
+        private void SwitchState(StateBase @new)
         {
             ExitState();
-            newState.EnterState();
-            Ctx.CurrentState = newState;
+            @new.EnterState();
+            Ctx.Current = @new;
         }
 
         #endregion
