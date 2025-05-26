@@ -21,12 +21,15 @@ namespace Epitaph.Scripts.Player.Input
         public bool IsRunPressed { get; private set; }
         
         private PlayerInputActions _playerInputActions;
+        private PlayerController _playerController;
 
         private void Awake()
         {
             if (_playerInputActions != null) return;
             _playerInputActions = new PlayerInputActions();
             _playerInputActions.Player.SetCallbacks(this);
+            
+            _playerController = GetComponent<PlayerController>();
         }
 
         private void LateUpdate()
@@ -82,7 +85,10 @@ namespace Epitaph.Scripts.Player.Input
 
         public void OnInteract(InputAction.CallbackContext context)
         {
-            
+            if (context.performed)
+            {
+                _playerController.InteractionBehaviour.TryInteract();
+            }
         }
 
         public void OnCrouch(InputAction.CallbackContext context)
