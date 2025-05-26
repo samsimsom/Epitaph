@@ -276,7 +276,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             if (_myStyle == null)
             {
                 _myStyle = new GUIStyle();
-                _myStyle.fontSize = 18;
+                _myStyle.fontSize = 20;
                 _myStyle.normal.textColor = Color.white;
             }
 

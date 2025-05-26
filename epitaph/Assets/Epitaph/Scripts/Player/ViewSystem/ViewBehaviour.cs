@@ -7,6 +7,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
     public class ViewBehaviour : PlayerBehaviour
     {
         // Properties
+        public Look Look { get; private set; }
         public HeadBob HeadBob { get; private set; }
         
         // Head Bob Configuration
@@ -154,7 +155,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
         {
             if (PlayerController.CameraTransform != null)
             {
-                // PlayerLook = AddViewBehaviour(new PlayerLook()); 
+                Look = AddViewBehaviour(new Look(this, PlayerController));
                 HeadBob = AddViewBehaviour(new HeadBob(this, PlayerController));
             }
             else

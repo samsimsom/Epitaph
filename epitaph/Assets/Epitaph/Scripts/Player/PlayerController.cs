@@ -141,18 +141,11 @@ namespace Epitaph.Scripts.Player
             ViewBehaviour = AddBehaviour(new ViewBehaviour(this));
             MovementBehaviour = AddBehaviour(new MovementBehaviour(this));
             InteractionBehaviour = AddBehaviour(new InteractionBehaviour(this));
-            
-            LockCursor(); // TODO: Remove this line
         }
 
         #endregion
         
         // ---------------------------------------------------------------------------- //
         
-        private static void LockCursor()
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-        }
     }
 }
