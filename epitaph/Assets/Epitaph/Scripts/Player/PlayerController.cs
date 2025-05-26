@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using Epitaph.Scripts.InputManager;
 using Epitaph.Scripts.Player.BaseBehaviour;
-using Epitaph.Scripts.Player.Input;
 using Epitaph.Scripts.Player.InteractionSystem;
 using Epitaph.Scripts.Player.MovementSystem;
 using Epitaph.Scripts.Player.ViewSystem;

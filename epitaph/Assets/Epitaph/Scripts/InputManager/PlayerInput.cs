@@ -1,7 +1,8 @@
+using Epitaph.Scripts.Player;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Epitaph.Scripts.Player.Input
+namespace Epitaph.Scripts.InputManager
 {
     public class PlayerInput : MonoBehaviour, PlayerInputActions.IPlayerActions
     {
