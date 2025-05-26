@@ -6,9 +6,6 @@ namespace Epitaph.Scripts.Player.Input
 {
     public class PlayerInput : MonoBehaviour, PlayerInputActions.IPlayerActions
     {
-        public event Action OnNextEvent;
-        public event Action OnPreviousEvent;
-        
         public Vector2 MoveInput { get; private set; }
         public bool IsMoveInput { get; private set; }
         
@@ -116,18 +113,12 @@ namespace Epitaph.Scripts.Player.Input
 
         public void OnPrevious(InputAction.CallbackContext context)
         {
-            if (context.performed)
-            {
-                OnPreviousEvent?.Invoke();
-            }
+            
         }
 
         public void OnNext(InputAction.CallbackContext context)
         {
-            if (context.performed)
-            {
-                OnNextEvent?.Invoke();
-            }
+            
         }
 
         public void OnRun(InputAction.CallbackContext context)

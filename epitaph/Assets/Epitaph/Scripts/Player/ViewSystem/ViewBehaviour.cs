@@ -42,17 +42,6 @@ namespace Epitaph.Scripts.Player.ViewSystem
         
         #region Camera Position Methods
         
-        private void OnPreviousEvent()
-        {
-            var random = new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f));;
-            SetRandomHeadBobOffset(random);
-        }
-
-        private void OnNextEvent()
-        {
-            CameraReset();
-        }
-        
         private void InitializeCameraBasePosition()
         {
             _basePosition = PlayerController.CameraTransform.localPosition;
@@ -117,8 +106,6 @@ namespace Epitaph.Scripts.Player.ViewSystem
 
         public override void OnEnable()
         {
-            PlayerController.PlayerInput.OnPreviousEvent += OnPreviousEvent;
-            PlayerController.PlayerInput.OnNextEvent += OnNextEvent;
             foreach (var behaviour in _viewBehaviours) behaviour.OnEnable();
         }
 
@@ -145,8 +132,6 @@ namespace Epitaph.Scripts.Player.ViewSystem
 
         public override void OnDisable()
         {
-            PlayerController.PlayerInput.OnPreviousEvent -= OnPreviousEvent;
-            PlayerController.PlayerInput.OnNextEvent -= OnNextEvent;
             foreach (var behaviour in _viewBehaviours) behaviour.OnDisable();
         }
 
