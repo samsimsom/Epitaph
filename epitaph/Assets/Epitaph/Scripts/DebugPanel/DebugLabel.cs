@@ -1,4 +1,3 @@
-using System;
 using Epitaph.Scripts.GameTimeManager;
 using Epitaph.Scripts.Player;
 using UnityEngine;
@@ -8,7 +7,6 @@ namespace Epitaph.Scripts.DebugPanel
     public class DebugLabel : MonoBehaviour
     {
         [SerializeField] private PlayerController playerController;
-        [SerializeField] private GameTime gameTimeManager;
 
         private GUIStyle _labelStyle;
 
@@ -22,7 +20,7 @@ namespace Epitaph.Scripts.DebugPanel
         private void OnGUI()
         {
             GUI.Label(new Rect(10, 10, 300, 20), 
-                $"Clock : {gameTimeManager.GameHour}:{gameTimeManager.GameMinute}", _labelStyle);
+                $"Clock : {GameTime.Instance.GameHour}:{GameTime.Instance.GameMinute}", _labelStyle);
             
             GUI.Label(new Rect(10, 30, 300, 20), 
                 $"Vertical Movement : {playerController.MovementBehaviour.VerticalMovement:F1}", _labelStyle);
