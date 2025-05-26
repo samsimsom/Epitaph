@@ -46,12 +46,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float AppliedMovementX { get; set; }
         public float AppliedMovementZ { get; set; }
 
-        #region Gizmo & GUI Variables
-
-        private GUIStyle _myStyle;
-
-        #endregion
-
         // ---------------------------------------------------------------------------- //
         
         public MovementBehaviour(PlayerController playerController)
@@ -269,34 +263,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             DrawCharacterControllerGizmo();
             DrawHasObstacleAboveForJumpGizmo();
             DrawCheckIsGroundedGizmo();
-        }
-
-        public override void OnGUI()
-        {
-            if (_myStyle == null)
-            {
-                _myStyle = new GUIStyle();
-                _myStyle.fontSize = 20;
-                _myStyle.normal.textColor = Color.white;
-            }
-
-            GUI.Label(new Rect(10, 10, 300, 20), 
-                $"Vertical Movement : {VerticalMovement:F1}", _myStyle);
-            GUI.Label(new Rect(10, 30, 300, 20), 
-                $"Capsul Velocity : {CapsulVelocity}", _myStyle);
-            GUI.Label(new Rect(10, 50, 300, 20), 
-                $"Current Movement : {CurrentSpeed:F1}", _myStyle);
-            
-            GUI.Label(new Rect(10, 70, 300, 20), 
-                $"Is Grounded Custom: {IsGrounded}", _myStyle);
-            GUI.Label(new Rect(10, 90, 300, 20), 
-                $"Is Grounded Capsule: {PlayerController.CharacterController.isGrounded}", _myStyle);
-            
-            GUI.Label(new Rect(10, 110, 300, 20), 
-                $"Ground Normal : {GroundNormal}", _myStyle);
-            
-            GUI.Label(new Rect(10, 130, 300, 20), 
-                $"Movement State : {CurrentState.StateName}", _myStyle);
         }
 
         private void DrawCharacterControllerGizmo()

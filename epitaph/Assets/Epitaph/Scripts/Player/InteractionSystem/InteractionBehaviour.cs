@@ -19,10 +19,7 @@ namespace Epitaph.Scripts.Player.InteractionSystem
         private Vector3 _rayOrigin;
         private CancellationTokenSource _cts;
         private IInteractable _currentInteractable;
-
-        // Public fields for Inspector configuration
-        // Consider making these [SerializeField] private fields for better encapsulation
-        // if they don't need to be accessed from other scripts.
+        
         public float RaycastInterval = 0.05f;
         public float InteractionDistance = 10.0f;
         public bool ShowDebugGizmos = true;
@@ -52,14 +49,11 @@ namespace Epitaph.Scripts.Player.InteractionSystem
 
         public bool IsTargetingInteractable()
         {
-            // With the refined raycast loop, _currentInteractable will accurately reflect
-            // if we are targeting a valid interactable.
             return _currentInteractable != null;
         }
 
         public GameObject GetTargetedObject()
         {
-            // _didHit ensures _lastHit is relevant.
             return _didHit && _lastHit.collider != null ? _lastHit.collider.gameObject : null;
         }
 
