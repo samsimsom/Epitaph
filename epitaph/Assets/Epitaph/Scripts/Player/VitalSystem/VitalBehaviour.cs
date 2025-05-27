@@ -49,9 +49,7 @@ namespace Epitaph.Scripts.Player.VitalSystem
         {
             while (_isUpdating)
             {
-                
                 UpdateVitalStats(Time.deltaTime);
-                
                 await UniTask.Yield(PlayerLoopTiming.Update);
             }
         }
