@@ -8,7 +8,6 @@ using Epitaph.Scripts.GameTimeManager;
 using Epitaph.Scripts.Player.LifeStatsSystem.LifeEvents;
 using Epitaph.Scripts.Player.LifeStatsSystem.LifeStats;
 using Epitaph.Scripts.Player.LifeStatsSystem.StatusEffects;
-using Epitaph.Scripts.Player.MovementSystem.StateMachine;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.LifeStatsSystem
@@ -36,9 +35,9 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         private readonly List<IStatusEffect> _statusEffects = new();
 
         // 1 oyun dakikası = 2.5 saniye
-        // private float _hungerPerGameMinute =  4.16f / 60f;    // +0.069
-        // private float _thirstPerGameMinute =  4.16f / 60f;
-        // private float _fatiquePerGameMinute = 6.25f / 60f;    // +0.104
+        private float _hungerPerGameMinute =  4.16f / 60f;    // +0.069
+        private float _thirstPerGameMinute =  4.16f / 60f;
+        private float _fatiquePerGameMinute = 6.25f / 60f;    // +0.104
         // private float _fatiqueSleepPerMinute = -12.5f / 60f;  // -0.208 (uykuda)
         
         // Damage rates, tweak as needed
@@ -154,29 +153,29 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
 
         public void DecreaseThirst(float deltaTime, float activityLevel)
         {
-            AddStat("Thirst", 0.3f * deltaTime * (1 + activityLevel + (Temperature.IsTooHigh ? 1 : 0)));
+            AddStat("Thirst", _thirstPerGameMinute * deltaTime * (1 + activityLevel + (Temperature.IsTooHigh ? 1 : 0)));
         }
         public void IncreaseThirst(float deltaTime, float activityLevel)
         {
-            AddStat("Thirst", -0.3f * deltaTime * (1 + activityLevel + (Temperature.IsTooHigh ? 1 : 0)));
+            AddStat("Thirst", -_thirstPerGameMinute * deltaTime * (1 + activityLevel + (Temperature.IsTooHigh ? 1 : 0)));
         }
 
         public void DecreaseFatique(float deltaTime, float activityLevel)
         {
-            AddStat("Fatique", 0.1f * deltaTime * (1 + activityLevel + (Hunger.IsCritical ? 1 : 0) + (Thirst.IsCritical ? 1 : 0)));
+            AddStat("Fatique", _fatiquePerGameMinute * deltaTime * (1 + activityLevel + (Hunger.IsCritical ? 1 : 0) + (Thirst.IsCritical ? 1 : 0)));
         }
         public void IncreaseFatique(float deltaTime, float activityLevel)
         {
-            AddStat("Fatique", -0.1f * deltaTime * (1 + activityLevel + (Hunger.IsCritical ? 1 : 0) + (Thirst.IsCritical ? 1 : 0)));
+            AddStat("Fatique", -_fatiquePerGameMinute * deltaTime * (1 + activityLevel + (Hunger.IsCritical ? 1 : 0) + (Thirst.IsCritical ? 1 : 0)));
         }
         
         public void DecreaseHunger(float deltaTime, float activityLevel)
         {
-            AddStat("Hunger", 0.2f * deltaTime * (1 + activityLevel));
+            AddStat("Hunger", _hungerPerGameMinute * deltaTime * (1 + activityLevel));
         }
         public void IncreaseHunger(float deltaTime, float activityLevel)
         {
-            AddStat("Hunger", -0.2f * deltaTime * (1 + activityLevel));
+            AddStat("Hunger", -_hungerPerGameMinute * deltaTime * (1 + activityLevel));
         }
         
         
@@ -211,31 +210,54 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         }
         public void UpdateVitality(float deltaTime)
         {
-            // 0-100 kotu | iyi
-            var healthRatio = Health.Max / Mathf.Clamp(Health.Current, 1, Health.Max) / 10.0f; 
-            
-            // 100-0 kotu | iyi
-            var hungerRatio = Mathf.Clamp(Hunger.Current, 1, Hunger.Max) / Hunger.Max;
-            var fatiqueRatio = Mathf.Clamp(Fatique.Current, 1, Fatique.Max) / Fatique.Max;
-            var thirstRatio = Mathf.Clamp(Thirst.Current, 1, Thirst.Max) / Thirst.Max;
-            
-            VitalityRatio = (healthRatio + hungerRatio + fatiqueRatio + thirstRatio) / 4.0f;
-
-            // Güncelleme sıklığına (deltaTime) ve güncelleme hızınıza göre scale'i ayarlayın
+            // Health için normalleştirilmiş oran (1'e yaklaştıkça daha iyi)
+            var healthNormalized = Mathf.Clamp01(Health.Current / Health.Max);
+    
+            // Diğer parametreler için normalleştirilmiş oranlar (0'a yaklaştıkça daha iyi)
+            var hungerNormalized = 1f - Mathf.Clamp01(Hunger.Current / Hunger.Max);
+            var fatiqueNormalized = 1f - Mathf.Clamp01(Fatique.Current / Fatique.Max);
+            var thirstNormalized = 1f - Mathf.Clamp01(Thirst.Current / Thirst.Max);
+    
+            // Tüm değerlerin ağırlıklı ortalaması (0-1 aralığında)
+            // Health'e daha fazla ağırlık verebilirsiniz
+            var healthWeight = 1.5f; // Health için ağırlık
+            var otherWeight = 1.0f;  // Diğer faktörler için ağırlık
+    
+            var totalWeight = healthWeight + (otherWeight * 3); // Toplam ağırlık
+    
+            // Ağırlıklı ortalama (0-1 aralığında)
+            VitalityRatio = (healthNormalized * healthWeight + 
+                             hungerNormalized * otherWeight + 
+                             fatiqueNormalized * otherWeight + 
+                             thirstNormalized * otherWeight) / totalWeight;
+    
+            // Vitality stat'ını güncelle
             var vitalityChangeRate = 10f;
-
-            if (VitalityRatio < 0.1f)
+    
+            // Mevcut Vitality ile hesaplanan VitalityRatio arasındaki farkı azalt
+            var currentVitalityNormalized = Vitality.Current / Vitality.Max;
+            var diff = VitalityRatio - currentVitalityNormalized;
+    
+            // Değişim miktarı (pozitif veya negatif olabilir)
+            var changeAmount = Mathf.Abs(diff) * vitalityChangeRate * deltaTime;
+    
+            // İstenen aralıklara göre Vitality değerini güncelle
+            if (VitalityRatio >= 0.9f && VitalityRatio <= 1.0f)
             {
-                // İyileşiyor
-                var increaseAmount = (0.5f - VitalityRatio) * vitalityChangeRate * deltaTime;
-                AddStat("Vitality", increaseAmount);
+                // 0.9-1.0 aralığında pozitif değişim
+                AddStat("Vitality", changeAmount);
             }
-            else if (VitalityRatio > 0.15f && VitalityRatio < 0.3f)
+            else if (VitalityRatio >= 0.5f && VitalityRatio < 0.9f)
             {
-                // Kötüleşiyor
-                var decreaseAmount = VitalityRatio * vitalityChangeRate * deltaTime;
-                AddStat("Vitality", -decreaseAmount);
+                // 0.5-0.9 aralığında negatif değişim
+                AddStat("Vitality", -changeAmount);
             }
+            
+            // Debug
+            Debug.Log($"VitalityRatio: {VitalityRatio:F2} | Health: {healthNormalized:F2} | " +
+                      $"Hunger: {hungerNormalized:F2} | Fatique: {fatiqueNormalized:F2} | " +
+                      $"Thirst: {thirstNormalized:F2}");
+            
         }
         public void UpdateStatusEffects(float deltaTime)
         {
