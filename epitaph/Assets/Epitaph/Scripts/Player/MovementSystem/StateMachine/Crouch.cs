@@ -30,8 +30,12 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         public override void UpdateState()
         {
             HandleMovementInput();
-            // Ctx.PlayerController.LifeStatsManager.Update(0.01f, 2f);
-            Ctx.PlayerController.LifeStatsManager.DecreaseStatsByActivity(0.01f, 0.01f);
+            
+            Ctx.PlayerController.LifeStatsManager.DecreaseStamina(0.01f, 0.01f);
+            Ctx.PlayerController.LifeStatsManager.DecreaseThirst(0.01f, 0.01f);
+            Ctx.PlayerController.LifeStatsManager.DecreaseHunger(0.01f, 0.01f);
+            Ctx.PlayerController.LifeStatsManager.DecreaseFatique(0.01f, 0.01f);
+            
             CheckSwitchStates();
         }
 

@@ -119,7 +119,12 @@ namespace Epitaph.Scripts.InputManager
 
         public void OnPrevious(InputAction.CallbackContext context)
         {
-            
+            if (context.performed)
+            {
+                _playerController.LifeStatsManager.AddStat("Thirst", -10f);
+                _playerController.LifeStatsManager.AddStat("Hunger", -10f);
+                _playerController.LifeStatsManager.AddStat("Fatique", -10f);
+            }
         }
 
         public void OnNext(InputAction.CallbackContext context)

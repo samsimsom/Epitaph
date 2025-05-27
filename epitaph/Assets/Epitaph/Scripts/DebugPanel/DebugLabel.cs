@@ -167,25 +167,28 @@ namespace Epitaph.Scripts.DebugPanel
             
             // Değişen Life Stats bilgilerini göster
             // if (!string.IsNullOrEmpty(_healthText))
-                DrawGuiLabel($"{_healthText} : {_healthOldValue:F} -> {_healthNewValue:F}");
+            DrawGuiLabel($"Health : {playerController.LifeStatsManager.Health.Current:F}");
             // if (!string.IsNullOrEmpty(_vitalityText))
-                DrawGuiLabel($"{_vitalityText} : {_vitalityOldValue:F} -> {_vitalityNewValue:F}");
+            DrawGuiLabel($"Vitality Ratio : {playerController.LifeStatsManager.VitalityRatio:F}");
+            DrawGuiLabel($"Vitality : {playerController.LifeStatsManager.Vitality.Current:F}");
             
             _currentYPosition += 5f; // Bölümler arası küçük boşluk
             
             // if (!string.IsNullOrEmpty(_staminaText))
-                DrawGuiLabel($"{_staminaText} : {_staminaOldValue:F} -> {_staminaNewValue:F}");
+            DrawGuiLabel($"Stamina : {playerController.LifeStatsManager.Stamina.Current:F}");
             // if (!string.IsNullOrEmpty(_hungerText))
-                DrawGuiLabel($"{_hungerText} : {_hungerOldValue:F} -> {_hungerNewValue:F}");
+            DrawGuiLabel($"Hunger : {playerController.LifeStatsManager.Hunger.Current:F}");
             // if (!string.IsNullOrEmpty(_thirstText))
-                DrawGuiLabel($"{_thirstText} : {_thirstOldValue:F} -> {_thirstNewValue:F}");
+            DrawGuiLabel($"Thirst : {playerController.LifeStatsManager.Thirst.Current:F}");
             // if (!string.IsNullOrEmpty(_fatiqueText))
-                DrawGuiLabel($"{_fatiqueText} : {_fatiqueOldValue:F} -> {_fatiqueNewValue:F}");
+            DrawGuiLabel($"Fatique : {playerController.LifeStatsManager.Fatique.Current:F}");
             
             _currentYPosition += 5f; // Bölümler arası küçük boşluk
             
-            if (!string.IsNullOrEmpty(_temperatureText))
-                DrawGuiLabel($"{_temperatureText} : {_temperatureOldValue:F} => {_temperatureNewValue:F}");
+            // if (!string.IsNullOrEmpty(_temperatureText))
+            DrawGuiLabel($"Temperature isSafe : {playerController.LifeStatsManager.Temperature.IsSafe}");
+            // if (!string.IsNullOrEmpty(_temperatureText))
+            DrawGuiLabel($"Temperature : {playerController.LifeStatsManager.Temperature.Current}");
         }
     }
 }

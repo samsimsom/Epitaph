@@ -17,7 +17,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void UpdateState()
         {
-            Ctx.PlayerController.LifeStatsManager.IncreaseStats(0.01f);
+            Ctx.PlayerController.LifeStatsManager.IncreaseStamina(0.01f);
             CheckSwitchStates();
         }
 

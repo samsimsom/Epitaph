@@ -43,6 +43,12 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem.LifeStats
             }
         }
         
+        public virtual void SetMax(float newMax)
+        {
+            Max = newMax;
+            Current = Clamp(Current); // Eğer mevcut değer yeni maksın üstündeyse düşürür
+        }
+        
         // public virtual void Increase() { }
         // public virtual void Decrease() { }
         // public virtual void Restore() { }
