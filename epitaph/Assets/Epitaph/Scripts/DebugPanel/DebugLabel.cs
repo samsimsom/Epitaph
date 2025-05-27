@@ -158,17 +158,23 @@ namespace Epitaph.Scripts.DebugPanel
             
             // Değişen Life Stats bilgilerini göster
             if (!string.IsNullOrEmpty(_healthText))
-                DrawGuiLabel($"{_healthText} : {_healthOldValue:F1} -> {_healthNewValue:F1}");
+                DrawGuiLabel($"{_healthText} : {_healthOldValue:F} -> {_healthNewValue:F}");
             if (!string.IsNullOrEmpty(_staminaText))
-                DrawGuiLabel($"{_staminaText} : {_staminaOldValue:F1} -> {_staminaNewValue:F1}");
-            if (!string.IsNullOrEmpty(_fatiqueText))
-                DrawGuiLabel($"{_fatiqueText} : {_fatiqueOldValue:F1} -> {_fatiqueNewValue:F1}");
-            if (!string.IsNullOrEmpty(_thirstText))
-                DrawGuiLabel($"{_thirstText} : {_thirstOldValue:F1} -> {_thirstNewValue:F1}");
+                DrawGuiLabel($"{_staminaText} : {_staminaOldValue:F} -> {_staminaNewValue:F}");
+            
+            _currentYPosition += 5f; // Bölümler arası küçük boşluk
+            
             if (!string.IsNullOrEmpty(_hungerText))
-                DrawGuiLabel($"{_hungerText} : {_hungerOldValue:F1} -> {_hungerNewValue:F1}");
+                DrawGuiLabel($"{_hungerText} : {_hungerOldValue:F} -> {_hungerNewValue:F}");
+            if (!string.IsNullOrEmpty(_thirstText))
+                DrawGuiLabel($"{_thirstText} : {_thirstOldValue:F} -> {_thirstNewValue:F}");
+            if (!string.IsNullOrEmpty(_fatiqueText))
+                DrawGuiLabel($"{_fatiqueText} : {_fatiqueOldValue:F} -> {_fatiqueNewValue:F}");
+            
+            _currentYPosition += 5f; // Bölümler arası küçük boşluk
+            
             if (!string.IsNullOrEmpty(_temperatureText))
-                DrawGuiLabel($"{_temperatureText} : {_temperatureOldValue:F1} => {_temperatureNewValue:F1}");
+                DrawGuiLabel($"{_temperatureText} : {_temperatureOldValue:F} => {_temperatureNewValue:F}");
         }
     }
 }

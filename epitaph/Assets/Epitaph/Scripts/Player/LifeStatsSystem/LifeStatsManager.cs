@@ -133,19 +133,27 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
                     AddStat("Stamina", -0.2f * deltaTime);
                 }
             }
+            
+            // 1 oyun dakikası = 2.5 saniye
+            var hungerPerGameMinute =  4.16f / 60f;    // +0.069
+            var thirstPerGameMinute =  4.16f / 60f;
+            var fatiquePerGameMinute = 6.25f / 60f;    // +0.104
+            var fatiqueSleepPerMinute = -12.5f / 60f;  // -0.208 (uykuda)
 
-            AddStat("Hunger", 0.2f * deltaTime * (1 + activityLevel));
-            AddStat("Thirst", 0.3f * deltaTime * (1 + activityLevel + (Temperature.IsTooHigh ? 1 : 0)));
-            AddStat("Fatique", 0.1f * deltaTime * (1 + activityLevel + (Hunger.IsCritical ? 1 : 0) + (Thirst.IsCritical ? 1 : 0)));
+            AddStat("Hunger", hungerPerGameMinute * deltaTime * (1 + activityLevel));
+            AddStat("Thirst", thirstPerGameMinute * deltaTime * (1 + activityLevel + (Temperature.IsTooHigh ? 2f : 0)));
+
+            var isSleeping = false;
+            
+            if (isSleeping)
+                AddStat("Fatique", fatiqueSleepPerMinute * deltaTime);
+            else
+                AddStat("Fatique", fatiquePerGameMinute * deltaTime * (1 + activityLevel));
 
             if (activityLevel > 0)
-            {
-                AddStat("Stamina", -1f * deltaTime * activityLevel * (1 + (Fatique.IsCritical ? 1 : 0)));
-            }
+                AddStat("Stamina", -1.0f * deltaTime * activityLevel * (1 + (Fatique.IsCritical ? 1 : 0)));
             else
-            {
-                AddStat("Stamina", 1f * deltaTime * (Fatique.IsCritical ? 0.2f : 0.5f));
-            }
+                AddStat("Stamina", 0.25f * deltaTime * (Fatique.IsCritical ? 0.2f : 0.5f));
 
             if (Fatique.IsCritical)
                 AddStat("Health", -_fatiqueDamageRate * deltaTime);
@@ -229,7 +237,7 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         public override void Start()
         {
             // FrameBasedUpdates().Forget();
-            // MinuteBasedUpdates().Forget();
+            MinuteBasedUpdates().Forget();
         }
         
         private async UniTaskVoid FrameBasedUpdates()
@@ -255,10 +263,10 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
                 if (currentMinute != _lastMinute)
                 {
                     _lastMinute = currentMinute;
-                    Update(0.1f, 1.0f); 
+                    Update(1.0f, 0.0f);
                 }
                 
-                await GameTime.Instance.WaitForGameSecond();
+                await GameTime.Instance.WaitForGameMinutes();
             }
         }
 
