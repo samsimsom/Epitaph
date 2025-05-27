@@ -8,7 +8,6 @@ using Epitaph.Scripts.GameTimeManager;
 using Epitaph.Scripts.Player.LifeStatsSystem.LifeEvents;
 using Epitaph.Scripts.Player.LifeStatsSystem.LifeStats;
 using Epitaph.Scripts.Player.LifeStatsSystem.StatusEffects;
-using UnityEngine;
 
 namespace Epitaph.Scripts.Player.LifeStatsSystem
 {
