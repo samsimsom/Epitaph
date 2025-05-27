@@ -30,7 +30,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         public override void UpdateState()
         {
             HandleMovementInput();
-            Ctx.PlayerController.LifeStatsManager.Update(0.01f, 2f);
+            // Ctx.PlayerController.LifeStatsManager.Update(0.01f, 2f);
             CheckSwitchStates();
         }
 

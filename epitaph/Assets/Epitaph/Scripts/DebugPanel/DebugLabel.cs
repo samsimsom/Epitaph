@@ -20,6 +20,10 @@ namespace Epitaph.Scripts.DebugPanel
         private float _vitalityOldValue;
         private float _vitalityNewValue;
         
+        private string _staminaText;
+        private float _staminaOldValue;
+        private float _staminaNewValue;
+        
         private string _fatiqueText;
         private float _fatiqueOldValue;
         private float _fatiqueNewValue;
@@ -92,6 +96,11 @@ namespace Epitaph.Scripts.DebugPanel
                     _vitalityOldValue = old;
                     _vitalityNewValue = cur;
                     break;
+                case "Stamina":
+                    _staminaText = $"Stamina";
+                    _staminaOldValue = old;
+                    _staminaNewValue = cur;
+                    break;
                 case "Fatique":
                     _fatiqueText = $"Fatique";
                     _fatiqueOldValue = old;
@@ -156,18 +165,20 @@ namespace Epitaph.Scripts.DebugPanel
             _currentYPosition += 10f; // Life stats öncesi daha büyük boşluk
             
             // Değişen Life Stats bilgilerini göster
-            if (!string.IsNullOrEmpty(_healthText))
+            // if (!string.IsNullOrEmpty(_healthText))
                 DrawGuiLabel($"{_healthText} : {_healthOldValue:F} -> {_healthNewValue:F}");
-            if (!string.IsNullOrEmpty(_vitalityText))
+            // if (!string.IsNullOrEmpty(_vitalityText))
                 DrawGuiLabel($"{_vitalityText} : {_vitalityOldValue:F} -> {_vitalityNewValue:F}");
             
             _currentYPosition += 5f; // Bölümler arası küçük boşluk
             
-            if (!string.IsNullOrEmpty(_hungerText))
+            // if (!string.IsNullOrEmpty(_staminaText))
+                DrawGuiLabel($"{_staminaText} : {_staminaOldValue:F} -> {_staminaNewValue:F}");
+            // if (!string.IsNullOrEmpty(_hungerText))
                 DrawGuiLabel($"{_hungerText} : {_hungerOldValue:F} -> {_hungerNewValue:F}");
-            if (!string.IsNullOrEmpty(_thirstText))
+            // if (!string.IsNullOrEmpty(_thirstText))
                 DrawGuiLabel($"{_thirstText} : {_thirstOldValue:F} -> {_thirstNewValue:F}");
-            if (!string.IsNullOrEmpty(_fatiqueText))
+            // if (!string.IsNullOrEmpty(_fatiqueText))
                 DrawGuiLabel($"{_fatiqueText} : {_fatiqueOldValue:F} -> {_fatiqueNewValue:F}");
             
             _currentYPosition += 5f; // Bölümler arası küçük boşluk

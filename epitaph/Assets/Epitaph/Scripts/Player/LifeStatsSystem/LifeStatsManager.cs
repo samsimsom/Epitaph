@@ -33,10 +33,10 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         private readonly List<IStatusEffect> _statusEffects = new();
 
         // 1 oyun dakikası = 2.5 saniye
-        private float _hungerPerGameMinute =  4.16f / 60f;    // +0.069
-        private float _thirstPerGameMinute =  4.16f / 60f;
-        private float _fatiquePerGameMinute = 6.25f / 60f;    // +0.104
-        private float _fatiqueSleepPerMinute = -12.5f / 60f;  // -0.208 (uykuda)
+        // private float _hungerPerGameMinute =  4.16f / 60f;    // +0.069
+        // private float _thirstPerGameMinute =  4.16f / 60f;
+        // private float _fatiquePerGameMinute = 6.25f / 60f;    // +0.104
+        // private float _fatiqueSleepPerMinute = -12.5f / 60f;  // -0.208 (uykuda)
         
         // Damage rates, tweak as needed
         private readonly float _temperatureDamageRate = 0.5f;
@@ -44,7 +44,7 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         private readonly float _thirstDamageRate = 0.5f;
         private readonly float _fatiqueDamageRate = 0.2f;
         
-        private bool _isSleeping = false;
+        // private bool _isSleeping = false;
         private bool _isUpdating;
         private int _lastMinute = -1;
 
@@ -56,8 +56,8 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         {
             Health = new Health(healthMax, healthMax);
             Vitality = new Vitality(vitalityMax, vitalityMax);
+            Stamina = new Stamina(staminaMax, staminaMax);
             
-            Stamina = new Stamina(staminaMax, vitalityMax);
             Fatique = new Fatique(fatiqueMax, 0f);
             Thirst = new Thirst(thirstMax, 0f);
             Hunger = new Hunger(hungerMax, 0f);
@@ -139,13 +139,10 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         public void Update(float deltaTime, float activityLevel)
         {
             // Statlar arası ilişkiler:
-            AddStat("Hunger", _hungerPerGameMinute * deltaTime * (1 + activityLevel));
-            AddStat("Thirst", _thirstPerGameMinute * deltaTime * (1 + activityLevel + (Temperature.IsTooHigh ? 2f : 0)));
+            // AddStat("Hunger", _hungerPerGameMinute * deltaTime * (1 + activityLevel));
+            // AddStat("Thirst", _thirstPerGameMinute * deltaTime * (1 + activityLevel + (Temperature.IsTooHigh ? 2f : 0)));
             
-            if (_isSleeping)
-                AddStat("Fatique", _fatiqueSleepPerMinute * deltaTime);
-            else
-                AddStat("Fatique", _fatiquePerGameMinute * deltaTime * (1 + activityLevel));
+            UpdateStatsByActivity(deltaTime, activityLevel);
 
             if (Fatique.IsCritical)
                 AddStat("Health", -_fatiqueDamageRate * deltaTime);
@@ -157,6 +154,23 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
                 AddStat("Health", -_thirstDamageRate * deltaTime);
         }
 
+        public void UpdateStatsByActivity(float deltaTime, float activityLevel)
+        {
+            AddStat("Hunger", 0.2f * deltaTime * (1 + activityLevel));
+            AddStat("Thirst", 0.3f * deltaTime * (1 + activityLevel + (Temperature.IsTooHigh ? 1 : 0)));
+            AddStat("Fatique", -0.1f * deltaTime * (1 + activityLevel + (Hunger.IsCritical ? 1 : 0) + (Thirst.IsCritical ? 1 : 0)));
+            
+            if (activityLevel > 0)
+                AddStat("Stamina", -1f * deltaTime * activityLevel * (1 + (Fatique.IsCritical ? 1 : 0)));
+            else
+                AddStat("Stamina", 1f * deltaTime * (Fatique.IsCritical ? 0.2f : 0.5f));
+            
+            // if (_isSleeping)
+            //     AddStat("Fatique", _fatiqueSleepPerMinute * deltaTime);
+            // else
+            //     AddStat("Fatique", _fatiquePerGameMinute * deltaTime * (1 + activityLevel));
+        }
+        
         public void UpdateStatsByTemperature(float deltaTime)
         {
             if (!Temperature.IsSafe)
@@ -187,7 +201,6 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
             var thirstRatio = Mathf.Clamp(Thirst.Current, 1, Thirst.Max) / Thirst.Max;
             
             var vitalityRatio = (healthRatio + hungerRatio + fatiqueRatio + thirstRatio) / 4.0f;
-            Debug.Log(vitalityRatio);
 
             // Güncelleme sıklığına (deltaTime) ve güncelleme hızınıza göre scale'i ayarlayın
             var vitalityChangeRate = 10f;
@@ -198,7 +211,7 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
                 var increaseAmount = (0.5f - vitalityRatio) * vitalityChangeRate * deltaTime;
                 AddStat("Vitality", increaseAmount);
             }
-            else if (vitalityRatio > 0.2f && vitalityRatio < 0.5f)
+            else if (vitalityRatio > 0.15f && vitalityRatio < 0.3f)
             {
                 // Kötüleşiyor
                 var decreaseAmount = vitalityRatio * vitalityChangeRate * deltaTime;
@@ -282,7 +295,7 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         
         public override void Start()
         {
-            // FrameBasedUpdates().Forget();
+            FrameBasedUpdates().Forget();
             MinuteBasedUpdates().Forget();
         }
         
@@ -290,7 +303,7 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         {
             while (_isUpdating)
             {
-                Update(0.01f, 0.1f); 
+                Update(0.01f, 0.0f);
                 await UniTask.Yield(PlayerLoopTiming.Update);
             }
         }
@@ -309,7 +322,6 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
                 if (currentMinute != _lastMinute)
                 {
                     _lastMinute = currentMinute;
-                    Update(1.0f, 0.0f);
                     UpdateStatsByTemperature(1.0f);
                     UpdateStatsByVitality(1.0f);
                     UpdateStatsByStatusEffects(1.0f);

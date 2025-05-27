@@ -17,7 +17,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         public override void UpdateState()
         {
             HandleAirborneMovement();
-            Ctx.PlayerController.LifeStatsManager.Update(0.01f, 20f);
+            // Ctx.PlayerController.LifeStatsManager.Update(0.01f, 20f);
             CheckSwitchStates();
         }
 
