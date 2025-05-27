@@ -16,9 +16,9 @@ namespace Epitaph.Scripts.DebugPanel
         private float _healthOldValue;
         private float _healthNewValue;
         
-        private string _staminaText;
-        private float _staminaOldValue;
-        private float _staminaNewValue;
+        private string _vitalityText;
+        private float _vitalityOldValue;
+        private float _vitalityNewValue;
         
         private string _fatiqueText;
         private float _fatiqueOldValue;
@@ -87,10 +87,10 @@ namespace Epitaph.Scripts.DebugPanel
                     _healthOldValue = old;
                     _healthNewValue = cur;
                     break;
-                case "Stamina":
-                    _staminaText = $"Stamina";
-                    _staminaOldValue = old;
-                    _staminaNewValue = cur;
+                case "Vitality":
+                    _vitalityText = $"Vitality";
+                    _vitalityOldValue = old;
+                    _vitalityNewValue = cur;
                     break;
                 case "Fatique":
                     _fatiqueText = $"Fatique";
@@ -158,8 +158,8 @@ namespace Epitaph.Scripts.DebugPanel
             // Değişen Life Stats bilgilerini göster
             if (!string.IsNullOrEmpty(_healthText))
                 DrawGuiLabel($"{_healthText} : {_healthOldValue:F} -> {_healthNewValue:F}");
-            if (!string.IsNullOrEmpty(_staminaText))
-                DrawGuiLabel($"{_staminaText} : {_staminaOldValue:F} -> {_staminaNewValue:F}");
+            if (!string.IsNullOrEmpty(_vitalityText))
+                DrawGuiLabel($"{_vitalityText} : {_vitalityOldValue:F} -> {_vitalityNewValue:F}");
             
             _currentYPosition += 5f; // Bölümler arası küçük boşluk
             

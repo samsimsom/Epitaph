@@ -146,9 +146,9 @@ namespace Epitaph.Scripts.Player
             InteractionBehaviour = AddBehaviour(new InteractionBehaviour(this));
             
             LifeStatsManager = AddBehaviour(new LifeStatsManager (this, 
-                healthMax: 100f, staminaMax: 100f, fatiqueMax: 100f, thirstMax: 100f, 
-                hungerMax: 100f, temperatureMin: 28f, temperatureMax: 44f, tempMinSafe: 36f, 
-                tempMaxSafe: 38f, tempStart: 37f)
+                healthMax: 100f, vitalityMax: 100f,staminaMax: 100f, fatiqueMax: 100f, 
+                thirstMax: 100f, hungerMax: 100f, temperatureMin: 28f, temperatureMax: 44f, 
+                tempMinSafe: 36f, tempMaxSafe: 38f, tempStart: 37f)
             );
             
             LifeStatsManager.AddStatusEffect(new PoisonedEffect(10f));
