@@ -28,12 +28,19 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         private bool _isDead;
         private readonly List<IStatusEffect> _statusEffects = new();
 
+        // 1 oyun dakikası = 2.5 saniye
+        private float _hungerPerGameMinute =  4.16f / 60f;    // +0.069
+        private float _thirstPerGameMinute =  4.16f / 60f;
+        private float _fatiquePerGameMinute = 6.25f / 60f;    // +0.104
+        private float _fatiqueSleepPerMinute = -12.5f / 60f;  // -0.208 (uykuda)
+        
         // Damage rates, tweak as needed
         private readonly float _temperatureDamageRate = 0.5f;
         private readonly float _hungerDamageRate = 0.3f;
         private readonly float _thirstDamageRate = 0.5f;
         private readonly float _fatiqueDamageRate = 0.2f;
         
+        private bool _isSleeping = false;
         private bool _isUpdating;
         private int _lastMinute = -1;
 
@@ -48,7 +55,8 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
             Fatique = new Fatique(fatiqueMax, 0f);
             Thirst = new Thirst(thirstMax, 0f);
             Hunger = new Hunger(hungerMax, 0f);
-            Temperature = new Temperature(temperatureMin, temperatureMax, tempMinSafe, tempMaxSafe, tempStart);
+            Temperature = new Temperature(temperatureMin, temperatureMax, tempMinSafe, 
+                tempMaxSafe, tempStart);
 
             _stats = new Dictionary<string, StatBase>
             {
@@ -114,7 +122,8 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         
         // ---------------------------------------------------------------------------- //
 
-        // --- Oyun döngüsü update fonksiyonu ---
+        #region Update Methods
+
         public void Update(float deltaTime, float activityLevel)
         {
             // Statlar arası ilişkiler:
@@ -133,22 +142,14 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
                     AddStat("Stamina", -0.2f * deltaTime);
                 }
             }
-            
-            // 1 oyun dakikası = 2.5 saniye
-            var hungerPerGameMinute =  4.16f / 60f;    // +0.069
-            var thirstPerGameMinute =  4.16f / 60f;
-            var fatiquePerGameMinute = 6.25f / 60f;    // +0.104
-            var fatiqueSleepPerMinute = -12.5f / 60f;  // -0.208 (uykuda)
 
-            AddStat("Hunger", hungerPerGameMinute * deltaTime * (1 + activityLevel));
-            AddStat("Thirst", thirstPerGameMinute * deltaTime * (1 + activityLevel + (Temperature.IsTooHigh ? 2f : 0)));
-
-            var isSleeping = false;
+            AddStat("Hunger", _hungerPerGameMinute * deltaTime * (1 + activityLevel));
+            AddStat("Thirst", _thirstPerGameMinute * deltaTime * (1 + activityLevel + (Temperature.IsTooHigh ? 2f : 0)));
             
-            if (isSleeping)
-                AddStat("Fatique", fatiqueSleepPerMinute * deltaTime);
+            if (_isSleeping)
+                AddStat("Fatique", _fatiqueSleepPerMinute * deltaTime);
             else
-                AddStat("Fatique", fatiquePerGameMinute * deltaTime * (1 + activityLevel));
+                AddStat("Fatique", _fatiquePerGameMinute * deltaTime * (1 + activityLevel));
 
             if (activityLevel > 0)
                 AddStat("Stamina", -1.0f * deltaTime * activityLevel * (1 + (Fatique.IsCritical ? 1 : 0)));
@@ -163,7 +164,10 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
             
             if (Thirst.IsCritical)
                 AddStat("Health", -_thirstDamageRate * deltaTime);
+        }
 
+        public void UpdateStatusEffects(float deltaTime)
+        {
             // Status effectler
             for (var i = _statusEffects.Count - 1; i >= 0; i--)
             {
@@ -176,6 +180,8 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
                 }
             }
         }
+
+        #endregion
         
         // ---------------------------------------------------------------------------- //
         
@@ -222,7 +228,7 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         
         // ---------------------------------------------------------------------------- //
 
-        #region MyRegion
+        #region Monobehavior Methods
 
         public override void OnEnable()
         {
@@ -264,6 +270,7 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
                 {
                     _lastMinute = currentMinute;
                     Update(1.0f, 0.0f);
+                    UpdateStatusEffects(1.0f);
                 }
                 
                 await GameTime.Instance.WaitForGameMinutes();
