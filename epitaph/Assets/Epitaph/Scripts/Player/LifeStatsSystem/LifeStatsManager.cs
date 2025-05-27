@@ -92,8 +92,11 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
             if (!_stats.ContainsKey(statName)) return;
             SetStat(statName, _stats[statName].Current + amount);
         }
+        
+        // ---------------------------------------------------------------------------- //
 
-        // --- Status effect yönetimi ---
+        #region Status Effect
+
         public void AddStatusEffect(IStatusEffect effect)
         {
             _statusEffects.Add(effect);
@@ -106,6 +109,10 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         {
             _statusEffects.RemoveAll(se => se.Name == effectName);
         }
+
+        #endregion
+        
+        // ---------------------------------------------------------------------------- //
 
         // --- Oyun döngüsü update fonksiyonu ---
         public void Update(float deltaTime, float activityLevel)
@@ -161,8 +168,11 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
                 }
             }
         }
+        
+        // ---------------------------------------------------------------------------- //
+        
+        #region Serialization (Kaydet/Yükle)
 
-        // --- Serialization (Kaydet/Yükle) ---
         public string SaveToJson()
         {
             var saveData = new LifeStatsSaveData
@@ -199,6 +209,8 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
                 }
             }
         }
+
+        #endregion
         
         // ---------------------------------------------------------------------------- //
 
