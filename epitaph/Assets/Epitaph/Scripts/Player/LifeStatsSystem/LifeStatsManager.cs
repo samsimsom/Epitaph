@@ -163,11 +163,6 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
             AddStat("Hunger", 0.2f * deltaTime * (1 + activityLevel));
             AddStat("Thirst", 0.3f * deltaTime * (1 + activityLevel + (Temperature.IsTooHigh ? 1 : 0)));
             AddStat("Fatique", 0.1f * deltaTime * (1 + activityLevel + (Hunger.IsCritical ? 1 : 0) + (Thirst.IsCritical ? 1 : 0)));
-            
-            // if (_isSleeping)
-            //     AddStat("Fatique", _fatiqueSleepPerMinute * deltaTime);
-            // else
-            //     AddStat("Fatique", _fatiquePerGameMinute * deltaTime * (1 + activityLevel));
         }
         
         public void UpdateStatsByTemperature(float deltaTime)
@@ -298,6 +293,8 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
             MinuteBasedUpdates().Forget();
         }
         
+        #endregion
+        
         private async UniTaskVoid FrameBasedUpdates()
         {
             while (_isUpdating)
@@ -331,7 +328,7 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
             }
         }
 
-        #endregion
+
         
         // ---------------------------------------------------------------------------- //
         
