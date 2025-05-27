@@ -1,4 +1,3 @@
-using System;
 using Epitaph.Scripts.GameTimeManager;
 using Epitaph.Scripts.Player;
 using UnityEngine;
@@ -40,7 +39,7 @@ namespace Epitaph.Scripts.DebugPanel
         private void Awake()
         {
             _labelStyle = new GUIStyle();
-            _labelStyle.fontSize = 18; // Yazı tipi boyutu biraz küçültüldü, isteğe bağlı
+            _labelStyle.fontSize = 20; // Yazı tipi boyutu biraz küçültüldü, isteğe bağlı
             _labelStyle.normal.textColor = Color.white;
         }
 
@@ -124,7 +123,7 @@ namespace Epitaph.Scripts.DebugPanel
         private void DrawGuiLabel(string text)
         {
             GUI.Label(new Rect(10, _currentYPosition, 300, 20), text, _labelStyle);
-            _currentYPosition += 25; // Bir sonraki label için Y pozisyonunu artır (20 yükseklik + 2 boşluk)
+            _currentYPosition += 35; // Bir sonraki label için Y pozisyonunu artır (20 yükseklik + 2 boşluk)
         }
 
         private void OnGUI()
