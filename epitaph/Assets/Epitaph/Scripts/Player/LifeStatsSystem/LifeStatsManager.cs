@@ -132,14 +132,20 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
             AddStat("Fatique", 0.1f * deltaTime * (1 + activityLevel + (Hunger.IsCritical ? 1 : 0) + (Thirst.IsCritical ? 1 : 0)));
 
             if (activityLevel > 0)
+            {
                 AddStat("Stamina", -1f * deltaTime * activityLevel * (1 + (Fatique.IsCritical ? 1 : 0)));
+            }
             else
+            {
                 AddStat("Stamina", 1f * deltaTime * (Fatique.IsCritical ? 0.2f : 0.5f));
+            }
 
             if (Fatique.IsCritical)
                 AddStat("Health", -_fatiqueDamageRate * deltaTime);
+            
             if (Hunger.IsCritical)
                 AddStat("Health", -_hungerDamageRate * deltaTime);
+            
             if (Thirst.IsCritical)
                 AddStat("Health", -_thirstDamageRate * deltaTime);
 
@@ -196,6 +202,8 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         
         // ---------------------------------------------------------------------------- //
 
+        #region MyRegion
+
         public override void OnEnable()
         {
             _isUpdating = true;
@@ -209,14 +217,14 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         public override void Start()
         {
             // FrameBasedUpdates().Forget();
-            MinuteBasedUpdates().Forget();
+            // MinuteBasedUpdates().Forget();
         }
         
         private async UniTaskVoid FrameBasedUpdates()
         {
             while (_isUpdating)
             {
-                Update(1.0f, 0.5f); 
+                Update(0.01f, 0.1f); 
                 await UniTask.Yield(PlayerLoopTiming.Update);
             }
         }
@@ -235,11 +243,16 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
                 if (currentMinute != _lastMinute)
                 {
                     _lastMinute = currentMinute;
-                    Update(1.0f, 1.0f); 
+                    Update(0.1f, 1.0f); 
                 }
                 
                 await GameTime.Instance.WaitForGameSecond();
             }
         }
+
+        #endregion
+        
+        // ---------------------------------------------------------------------------- //
+        
     }
 }

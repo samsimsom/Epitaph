@@ -151,18 +151,14 @@ namespace Epitaph.Scripts.Player
                 tempMaxSafe: 38f, tempStart: 37f)
             );
             
-            LifeStatsManager.OnStatChanged += (stat, cur, old) => Debug.Log($"{stat} changed: {old} -> {cur}");
-            LifeStatsManager.OnStatCritical += (stat, val) => Debug.Log($"{stat} is now CRITICAL: {val}");
-            LifeStatsManager.OnDeath += () => Debug.Log("Character is dead!");
-            
-            // LifeStatsManager.AddStatusEffect(new PoisonedEffect(10f));
+            LifeStatsManager.AddStatusEffect(new PoisonedEffect(10f));
             
             // Kaydet/yükle
-            var save = LifeStatsManager.SaveToJson();
-            var stats2 = new LifeStatsManager(this, 100,
-                100,100,100,100,28,
-                44,36,38,37);
-            stats2.LoadFromJson(save);
+            // var save = LifeStatsManager.SaveToJson();
+            // var stats2 = new LifeStatsManager(this, 100,
+            //     100,100,100,100,28,
+            //     44,36,38,37);
+            // stats2.LoadFromJson(save);
         }
 
         #endregion
