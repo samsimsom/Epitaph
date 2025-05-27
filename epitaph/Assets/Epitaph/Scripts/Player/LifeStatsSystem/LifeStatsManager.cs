@@ -254,9 +254,9 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
             }
             
             // Debug
-            Debug.Log($"VitalityRatio: {VitalityRatio:F2} | Health: {healthNormalized:F2} | " +
-                      $"Hunger: {hungerNormalized:F2} | Fatique: {fatiqueNormalized:F2} | " +
-                      $"Thirst: {thirstNormalized:F2}");
+            // Debug.Log($"VitalityRatio: {VitalityRatio:F2} | Health: {healthNormalized:F2} | " +
+            //           $"Hunger: {hungerNormalized:F2} | Fatique: {fatiqueNormalized:F2} | " +
+            //           $"Thirst: {thirstNormalized:F2}");
             
         }
         public void UpdateStatusEffects(float deltaTime)
@@ -370,7 +370,6 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
                     UpdateStatsByTemperature(1.0f);
                     UpdateVitality(1.0f);
                     UpdateStatusEffects(1.0f);
-                    Debug.Log($"Current : {Vitality.Current} | Max : {Vitality.Max} | Min : {Vitality.Min}");
                 }
                 
                 await GameTime.Instance.WaitForGameMinutes();
