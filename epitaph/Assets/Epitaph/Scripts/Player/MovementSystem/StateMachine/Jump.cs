@@ -18,6 +18,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         {
             HandleAirborneMovement();
             // Ctx.PlayerController.LifeStatsManager.Update(0.01f, 20f);
+            Ctx.PlayerController.LifeStatsManager.DecreaseStamina(0.01f, 0.3f);
             CheckSwitchStates();
         }
 

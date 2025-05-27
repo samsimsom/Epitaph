@@ -136,14 +136,8 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
 
         #region Update Methods
 
-        public void Update(float deltaTime, float activityLevel)
+        public void DecreaseHealth(float deltaTime)
         {
-            // Statlar arası ilişkiler:
-            // AddStat("Hunger", _hungerPerGameMinute * deltaTime * (1 + activityLevel));
-            // AddStat("Thirst", _thirstPerGameMinute * deltaTime * (1 + activityLevel + (Temperature.IsTooHigh ? 2f : 0)));
-            
-            UpdateStatsByActivity(deltaTime, activityLevel);
-
             if (Fatique.IsCritical)
                 AddStat("Health", -_fatiqueDamageRate * deltaTime);
             
@@ -154,16 +148,21 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
                 AddStat("Health", -_thirstDamageRate * deltaTime);
         }
 
+        public void DecreaseStamina(float deltaTime, float activityLevel)
+        {
+            AddStat("Stamina", -1f * deltaTime * activityLevel * (1 + (Fatique.IsCritical ? 1 : 0)));
+        }
+        
+        public void IncreaseStamina(float deltaTime)
+        {
+            AddStat("Stamina", 1f * deltaTime * (Fatique.IsCritical ? 0.2f : 0.5f));
+        }
+
         public void UpdateStatsByActivity(float deltaTime, float activityLevel)
         {
             AddStat("Hunger", 0.2f * deltaTime * (1 + activityLevel));
             AddStat("Thirst", 0.3f * deltaTime * (1 + activityLevel + (Temperature.IsTooHigh ? 1 : 0)));
-            AddStat("Fatique", -0.1f * deltaTime * (1 + activityLevel + (Hunger.IsCritical ? 1 : 0) + (Thirst.IsCritical ? 1 : 0)));
-            
-            if (activityLevel > 0)
-                AddStat("Stamina", -1f * deltaTime * activityLevel * (1 + (Fatique.IsCritical ? 1 : 0)));
-            else
-                AddStat("Stamina", 1f * deltaTime * (Fatique.IsCritical ? 0.2f : 0.5f));
+            AddStat("Fatique", 0.1f * deltaTime * (1 + activityLevel + (Hunger.IsCritical ? 1 : 0) + (Thirst.IsCritical ? 1 : 0)));
             
             // if (_isSleeping)
             //     AddStat("Fatique", _fatiqueSleepPerMinute * deltaTime);
@@ -303,7 +302,8 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         {
             while (_isUpdating)
             {
-                Update(0.01f, 0.0f);
+                DecreaseHealth(0.01f);
+                UpdateStatsByActivity(0.01f, 0.1f);
                 await UniTask.Yield(PlayerLoopTiming.Update);
             }
         }
