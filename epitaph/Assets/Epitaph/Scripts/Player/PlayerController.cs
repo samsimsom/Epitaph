@@ -2,9 +2,10 @@ using System.Collections.Generic;
 using Epitaph.Scripts.InputManager;
 using Epitaph.Scripts.Player.BaseBehaviour;
 using Epitaph.Scripts.Player.InteractionSystem;
+using Epitaph.Scripts.Player.LifeStatsSystem;
+using Epitaph.Scripts.Player.LifeStatsSystem.StatusEffects;
 using Epitaph.Scripts.Player.MovementSystem;
 using Epitaph.Scripts.Player.ViewSystem;
-using Epitaph.Scripts.Player.VitalSystem;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player
@@ -32,7 +33,7 @@ namespace Epitaph.Scripts.Player
         public MovementBehaviour MovementBehaviour { get; private set; }
         public ViewBehaviour ViewBehaviour { get; private set; }
         public InteractionBehaviour InteractionBehaviour { get; private set; }
-        public VitalBehaviour VitalBehaviour { get; private set; }
+        public LifeStatsManager LifeStatsManager { get; private set; }
 
         #endregion
         
@@ -143,7 +144,25 @@ namespace Epitaph.Scripts.Player
             ViewBehaviour = AddBehaviour(new ViewBehaviour(this));
             MovementBehaviour = AddBehaviour(new MovementBehaviour(this));
             InteractionBehaviour = AddBehaviour(new InteractionBehaviour(this));
-            VitalBehaviour = AddBehaviour(new VitalBehaviour(this));
+            
+            LifeStatsManager = AddBehaviour(new LifeStatsManager (this, 
+                healthMax: 100f, staminaMax: 100f, fatiqueMax: 100f, thirstMax: 100f, 
+                hungerMax: 100f, temperatureMin: 28f, temperatureMax: 44f, tempMinSafe: 36f, 
+                tempMaxSafe: 38f, tempStart: 37f)
+            );
+            
+            LifeStatsManager.OnStatChanged += (stat, cur, old) => Debug.Log($"{stat} changed: {old} -> {cur}");
+            LifeStatsManager.OnStatCritical += (stat, val) => Debug.Log($"{stat} is now CRITICAL: {val}");
+            LifeStatsManager.OnDeath += () => Debug.Log("Character is dead!");
+            
+            // LifeStatsManager.AddStatusEffect(new PoisonedEffect(10f));
+            
+            // Kaydet/yükle
+            var save = LifeStatsManager.SaveToJson();
+            var stats2 = new LifeStatsManager(this, 100,
+                100,100,100,100,28,
+                44,36,38,37);
+            stats2.LoadFromJson(save);
         }
 
         #endregion
