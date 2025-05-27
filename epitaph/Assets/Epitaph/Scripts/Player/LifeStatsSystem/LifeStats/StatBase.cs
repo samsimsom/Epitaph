@@ -42,6 +42,11 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem.LifeStats
                 }
             }
         }
+        
+        // public virtual void Increase() { }
+        // public virtual void Decrease() { }
+        // public virtual void Restore() { }
+        // public virtual void Drain() { }
     }
 
 }

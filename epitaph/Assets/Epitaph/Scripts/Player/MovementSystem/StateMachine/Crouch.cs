@@ -31,7 +31,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         {
             HandleMovementInput();
             // Ctx.PlayerController.LifeStatsManager.Update(0.01f, 2f);
-            Ctx.PlayerController.LifeStatsManager.DecreaseStamina(0.01f, 0.01f);
+            Ctx.PlayerController.LifeStatsManager.DecreaseStatsByActivity(0.01f, 0.01f);
             CheckSwitchStates();
         }
 

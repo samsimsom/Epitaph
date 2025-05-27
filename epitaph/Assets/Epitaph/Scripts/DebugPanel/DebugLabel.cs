@@ -1,3 +1,4 @@
+using System;
 using Epitaph.Scripts.GameTimeManager;
 using Epitaph.Scripts.Player;
 using UnityEngine;
@@ -69,7 +70,7 @@ namespace Epitaph.Scripts.DebugPanel
                 playerController.LifeStatsManager.OnDeath -= OnLifeStatsManagerOnOnDeath;
             }
         }
-        
+
         private void OnLifeStatsManagerOnOnDeath()
         {
             Debug.Log("Character is dead!");
@@ -141,7 +142,7 @@ namespace Epitaph.Scripts.DebugPanel
             if (playerController == null || playerController.MovementBehaviour == null || 
                 playerController.CharacterController == null || GameTime.Instance == null)
             {
-                // GUI.Label(new Rect(10, 10, 300, 20), "PlayerController or components not ready.", _labelStyle);
+                GUI.Label(new Rect(10, 10, 300, 20), "PlayerController or components not ready.", _labelStyle);
                 return;
             }
 

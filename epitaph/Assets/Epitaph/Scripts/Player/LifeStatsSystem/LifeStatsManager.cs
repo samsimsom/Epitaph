@@ -148,21 +148,17 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
                 AddStat("Health", -_thirstDamageRate * deltaTime);
         }
 
-        public void DecreaseStamina(float deltaTime, float activityLevel)
+        public void DecreaseStatsByActivity(float deltaTime, float activityLevel)
         {
             AddStat("Stamina", -1f * deltaTime * activityLevel * (1 + (Fatique.IsCritical ? 1 : 0)));
-        }
-        
-        public void IncreaseStamina(float deltaTime)
-        {
-            AddStat("Stamina", 1f * deltaTime * (Fatique.IsCritical ? 0.2f : 0.5f));
-        }
-
-        public void UpdateStatsByActivity(float deltaTime, float activityLevel)
-        {
             AddStat("Hunger", 0.2f * deltaTime * (1 + activityLevel));
             AddStat("Thirst", 0.3f * deltaTime * (1 + activityLevel + (Temperature.IsTooHigh ? 1 : 0)));
             AddStat("Fatique", 0.1f * deltaTime * (1 + activityLevel + (Hunger.IsCritical ? 1 : 0) + (Thirst.IsCritical ? 1 : 0)));
+        }
+        
+        public void IncreaseStats(float deltaTime)
+        {
+            AddStat("Stamina", 1f * deltaTime * (Fatique.IsCritical ? 0.2f : 0.5f));
         }
         
         public void UpdateStatsByTemperature(float deltaTime)
@@ -289,6 +285,7 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         
         public override void Start()
         {
+            AddStat("Vitality", 0f);
             FrameBasedUpdates().Forget();
             MinuteBasedUpdates().Forget();
         }
@@ -300,7 +297,6 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
             while (_isUpdating)
             {
                 DecreaseHealth(0.01f);
-                UpdateStatsByActivity(0.01f, 0.1f);
                 await UniTask.Yield(PlayerLoopTiming.Update);
             }
         }
@@ -322,6 +318,7 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
                     UpdateStatsByTemperature(1.0f);
                     UpdateStatsByVitality(1.0f);
                     UpdateStatsByStatusEffects(1.0f);
+                    Debug.Log($"Current : {Vitality.Current} | Max : {Vitality.Max} | Min : {Vitality.Min}");
                 }
                 
                 await GameTime.Instance.WaitForGameMinutes();

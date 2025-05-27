@@ -16,7 +16,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         {
             HandleMovementInput();
             // Ctx.PlayerController.LifeStatsManager.Update(0.01f, 10f);
-            Ctx.PlayerController.LifeStatsManager.DecreaseStamina(0.01f, 0.5f);
+            Ctx.PlayerController.LifeStatsManager.DecreaseStatsByActivity(0.01f, 0.5f);
             CheckSwitchStates();
         }
         public override void FixedUpdateState() { }
