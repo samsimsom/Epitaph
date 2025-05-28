@@ -85,7 +85,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         {
             ExitState();
             @new.EnterState();
-            Ctx.Current = @new;
+            Ctx.CurrentState = @new;
         }
 
         #endregion

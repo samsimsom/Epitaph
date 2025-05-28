@@ -160,7 +160,7 @@ namespace Epitaph.Scripts.DebugPanel
                 DrawGuiLabel($"Is Grounded (Custom): {playerController.MovementBehaviour.IsGrounded}");
                 DrawGuiLabel($"Is Grounded (Capsule): {playerController.CharacterController.isGrounded}");
                 DrawGuiLabel($"Ground Normal : {playerController.MovementBehaviour.GroundNormal}");
-                DrawGuiLabel($"Movement State : {playerController.MovementBehaviour.Current?.StateName ?? "N/A"}");
+                DrawGuiLabel($"Movement State : {playerController.MovementBehaviour.CurrentState?.StateName ?? "N/A"}");
             }
 
 #if false

@@ -24,8 +24,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         // Coyote Time Counter
         public float CoyoteTime = 0.2f;
-        private float _coyoteTimeCounter;
-        public float CoyoteTimeCounter => _coyoteTimeCounter;
+        public float CoyoteTimeCounter;
 
         // Gravity Variables
         public float VerticalMovementLimit = -10.0f;
@@ -39,7 +38,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public Vector3 CrouchControllerCenter = new(0, 0.45f, 0);
 
         // Getters & Setters
-        public StateBase Current { get; internal set; }
+        public StateBase CurrentState { get; internal set; }
         
         public bool IsCrouching { get; internal set; }
         public bool IsGrounded { get; private set; }
@@ -49,8 +48,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float CurrentSpeed { get; private set; }
         public float VerticalMovement { get; internal set; }
 
-        public float AppliedMovementX { get; set; }
-        public float AppliedMovementZ { get; set; }
+        public float AppliedMovementX { get; internal set; }
+        public float AppliedMovementZ { get; internal set; }
 
         // ---------------------------------------------------------------------------- //
         
@@ -62,8 +61,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public override void Awake()
         {
             _states = new StateFactory(this);
-            Current = _states.Idle();
-            Current.EnterState();
+            CurrentState = _states.Idle();
+            CurrentState.EnterState();
         }
 
         public override void Start()
@@ -75,24 +74,24 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public override void Update()
         {
             CheckIsGrounded();
-            Current.UpdateState();
+            CurrentState.UpdateState();
             HandleMovement();
             
             // Coyote time yönetimi
             if (IsGrounded)
             {
-                _coyoteTimeCounter = CoyoteTime; // Yere değince yenile
+                CoyoteTimeCounter = CoyoteTime; // Yere değince yenile
             }
             else
             {
-                _coyoteTimeCounter -= Time.deltaTime;
+                CoyoteTimeCounter -= Time.deltaTime;
             }
         }
         
         public override void FixedUpdate()
         {
             HandleGravity();
-            Current.FixedUpdateState();
+            CurrentState.FixedUpdateState();
         }
 
         // ---------------------------------------------------------------------------- //

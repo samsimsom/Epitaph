@@ -60,9 +60,9 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             var input = Ctx.PlayerController.PlayerInput.MoveInput;
             var airControlFactor = Ctx.AirControlFactor;
             
-            Ctx.AppliedMovementX = input.x * (Ctx.Current is Run ? 
+            Ctx.AppliedMovementX = input.x * (Ctx.CurrentState is Run ? 
                 Ctx.RunSpeed * airControlFactor : Ctx.WalkSpeed * airControlFactor);
-            Ctx.AppliedMovementZ = input.y * (Ctx.Current is Run ? 
+            Ctx.AppliedMovementZ = input.y * (Ctx.CurrentState is Run ? 
                 Ctx.RunSpeed * airControlFactor : Ctx.WalkSpeed* airControlFactor);
         }
 
@@ -70,7 +70,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         {
             ExitState();
             @new.EnterState();
-            Ctx.Current = @new;
+            Ctx.CurrentState = @new;
         }
     }
 }
