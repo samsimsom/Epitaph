@@ -10,14 +10,11 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         public override void EnterState()
         {
             // Debug.Log("IDLE: Enter");
-            
-            Ctx.AppliedMovementX = 0;
-            Ctx.AppliedMovementZ = 0;
         }
 
         public override void UpdateState()
         {
-            Ctx.PlayerController.LifeStatsManager.IncreaseStamina(0.01f);
+            HandleMovementInput();
             CheckSwitchStates();
         }
 
@@ -51,6 +48,15 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             {
                 SwitchState(Factory.Walk());
             }
+        }
+        
+        private void HandleMovementInput()
+        {
+            var input = Ctx.PlayerController.PlayerInput.MoveInput;
+            Ctx.AppliedMovementX = Mathf.Lerp(Ctx.AppliedMovementX, 
+                0f, Ctx.IdleTransitionDuration);
+            Ctx.AppliedMovementZ = Mathf.Lerp(Ctx.AppliedMovementZ, 
+                0f, Ctx.IdleTransitionDuration);
         }
 
         private void SwitchState(StateBase @new)

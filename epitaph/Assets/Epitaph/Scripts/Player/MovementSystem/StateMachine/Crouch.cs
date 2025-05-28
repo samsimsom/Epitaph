@@ -4,13 +4,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 {
     public class Crouch : StateBase
     {
-        // #region Fields
-        //
-        // private Coroutine _crouchTransitionCoroutine;
-        // private Coroutine _cameraTransitionCoroutine;
-        //
-        // #endregion
-
         #region Constructor
 
         public Crouch(MovementBehaviour currentContext, StateFactory stateFactory)
@@ -30,12 +23,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         public override void UpdateState()
         {
             HandleMovementInput();
-            
-            Ctx.PlayerController.LifeStatsManager.DecreaseStamina(0.01f, 0.01f);
-            Ctx.PlayerController.LifeStatsManager.DecreaseThirst(0.01f, 0.01f);
-            Ctx.PlayerController.LifeStatsManager.DecreaseHunger(0.01f, 0.01f);
-            Ctx.PlayerController.LifeStatsManager.DecreaseFatique(0.01f, 0.01f);
-            
             CheckSwitchStates();
         }
 
@@ -60,7 +47,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame && 
                 CanStandUp())
             {
-                Ctx.IsCrouching = false;
+                Ctx.IsCrouching = false;;
 
                 if (Ctx.PlayerController.PlayerInput.IsMoveInput && 
                     Ctx.PlayerController.PlayerInput.IsRunPressed)
@@ -105,15 +92,15 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         // ---------------------------------------------------------------------------- //
         
-        // ---------------------------------------------------------------------------- //
-        
         #region Input Handling
 
         private void HandleMovementInput()
         {
             var input = Ctx.PlayerController.PlayerInput.MoveInput;
-            Ctx.AppliedMovementX = Mathf.Lerp(Ctx.AppliedMovementX, input.x * Ctx.CrouchSpeed, 0.1f);
-            Ctx.AppliedMovementZ = Mathf.Lerp(Ctx.AppliedMovementZ, input.y * Ctx.CrouchSpeed, 0.1f);
+            Ctx.AppliedMovementX = Mathf.Lerp(Ctx.AppliedMovementX, 
+                input.x * Ctx.CrouchSpeed, Ctx.SpeedTransitionDuration);
+            Ctx.AppliedMovementZ = Mathf.Lerp(Ctx.AppliedMovementZ, 
+                input.y * Ctx.CrouchSpeed, Ctx.SpeedTransitionDuration);
         }
 
         #endregion
@@ -122,23 +109,13 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         private void TransitionCrouchState(bool crouch)
         {
-            UpdateCameraHeightSmooth(crouch);
-    
-            if (crouch)
-            {
-                Ctx.PlayerController.CharacterController.height = Ctx.CrouchHeight;
-                Ctx.PlayerController.CharacterController.center = Ctx.CrouchControllerCenter;
-            }
-            else if (CanStandUp())
-            {
-                Ctx.PlayerController.CharacterController.height = Ctx.NormalHeight;
-                Ctx.PlayerController.CharacterController.center = Ctx.NormalControllerCenter;
-            }
+            AdjustCameraHeightForCrouch(crouch);
+            AdjustCharacterControllerForCrouch(crouch);
     
             Ctx.IsCrouching = crouch;
         }
 
-        private void UpdateCameraHeightSmooth(bool crouch)
+        private void AdjustCameraHeightForCrouch(bool crouch)
         {
             var targetY = crouch ? Ctx.CrouchCameraHeight : Ctx.NormalCameraHeight;
             
@@ -154,6 +131,20 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             
             Ctx.PlayerController.ViewBehaviour.SetCameraHeight(targetY);
         }
+        
+        private void AdjustCharacterControllerForCrouch(bool crouch)
+        {
+            if (crouch)
+            {
+                Ctx.PlayerController.CharacterController.height = Ctx.CrouchHeight;
+                Ctx.PlayerController.CharacterController.center = Ctx.CrouchControllerCenter;
+            }
+            else if (CanStandUp())
+            {
+                Ctx.PlayerController.CharacterController.height = Ctx.NormalHeight;
+                Ctx.PlayerController.CharacterController.center = Ctx.NormalControllerCenter;
+            }
+        }
 
         #endregion
 
@@ -165,8 +156,9 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         {
             var radius = Ctx.PlayerController.CharacterController.radius;
             var castDistance = Ctx.NormalHeight - Ctx.CrouchHeight;
-            var castStartPoint = Ctx.PlayerController.CharacterController.transform.position +
-                                 Ctx.CrouchControllerCenter + Vector3.up * (Ctx.CrouchHeight / 2 - radius);
+            var controllerPosition = Ctx.PlayerController.CharacterController.transform.position;
+            var castStartPoint = controllerPosition + Ctx.CrouchControllerCenter + 
+                                 Vector3.up * (Ctx.CrouchHeight / 2 - radius);
 
             Debug.DrawRay(castStartPoint, Vector3.up * castDistance, Color.red, 2f);
             if (Physics.SphereCast(castStartPoint, radius, Vector3.up,

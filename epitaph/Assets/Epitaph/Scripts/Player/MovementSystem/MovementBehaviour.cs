@@ -14,13 +14,18 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float WalkSpeed = 2.5f;
         public float RunSpeed = 4.0f;
         public float CrouchSpeed = 1.5f;
+        public float SpeedTransitionDuration = 0.1f;
+        public float IdleTransitionDuration = 0.25f;
 
         // Jump Variables
         public float JumpForce = 5.0f;
         public float AirControlFactor = 1.5f;
         public float Gravity = 20.0f;
+        
+        // Coyote Time Counter
         public float CoyoteTime = 0.2f;
-        public float CoyoteTimeCounter;
+        private float _coyoteTimeCounter;
+        public float CoyoteTimeCounter => _coyoteTimeCounter;
 
         // Gravity Variables
         public float VerticalMovementLimit = -10.0f;
@@ -34,14 +39,15 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public Vector3 CrouchControllerCenter = new(0, 0.45f, 0);
 
         // Getters & Setters
-        public StateBase Current { get; set; }
-        public bool IsCrouching { get; set; }
+        public StateBase Current { get; internal set; }
+        
+        public bool IsCrouching { get; internal set; }
         public bool IsGrounded { get; private set; }
         public Vector3 GroundNormal { get; private set; }
         
-        public Vector3 CapsulVelocity { get; set; }
-        public float CurrentSpeed { get; set; }
-        public float VerticalMovement { get; set; }
+        public Vector3 CapsulVelocity { get; private set; }
+        public float CurrentSpeed { get; private set; }
+        public float VerticalMovement { get; internal set; }
 
         public float AppliedMovementX { get; set; }
         public float AppliedMovementZ { get; set; }
@@ -75,11 +81,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
             // Coyote time yönetimi
             if (IsGrounded)
             {
-                CoyoteTimeCounter = CoyoteTime; // Yere değince yenile
+                _coyoteTimeCounter = CoyoteTime; // Yere değince yenile
             }
             else
             {
-                CoyoteTimeCounter -= Time.deltaTime;
+                _coyoteTimeCounter -= Time.deltaTime;
             }
         }
         
@@ -167,6 +173,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private void CheckIsGrounded()
         {
             var controller = PlayerController.CharacterController;
+            var controllerPosition = controller.transform.position;
             var radius = controller.radius;
             var origin = controller.transform.position + controller.center - 
                          Vector3.up * (controller.height / 2f);
@@ -178,10 +185,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
             
             // ------------------------------------------------------------------------ //
             
-            // TODO : Bu hesaplari yenidne yap kesin daha basiti vardir :)
             var rayDistance = controller.radius * 2f;
-            var characterBaseWorld = controller.transform.position + 
-                controller.center - Vector3.up * (controller.height / 3f);
+            var characterBaseWorld = controllerPosition + controller.center - 
+                                     Vector3.up * (controller.height / 2f - controller.radius);
             
             var originLeft = characterBaseWorld + (Vector3.left * controller.radius);
             var originRight = characterBaseWorld + (Vector3.right * controller.radius);
@@ -257,6 +263,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         }
         
         // ---------------------------------------------------------------------------- //
+        
         
 #if UNITY_EDITOR
         public override void OnDrawGizmos()

@@ -155,40 +155,36 @@ namespace Epitaph.Scripts.DebugPanel
             if (playerController.MovementBehaviour != null) // Ekstra güvenlik kontrolü
             {
                 DrawGuiLabel($"Vertical Movement : {playerController.MovementBehaviour.VerticalMovement:F1}");
-                DrawGuiLabel($"Capsule Velocity : {playerController.MovementBehaviour.CapsulVelocity}"); // Vector3.ToString() varsayılan formatı kullanır
+                DrawGuiLabel($"Capsule Velocity : {playerController.MovementBehaviour.CapsulVelocity}");
                 DrawGuiLabel($"Current Movement Speed: {playerController.MovementBehaviour.CurrentSpeed:F1}");
                 DrawGuiLabel($"Is Grounded (Custom): {playerController.MovementBehaviour.IsGrounded}");
                 DrawGuiLabel($"Is Grounded (Capsule): {playerController.CharacterController.isGrounded}");
                 DrawGuiLabel($"Ground Normal : {playerController.MovementBehaviour.GroundNormal}");
-                DrawGuiLabel($"Movement State : {playerController.MovementBehaviour.Current?.StateName ?? "N/A"}"); // Null check eklendi
+                DrawGuiLabel($"Movement State : {playerController.MovementBehaviour.Current?.StateName ?? "N/A"}");
             }
 
+#if false
             _currentYPosition += 10f; // Life stats öncesi daha büyük boşluk
             
             // Değişen Life Stats bilgilerini göster
-            // if (!string.IsNullOrEmpty(_healthText))
             DrawGuiLabel($"Health : {playerController.LifeStatsManager.Health.Current:F}");
-            // if (!string.IsNullOrEmpty(_vitalityText))
             DrawGuiLabel($"Vitality Ratio : {playerController.LifeStatsManager.VitalityRatio:F}");
             DrawGuiLabel($"Vitality : {playerController.LifeStatsManager.Vitality.Current:F}");
             
             _currentYPosition += 5f; // Bölümler arası küçük boşluk
             
-            // if (!string.IsNullOrEmpty(_staminaText))
             DrawGuiLabel($"Stamina : {playerController.LifeStatsManager.Stamina.Current:F}");
-            // if (!string.IsNullOrEmpty(_hungerText))
             DrawGuiLabel($"Hunger : {playerController.LifeStatsManager.Hunger.Current:F}");
-            // if (!string.IsNullOrEmpty(_thirstText))
             DrawGuiLabel($"Thirst : {playerController.LifeStatsManager.Thirst.Current:F}");
-            // if (!string.IsNullOrEmpty(_fatiqueText))
             DrawGuiLabel($"Fatique : {playerController.LifeStatsManager.Fatique.Current:F}");
             
             _currentYPosition += 5f; // Bölümler arası küçük boşluk
             
-            // if (!string.IsNullOrEmpty(_temperatureText))
             DrawGuiLabel($"Temperature isSafe : {playerController.LifeStatsManager.Temperature.IsSafe}");
-            // if (!string.IsNullOrEmpty(_temperatureText))
             DrawGuiLabel($"Temperature : {playerController.LifeStatsManager.Temperature.Current}");
+#endif
+            
+            
         }
     }
 }

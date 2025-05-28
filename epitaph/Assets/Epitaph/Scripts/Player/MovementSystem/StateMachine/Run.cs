@@ -15,10 +15,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         public override void UpdateState()
         {
             HandleMovementInput();
-            Ctx.PlayerController.LifeStatsManager.DecreaseStamina(0.01f, 5.0f);
-            Ctx.PlayerController.LifeStatsManager.DecreaseThirst(0.01f, 0.5f);
-            Ctx.PlayerController.LifeStatsManager.DecreaseHunger(0.01f, 0.5f);
-            Ctx.PlayerController.LifeStatsManager.DecreaseFatique(0.01f, 0.5f);
             CheckSwitchStates();
         }
         public override void FixedUpdateState() { }
@@ -57,9 +53,10 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         private void HandleMovementInput()
         {
             var input = Ctx.PlayerController.PlayerInput.MoveInput;
-            
-            Ctx.AppliedMovementX = Mathf.Lerp(Ctx.AppliedMovementX, input.x * Ctx.RunSpeed, 0.1f);
-            Ctx.AppliedMovementZ = Mathf.Lerp(Ctx.AppliedMovementZ, input.y * Ctx.RunSpeed, 0.1f);
+            Ctx.AppliedMovementX = Mathf.Lerp(Ctx.AppliedMovementX, 
+                input.x * Ctx.RunSpeed, Ctx.SpeedTransitionDuration);
+            Ctx.AppliedMovementZ = Mathf.Lerp(Ctx.AppliedMovementZ, 
+                input.y * Ctx.RunSpeed, Ctx.SpeedTransitionDuration);
         }
 
         private void SwitchState(StateBase @new)
