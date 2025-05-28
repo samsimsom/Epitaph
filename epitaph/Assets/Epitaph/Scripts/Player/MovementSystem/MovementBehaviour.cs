@@ -180,7 +180,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             
             // TODO : Bu hesaplari yenidne yap kesin daha basiti vardir :)
             var rayDistance = controller.radius * 2f;
-            var characterBaseWorld = controller.transform.position + controller.center - Vector3.up * (controller.height / 3f);
+            var characterBaseWorld = controller.transform.position + 
+                controller.center - Vector3.up * (controller.height / 3f);
             
             var originLeft = characterBaseWorld + (Vector3.left * controller.radius);
             var originRight = characterBaseWorld + (Vector3.right * controller.radius);

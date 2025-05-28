@@ -4,12 +4,12 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 {
     public class Crouch : StateBase
     {
-        #region Fields
-
-        private Coroutine _crouchTransitionCoroutine;
-        private Coroutine _cameraTransitionCoroutine;
-
-        #endregion
+        // #region Fields
+        //
+        // private Coroutine _crouchTransitionCoroutine;
+        // private Coroutine _cameraTransitionCoroutine;
+        //
+        // #endregion
 
         #region Constructor
 
