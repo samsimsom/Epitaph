@@ -133,7 +133,7 @@ namespace Epitaph.Scripts.DebugPanel
         private void DrawGuiLabel(string text)
         {
             GUI.Label(new Rect(10, _currentYPosition, 300, 20), text, _labelStyle);
-            _currentYPosition += 35; // Bir sonraki label için Y pozisyonunu artır (20 yükseklik + 2 boşluk)
+            _currentYPosition += 25; // Bir sonraki label için Y pozisyonunu artır (20 yükseklik + 2 boşluk)
         }
 
         private void OnGUI()
@@ -151,17 +151,24 @@ namespace Epitaph.Scripts.DebugPanel
             DrawGuiLabel($"Clock : {GameTime.Instance.GameHour:D2}:{GameTime.Instance.GameMinute:D2}");
             
             _currentYPosition += 5f; // Bölümler arası küçük boşluk
+            
+            DrawGuiLabel($"Is Walking : {playerController.MovementBehaviour.IsWalking}");
+            DrawGuiLabel($"Is Running : {playerController.MovementBehaviour.IsRunning}");
+            DrawGuiLabel($"Is Jumping : {playerController.MovementBehaviour.IsJumping}");
+            DrawGuiLabel($"Is Falling : {playerController.MovementBehaviour.IsFalling}");
+            
+            DrawGuiLabel($"Is Crouching : {playerController.MovementBehaviour.IsCrouching}");
+            DrawGuiLabel($"Is Grounded (Custom): {playerController.MovementBehaviour.IsGrounded}");
+            DrawGuiLabel($"Is Grounded (Capsule): {playerController.CharacterController.isGrounded}");
+            
+            _currentYPosition += 5f; // Bölümler arası küçük boşluk
+            
+            DrawGuiLabel($"Vertical Movement : {playerController.MovementBehaviour.VerticalMovement:F1}");
+            DrawGuiLabel($"Capsule Velocity : {playerController.MovementBehaviour.CapsulVelocity}");
+            DrawGuiLabel($"Current Movement Speed: {playerController.MovementBehaviour.CurrentSpeed:F1}");
 
-            if (playerController.MovementBehaviour != null) // Ekstra güvenlik kontrolü
-            {
-                DrawGuiLabel($"Vertical Movement : {playerController.MovementBehaviour.VerticalMovement:F1}");
-                DrawGuiLabel($"Capsule Velocity : {playerController.MovementBehaviour.CapsulVelocity}");
-                DrawGuiLabel($"Current Movement Speed: {playerController.MovementBehaviour.CurrentSpeed:F1}");
-                DrawGuiLabel($"Is Grounded (Custom): {playerController.MovementBehaviour.IsGrounded}");
-                DrawGuiLabel($"Is Grounded (Capsule): {playerController.CharacterController.isGrounded}");
-                DrawGuiLabel($"Ground Normal : {playerController.MovementBehaviour.GroundNormal}");
-                DrawGuiLabel($"Movement State : {playerController.MovementBehaviour.CurrentState?.StateName ?? "N/A"}");
-            }
+            DrawGuiLabel($"Ground Normal : {playerController.MovementBehaviour.GroundNormal}");
+            DrawGuiLabel($"Movement State : {playerController.MovementBehaviour.CurrentState?.StateName ?? "N/A"}");
 
 #if false
             _currentYPosition += 10f; // Life stats öncesi daha büyük boşluk

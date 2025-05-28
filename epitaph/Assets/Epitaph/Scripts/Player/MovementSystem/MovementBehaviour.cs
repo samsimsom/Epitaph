@@ -40,6 +40,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // Getters & Setters
         public StateBase CurrentState { get; internal set; }
         
+        public bool IsStanding { get; internal set; }
+        public bool IsWalking { get; internal set; }
+        public bool IsRunning { get; internal set; }
+        public bool IsFalling { get; internal set; }
+        public bool IsJumping { get; internal set; }
         public bool IsCrouching { get; internal set; }
         public bool IsGrounded { get; private set; }
         public Vector3 GroundNormal { get; private set; }
@@ -74,6 +79,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public override void Update()
         {
             CheckIsGrounded();
+            CheckIsFalling();
             CurrentState.UpdateState();
             HandleMovement();
             
@@ -263,6 +269,38 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         // ---------------------------------------------------------------------------- //
         
+        private void CheckIsFalling()
+        {
+            // Karakter havada ve aşağı doğru hareket ediyorsa düşüyor demektir
+            IsFalling = !IsGrounded && VerticalMovement < 0f;
+    
+            // Alternatif olarak, CharacterController velocity'sini de kullanabilirsiniz
+            // IsFalling = !IsGrounded && CapsulVelocity.y < 0f;
+        }
+        
+        public float CalculateMaxJumpHeight()
+        {
+            // Yerçekimi çarpanını dahil ederek daha doğru hesaplama
+            var effectiveGravity = Gravity * 0.85f;
+            var maxHeight = (JumpForce * JumpForce) / (2f * effectiveGravity);
+            return maxHeight;
+        }
+
+        public Vector3 CalculateMaxJumpPosition()
+        {
+            var maxHeight = CalculateMaxJumpHeight();
+            var currentPosition = PlayerController.transform.position;
+            return new Vector3(currentPosition.x, currentPosition.y + maxHeight, currentPosition.z);
+        }
+
+        public bool CanJumpToHeight(float targetHeight)
+        {
+            var maxHeight = CalculateMaxJumpHeight();
+            var currentY = PlayerController.transform.position.y;
+            return (currentY + maxHeight) >= targetHeight;
+        }
+
+        // ---------------------------------------------------------------------------- //
         
 #if UNITY_EDITOR
         public override void OnDrawGizmos()

@@ -12,6 +12,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             // Debug.Log("JUMP: Enter");
             
             Ctx.VerticalMovement = Ctx.JumpForce;
+            Ctx.IsJumping = true;
         }
 
         public override void UpdateState()
@@ -25,6 +26,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         public override void ExitState()
         {
             // Debug.Log("JUMP: Exit");
+            Ctx.IsJumping = false;
         }
 
         public override void InitializeSubState() { }
@@ -51,6 +53,15 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 else
                 {
                     SwitchState(Factory.Idle());
+                }
+            }
+            else
+            {
+                if (Ctx.IsFalling)
+                {
+                    Ctx.IsJumping = false;
+                    // Debug.Log("Fall State");
+                    // SwitchState(Factory.Idle());
                 }
             }
         }

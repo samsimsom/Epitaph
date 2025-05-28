@@ -10,6 +10,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         public override void EnterState()
         {
             // Debug.Log("WALK: Enter");
+            Ctx.IsWalking = true;
         }
 
         public override void UpdateState()
@@ -23,6 +24,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         public override void ExitState()
         {
             // Debug.Log("WALK: Exit");
+            Ctx.IsWalking = false;
         }
 
         public override void InitializeSubState() { }

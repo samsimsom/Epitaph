@@ -111,7 +111,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         {
             AdjustCameraHeightForCrouch(crouch);
             AdjustCharacterControllerForCrouch(crouch);
-    
             Ctx.IsCrouching = crouch;
         }
 
