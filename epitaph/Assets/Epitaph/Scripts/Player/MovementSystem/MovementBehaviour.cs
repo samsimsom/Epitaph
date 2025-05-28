@@ -82,18 +82,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
             CheckIsFalling();
             CurrentState.UpdateState();
             HandleMovement();
-            
-            // Coyote time yönetimi
-            if (IsGrounded)
-            {
-                CoyoteTimeCounter = CoyoteTime; // Yere değince yenile
-            }
-            else
-            {
-                CoyoteTimeCounter -= Time.deltaTime;
-            }
+            ManageCoyoteTime();
         }
-        
+
         public override void FixedUpdate()
         {
             HandleGravity();
@@ -108,6 +99,21 @@ namespace Epitaph.Scripts.Player.MovementSystem
             var playerHeight = PlayerController.CharacterController.skinWidth;
             PlayerController.transform.position += new Vector3(0, playerHeight, 0);
         }
+        
+        private void ManageCoyoteTime()
+        {
+            // Coyote time yönetimi
+            if (IsGrounded)
+            {
+                CoyoteTimeCounter = CoyoteTime; // Yere değince yenile
+            }
+            else
+            {
+                CoyoteTimeCounter -= Time.deltaTime;
+            }
+        }
+        
+        // ---------------------------------------------------------------------------- //
         
         private void HandleMovement()
         {
@@ -131,6 +137,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             CapsulVelocity = PlayerController.CharacterController.velocity;
             CurrentSpeed = CapsulVelocity.magnitude;
         }
+
+        // ---------------------------------------------------------------------------- //
 
         private void HandleGravity()
         {
