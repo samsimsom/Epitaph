@@ -18,8 +18,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float IdleTransitionDuration = 0.25f;
 
         // Jump Variables
-        public float JumpForce = 5.0f;
-        public float AirControlFactor = 1.5f;
+        public float JumpForce = 4.25f;
+        public float AirControlFactor = 1.25f;
         public float Gravity = 20.0f;
         
         // Coyote Time Counter
@@ -308,6 +308,62 @@ namespace Epitaph.Scripts.Player.MovementSystem
         }
 
         // ---------------------------------------------------------------------------- //
+
+        private void PreventCornerClimb(ref Vector3 desiredMoveDirection)
+        {
+            var antiClimbRayHeightOffset = 0.05f;
+            var antiClimbRayDistance = 0.6f;
+            var layerMask = ~LayerMask.GetMask("Player");
+            var controller = PlayerController.CharacterController;
+            // Işının başlangıç noktası: Karakterin merkezinin biraz altı, stepOffset'in hemen üzeri
+            var rayOrigin = controller.transform.position + controller.center -
+                            Vector3.up * (controller.height / 2f - (controller.stepOffset + antiClimbRayHeightOffset));
+
+            // Sadece yatay harekete bakıyoruz
+            var horizontalMoveDirection = new Vector3(desiredMoveDirection.x, 0, desiredMoveDirection.z).normalized;
+
+            RaycastHit hit;
+            // Debug için ışını çizdirebilirsiniz
+            // Debug.DrawRay(rayOrigin, horizontalMoveDirection * antiClimbRayDistance, Color.red, 0.1f);
+
+            if (Physics.Raycast(rayOrigin, horizontalMoveDirection, out hit, antiClimbRayDistance, layerMask))
+            {
+                // Bir engele çarptıysak ve bu engel dik bir yüzeyse (opsiyonel: normalini kontrol edebilirsiniz)
+                // Hareketi engellemek için, hareket vektörünü engelin yüzeyine paralel hale getirebiliriz.
+                // Veya daha basitçe, o yöndeki hareketi kesebiliriz.
+                // Burada basitçe, engelle çarpışan yöndeki hareketi sıfırlıyoruz gibi düşünebiliriz
+                // veya ProjectOnPlane ile kaymasını sağlayabiliriz.
+
+                // Daha iyi kayma için:
+                var projectedMove = Vector3.ProjectOnPlane(desiredMoveDirection, hit.normal);
+                if (Vector3.Dot(projectedMove, desiredMoveDirection) >= 0) // Geriye doğru itilmesini engelle
+                {
+                    desiredMoveDirection = projectedMove.normalized * desiredMoveDirection.magnitude;
+                }
+                else // Çok dik bir açıysa, belki sadece o yöne hareketi kes
+                {
+                    // Bu kısım daha karmaşık olabilir, en basit çözüm o yöne hareketi kısıtlamak
+                    // veya karakteri durdurmak olabilir.
+                    // Şimdilik engele doğru olan bileşeni azaltmayı deneyelim:
+                    var perpendicularToHit = Vector3.Cross(hit.normal, Vector3.up).normalized;
+                    var forwardComponent = Vector3.Dot(desiredMoveDirection, perpendicularToHit);
+                    desiredMoveDirection = perpendicularToHit * forwardComponent;
+
+                    // Veya daha basiti, eğer çarptıysa o yönde ilerlemesini kısıtla
+                    // desiredMoveDirection = Vector3.zero; // Bu çok ani durdurur.
+                }
+                // Basit bir engelleme için (kaydırmadan):
+                // Eğer engel karakterin tam önündeyse ve dik bir yüzeyse, hareketi durdur.
+                // float angle = Vector3.Angle(Vector3.up, hit.normal);
+                // if (angle > 80 && angle < 100) // Yaklaşık olarak dikey bir duvar
+                // {
+                //    desiredMoveDirection = Vector3.ProjectOnPlane(desiredMoveDirection, hit.normal);
+                // }
+            }
+        }
+
+    // Karakterin altındaki zemin kontrolü için gizmo
+
         
 #if UNITY_EDITOR
         public override void OnDrawGizmos()
@@ -316,6 +372,16 @@ namespace Epitaph.Scripts.Player.MovementSystem
             DrawCharacterControllerGizmo();
             DrawHasObstacleAboveForJumpGizmo();
             DrawCheckIsGroundedGizmo();
+            DrawPreventCornerClimb();
+        }
+        
+        private void DrawPreventCornerClimb()
+        {
+            var groundCheckDistance = 0.2f;
+            var controller = PlayerController.CharacterController;
+            if (controller == null) return;
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(controller.transform.position - new Vector3(0, controller.height / 2 - controller.radius + groundCheckDistance, 0), controller.radius);
         }
 
         private void DrawCharacterControllerGizmo()
