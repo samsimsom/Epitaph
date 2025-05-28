@@ -170,25 +170,25 @@ namespace Epitaph.Scripts.DebugPanel
             DrawGuiLabel($"Ground Normal : {playerController.MovementBehaviour.GroundNormal}");
             DrawGuiLabel($"Movement State : {playerController.MovementBehaviour.CurrentState?.StateName ?? "N/A"}");
 
-#if false
+#if true
             _currentYPosition += 10f; // Life stats öncesi daha büyük boşluk
             
-            // Değişen Life Stats bilgilerini göster
-            DrawGuiLabel($"Health : {playerController.LifeStatsManager.Health.Current:F}");
-            DrawGuiLabel($"Vitality Ratio : {playerController.LifeStatsManager.VitalityRatio:F}");
-            DrawGuiLabel($"Vitality : {playerController.LifeStatsManager.Vitality.Current:F}");
-            
-            _currentYPosition += 5f; // Bölümler arası küçük boşluk
+            // // Değişen Life Stats bilgilerini göster
+            // DrawGuiLabel($"Health : {playerController.LifeStatsManager.Health.Current:F}");
+            // DrawGuiLabel($"Vitality Ratio : {playerController.LifeStatsManager.VitalityRatio:F}");
+            // DrawGuiLabel($"Vitality : {playerController.LifeStatsManager.Vitality.Current:F}");
+            //
+            // _currentYPosition += 5f; // Bölümler arası küçük boşluk
             
             DrawGuiLabel($"Stamina : {playerController.LifeStatsManager.Stamina.Current:F}");
-            DrawGuiLabel($"Hunger : {playerController.LifeStatsManager.Hunger.Current:F}");
-            DrawGuiLabel($"Thirst : {playerController.LifeStatsManager.Thirst.Current:F}");
-            DrawGuiLabel($"Fatique : {playerController.LifeStatsManager.Fatique.Current:F}");
+            // DrawGuiLabel($"Hunger : {playerController.LifeStatsManager.Hunger.Current:F}");
+            // DrawGuiLabel($"Thirst : {playerController.LifeStatsManager.Thirst.Current:F}");
+            // DrawGuiLabel($"Fatique : {playerController.LifeStatsManager.Fatique.Current:F}");
             
-            _currentYPosition += 5f; // Bölümler arası küçük boşluk
-            
-            DrawGuiLabel($"Temperature isSafe : {playerController.LifeStatsManager.Temperature.IsSafe}");
-            DrawGuiLabel($"Temperature : {playerController.LifeStatsManager.Temperature.Current}");
+            // _currentYPosition += 5f; // Bölümler arası küçük boşluk
+            //
+            // DrawGuiLabel($"Temperature isSafe : {playerController.LifeStatsManager.Temperature.IsSafe}");
+            // DrawGuiLabel($"Temperature : {playerController.LifeStatsManager.Temperature.Current}");
 #endif
             
             

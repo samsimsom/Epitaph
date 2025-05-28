@@ -40,7 +40,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // Getters & Setters
         public StateBase CurrentState { get; internal set; }
         
-        public bool IsStanding { get; internal set; }
         public bool IsWalking { get; internal set; }
         public bool IsRunning { get; internal set; }
         public bool IsFalling { get; internal set; }

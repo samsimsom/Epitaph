@@ -48,6 +48,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             else if (Ctx.PlayerController.PlayerInput.IsMoveInput && 
                      Ctx.PlayerController.PlayerInput.IsRunPressed)
             {
+                // if (Ctx.PlayerController.LifeStatsManager.Stamina.IsCritical) return;
                 SwitchState(Factory.Run());
             }
         }
