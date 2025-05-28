@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Epitaph.Scripts.Player.BaseBehaviour;
 using Newtonsoft.Json;
 using Cysharp.Threading.Tasks;
@@ -49,7 +50,11 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         // private bool _isSleeping = false;
         private bool _isUpdating;
         private int _lastMinute = -1;
+        
+        private CancellationTokenSource _frameBasedUpdateCts;
+        private CancellationTokenSource _minuteBasedUpdateCts;
 
+        
         // --- Stat başlatıcı ---
         public LifeStatsManager(PlayerController playerController,
             float healthMax, float vitalityMax, float staminaMax, float fatiqueMax, float thirstMax, 
@@ -253,11 +258,10 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
                 AddStat("Vitality", -changeAmount);
             }
             
-            // Debug
             // Debug.Log($"VitalityRatio: {VitalityRatio:F2} | Health: {healthNormalized:F2} | " +
             //           $"Hunger: {hungerNormalized:F2} | Fatique: {fatiqueNormalized:F2} | " +
             //           $"Thirst: {thirstNormalized:F2}");
-            
+            // Debug.Log($"Vitality Change: {changeAmount:F2} | Vitality: {Vitality.Current:F2}");
         }
         public void UpdateStatusEffects(float deltaTime)
         {
@@ -321,42 +325,68 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         // ---------------------------------------------------------------------------- //
 
         #region Monobehavior Methods
-
-        public override void OnEnable()
-        {
-            _isUpdating = true;
-        }
-
-        public override void OnDisable()
-        {
-            _isUpdating = false; 
-        }
         
         public override void Start()
         {
-            FrameBasedUpdates().Forget();
-            MinuteBasedUpdates().Forget();
+            StartFrameBasedUpdates();
+            StartMinuteBasedUpdates();
         }
         
         #endregion
-        
-        private async UniTaskVoid FrameBasedUpdates()
+
+        // ---------------------------------------------------------------------------- //
+
+        #region Frame Based Update
+
+        public void StartFrameBasedUpdates()
         {
-            while (_isUpdating)
+            StopFrameBasedUpdates();
+            _frameBasedUpdateCts = new CancellationTokenSource();
+            FrameBasedUpdates(_frameBasedUpdateCts.Token).Forget();
+        }
+
+        public void StopFrameBasedUpdates()
+        {
+            _frameBasedUpdateCts?.Cancel();
+            _frameBasedUpdateCts = null;
+        }
+        
+        private async UniTaskVoid FrameBasedUpdates(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
             {
-                Stamina.SetMax(Vitality.Current);
+                // Stamina.SetMax(Vitality.Current);
                 DecreaseHealth(0.01f);
                 await UniTask.Yield(PlayerLoopTiming.Update);
             }
         }
+
+        #endregion
         
-        private async UniTaskVoid MinuteBasedUpdates()
+        // ---------------------------------------------------------------------------- //
+
+        #region Minute Based Update
+
+        public void StartMinuteBasedUpdates()
         {
-            while (_isUpdating)
+            StopMinuteBasedUpdates();
+            _minuteBasedUpdateCts = new CancellationTokenSource();
+            MinuteBasedUpdates(_minuteBasedUpdateCts.Token).Forget();
+        }
+
+        public void StopMinuteBasedUpdates()
+        {
+            _minuteBasedUpdateCts?.Cancel();
+            _minuteBasedUpdateCts = null;
+        }
+        
+        private async UniTaskVoid MinuteBasedUpdates(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
             {
                 if (GameTime.Instance == null)
                 {
-                    await UniTask.Yield(PlayerLoopTiming.Update); 
+                    await UniTask.Yield(PlayerLoopTiming.Update, token); 
                     continue;
                 }
 
@@ -372,9 +402,11 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
                     UpdateStatusEffects(1.0f);
                 }
                 
-                await GameTime.Instance.WaitForGameMinutes();
+                await GameTime.Instance.WaitForGameMinutes(token);
             }
         }
+
+        #endregion
         
         // ---------------------------------------------------------------------------- //
         

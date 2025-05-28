@@ -295,7 +295,7 @@ namespace Epitaph.Scripts.GameTimeManager
         /// Genellikle bir işlemi oyun zamanına göre, tam saniye aralıklarında başlatmak için kullanılır.
         /// </summary>
         /// <returns>Bir "game second" tamamlandığında tamamlanan bir UniTask.</returns>
-        public async UniTask WaitForGameSecond()
+        public async UniTask WaitForGameSecond(CancellationToken token)
         {
             var startSecond = GameSecond;
             while (GameSecond == startSecond)
@@ -310,7 +310,7 @@ namespace Epitaph.Scripts.GameTimeManager
         /// Genellikle bir işlemi oyun zamanına göre, tam dakika aralıklarında başlatmak için kullanılır.
         /// </summary>
         /// <returns>Bir "game minute" tamamlandığında tamamlanan bir UniTask.</returns>
-        public async UniTask WaitForGameMinutes()
+        public async UniTask WaitForGameMinutes(CancellationToken token)
         {
             var startSecond = GameMinute;
             while (GameMinute == startSecond)
