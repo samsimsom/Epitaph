@@ -377,7 +377,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
                    desiredMoveDirection = Vector3.ProjectOnPlane(desiredMoveDirection, hit.normal);
 
                    IsMovementBlocked = desiredMoveDirection.sqrMagnitude <= _movementThreshold;
-                   Debug.Log(IsMovementBlocked);
+                   // Debug.Log(IsMovementBlocked);
                 }
                 #endif
                 #endregion
