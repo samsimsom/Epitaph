@@ -85,7 +85,7 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         }
         
 
-        #region Stat erişim ve eventli değişim
+        #region Stat Methods
 
         public float GetStatValue(string statName)
         {
@@ -182,7 +182,6 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         {
             AddStat("Hunger", -_hungerPerGameMinute * deltaTime * (1 + activityLevel));
         }
-        
         
         public void DecreaseStamina(float deltaTime, float activityLevel)
         {
