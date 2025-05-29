@@ -37,6 +37,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
             : base(playerController)
         {
             InitializeCameraBasePosition();
+            InitializeBehaviours();
         }
 
         // ---------------------------------------------------------------------------- //
@@ -48,12 +49,6 @@ namespace Epitaph.Scripts.Player.ViewSystem
             _basePosition = PlayerController.CameraTransform.localPosition;
             _currentHeight = _basePosition.y;
             _targetHeight = _currentHeight;
-        }
-
-        public void SetRandomHeadBobOffset(Vector3 offset)
-        {
-            _randomOffset = offset;
-            UpdateCameraPosition();
         }
 
         public void SetHeadBobOffset(Vector3 offset)
@@ -101,7 +96,6 @@ namespace Epitaph.Scripts.Player.ViewSystem
         
         public override void Awake()
         {
-            InitializeBehaviours();
             foreach (var behaviour in _viewBehaviours) behaviour.Awake();
         }
 
@@ -122,8 +116,8 @@ namespace Epitaph.Scripts.Player.ViewSystem
 
         public override void LateUpdate()
         {
-            foreach (var behaviour in _viewBehaviours) behaviour.LateUpdate();
             UpdateCameraPosition();
+            foreach (var behaviour in _viewBehaviours) behaviour.LateUpdate();
         }
 
         public override void FixedUpdate()
