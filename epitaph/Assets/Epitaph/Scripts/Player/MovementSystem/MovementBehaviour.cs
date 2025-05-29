@@ -126,6 +126,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 Vector3.up).normalized;
             moveDirection = moveDirection.z * forward + moveDirection.x * right;
             
+            // Köşe tırmanmasını engelle
+            PreventCornerClimb(ref moveDirection);
+            
             // Dikey hızı hareket vektörüne uygula
             moveDirection.y = VerticalMovement;
 
@@ -362,8 +365,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             }
         }
 
-    // Karakterin altındaki zemin kontrolü için gizmo
-
         
 #if UNITY_EDITOR
         public override void OnDrawGizmos()
@@ -377,11 +378,59 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         private void DrawPreventCornerClimb()
         {
-            var groundCheckDistance = 0.2f;
             var controller = PlayerController.CharacterController;
             if (controller == null) return;
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(controller.transform.position - new Vector3(0, controller.height / 2 - controller.radius + groundCheckDistance, 0), controller.radius);
+            
+            // PreventCornerClimb methodundaki aynı parametreleri kullan
+            var antiClimbRayHeightOffset = 0.05f;
+            var antiClimbRayDistance = 0.6f;
+            var layerMask = ~LayerMask.GetMask("Player");
+            
+            // Işının başlangıç noktası: PreventCornerClimb ile aynı
+            var rayOrigin = controller.transform.position + controller.center -
+                            Vector3.up * (controller.height / 2f - (controller.stepOffset + antiClimbRayHeightOffset));
+
+            // Hareket yönünü almak için mevcut input'u kullan
+            var moveDirection = new Vector3(AppliedMovementX, 0, AppliedMovementZ);
+            
+            // Eğer hareket yoksa, kameranın ileri yönünü kullan
+            if (moveDirection.magnitude < 0.1f)
+            {
+                var cam = PlayerController.PlayerCamera.transform;
+                var forward = Vector3.ProjectOnPlane(cam.forward, Vector3.up).normalized;
+                moveDirection = forward;
+            }
+            else
+            {
+                // Kamera yönüne göre döndür (HandleMovement ile aynı)
+                var cam = PlayerController.PlayerCamera.transform;
+                var forward = Vector3.ProjectOnPlane(cam.forward, Vector3.up).normalized;
+                var right = Vector3.ProjectOnPlane(cam.right, Vector3.up).normalized;
+                moveDirection = moveDirection.z * forward + moveDirection.x * right;
+            }
+            
+            var horizontalMoveDirection = new Vector3(moveDirection.x, 0, moveDirection.z).normalized;
+            
+            // Raycast yap
+            var hitDetected = Physics.Raycast(rayOrigin, horizontalMoveDirection, out var hit, 
+                antiClimbRayDistance, layerMask);
+            
+            // Hit varsa kırmızı, yoksa sarı
+            Gizmos.color = hitDetected ? Color.red : Color.yellow;
+            
+            // Gizmo çiz
+            Gizmos.DrawWireSphere(rayOrigin, controller.radius * 0.5f);
+            
+            // Debug ray çiz
+            if (hitDetected)
+            {
+                Gizmos.DrawLine(rayOrigin, hit.point);
+                Gizmos.DrawSphere(hit.point, 0.05f);
+            }
+            else
+            {
+                Gizmos.DrawLine(rayOrigin, rayOrigin + horizontalMoveDirection * antiClimbRayDistance);
+            }
         }
 
         private void DrawCharacterControllerGizmo()
