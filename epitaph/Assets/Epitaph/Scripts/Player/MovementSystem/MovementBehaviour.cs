@@ -10,6 +10,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // State Variables
         private StateFactory _states;
         
+        public bool IsMovementBlocked { get; private set; }
+        private Vector3 _lastFramePosition;
+        private float _movementThreshold = 0.01f;
+        
         // Movement Variables
         public float WalkSpeed = 2.5f;
         public float RunSpeed = 4.0f;
@@ -371,6 +375,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 if (angle > 80 && angle < 100)
                 {
                    desiredMoveDirection = Vector3.ProjectOnPlane(desiredMoveDirection, hit.normal);
+
+                   IsMovementBlocked = desiredMoveDirection.sqrMagnitude <= _movementThreshold;
+                   Debug.Log(IsMovementBlocked);
                 }
                 #endif
                 #endregion
