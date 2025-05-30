@@ -140,7 +140,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             moveDirection = moveDirection.z * forward + moveDirection.x * right;
             
             // Köşe tırmanmasını engelle
-            PreventCornerClimb(ref moveDirection);
+            // PreventCornerClimb(ref moveDirection);
             
             // Dikey hızı hareket vektörüne uygula
             moveDirection.y = VerticalMovement;
@@ -211,7 +211,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             var customGroundCheck = Physics.CheckSphere(origin, radius, layerMask);
             
             // Edge detection için daha hassas kontrol
-            var edgeGroundCheck = CheckEdgeSupport(controller, layerMask);
+            // var edgeGroundCheck = CheckEdgeSupport(controller, layerMask);
             
             // IsGrounded = (customGroundCheck || capsuleGroundCheck) && edgeGroundCheck;
             IsGrounded = customGroundCheck || capsuleGroundCheck;
@@ -388,7 +388,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
             RaycastHit hit;
 
-            if (Physics.Raycast(rayOrigin, horizontalMoveDirection, out hit, _antiClimbRayDistance, ClimbLayerMask))
+            if (Physics.Raycast(rayOrigin, horizontalMoveDirection, out hit, 
+                    _antiClimbRayDistance, ClimbLayerMask))
             {
                 #region ProjectOnPlane Slide
                 #if false
@@ -440,93 +441,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             DrawHasObstacleAboveForJumpGizmo();
             DrawCheckIsGroundedGizmo();
             DrawGroundNormalGizmo();
-            DrawPreventCornerClimb();
-            DrawStepOffsetGizmo();
-        }
-
-        private void DrawGroundNormalGizmo()
-        {
-            if (!Application.isPlaying) return;
-            
-            var controller = PlayerController.CharacterController;
-            var controllerPosition = controller.transform.position;
-            var rayDistance = controller.radius * 2f;
-            var characterBaseWorld = controllerPosition + controller.center - 
-                                     Vector3.up * (controller.height / 2f - controller.radius);
-            
-            var originLeft = characterBaseWorld + (Vector3.left * controller.radius);
-            var originRight = characterBaseWorld + (Vector3.right * controller.radius);
-            var originFront = characterBaseWorld + (Vector3.forward * controller.radius);
-            var originBack = characterBaseWorld + (Vector3.back * controller.radius);
-            
-            var layerMask = ~LayerMask.GetMask("Player");
-            
-            // Raycast origin noktalarını çiz
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawWireSphere(originLeft, 0.025f);
-            Gizmos.DrawWireSphere(originRight, 0.025f);
-            Gizmos.DrawWireSphere(originFront, 0.025f);
-            Gizmos.DrawWireSphere(originBack, 0.025f);
-            
-            // Raycast sonuçlarını çiz
-            RaycastHit hitInfo;
-            
-            if (TryGroundNormalCheck(originLeft, rayDistance, layerMask, out hitInfo))
-            {
-                Gizmos.color = Color.green;
-                Gizmos.DrawLine(originLeft, hitInfo.point);
-                Gizmos.color = Color.blue;
-                Gizmos.DrawRay(hitInfo.point, hitInfo.normal * 0.5f);
-            }
-            else
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(originLeft, originLeft + Vector3.down * rayDistance);
-            }
-            
-            if (TryGroundNormalCheck(originRight, rayDistance, layerMask, out hitInfo))
-            {
-                Gizmos.color = Color.green;
-                Gizmos.DrawLine(originRight, hitInfo.point);
-                Gizmos.color = Color.blue;
-                Gizmos.DrawRay(hitInfo.point, hitInfo.normal * 0.5f);
-            }
-            else
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(originRight, originRight + Vector3.down * rayDistance);
-            }
-            
-            if (TryGroundNormalCheck(originFront, rayDistance, layerMask, out hitInfo))
-            {
-                Gizmos.color = Color.green;
-                Gizmos.DrawLine(originFront, hitInfo.point);
-                Gizmos.color = Color.blue;
-                Gizmos.DrawRay(hitInfo.point, hitInfo.normal * 0.5f);
-            }
-            else
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(originFront, originFront + Vector3.down * rayDistance);
-            }
-            
-            if (TryGroundNormalCheck(originBack, rayDistance, layerMask, out hitInfo))
-            {
-                Gizmos.color = Color.green;
-                Gizmos.DrawLine(originBack, hitInfo.point);
-                Gizmos.color = Color.blue;
-                Gizmos.DrawRay(hitInfo.point, hitInfo.normal * 0.5f);
-            }
-            else
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(originBack, originBack + Vector3.down * rayDistance);
-            }
-            
-            // Hesaplanan ortalama ground normal'i çiz
-            Gizmos.color = Color.magenta;
-            var normalDrawPosition = characterBaseWorld;
-            Gizmos.DrawRay(normalDrawPosition, GroundNormal * 1f);
+            // DrawPreventCornerClimb();
+            // DrawStepOffsetGizmo();
         }
         
         private void DrawPreventCornerClimb()
@@ -667,6 +583,91 @@ namespace Epitaph.Scripts.Player.MovementSystem
             }
         }
 
+        private void DrawGroundNormalGizmo()
+        {
+            if (!Application.isPlaying) return;
+            
+            var controller = PlayerController.CharacterController;
+            var controllerPosition = controller.transform.position;
+            var rayDistance = controller.radius * 2f;
+            var characterBaseWorld = controllerPosition + controller.center - 
+                                     Vector3.up * (controller.height / 2f - controller.radius);
+            
+            var originLeft = characterBaseWorld + (Vector3.left * controller.radius);
+            var originRight = characterBaseWorld + (Vector3.right * controller.radius);
+            var originFront = characterBaseWorld + (Vector3.forward * controller.radius);
+            var originBack = characterBaseWorld + (Vector3.back * controller.radius);
+            
+            var layerMask = ~LayerMask.GetMask("Player");
+            
+            // Raycast origin noktalarını çiz
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireSphere(originLeft, 0.025f);
+            Gizmos.DrawWireSphere(originRight, 0.025f);
+            Gizmos.DrawWireSphere(originFront, 0.025f);
+            Gizmos.DrawWireSphere(originBack, 0.025f);
+            
+            // Raycast sonuçlarını çiz
+            RaycastHit hitInfo;
+            
+            if (TryGroundNormalCheck(originLeft, rayDistance, layerMask, out hitInfo))
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawLine(originLeft, hitInfo.point);
+                Gizmos.color = Color.blue;
+                Gizmos.DrawRay(hitInfo.point, hitInfo.normal * 0.5f);
+            }
+            else
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(originLeft, originLeft + Vector3.down * rayDistance);
+            }
+            
+            if (TryGroundNormalCheck(originRight, rayDistance, layerMask, out hitInfo))
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawLine(originRight, hitInfo.point);
+                Gizmos.color = Color.blue;
+                Gizmos.DrawRay(hitInfo.point, hitInfo.normal * 0.5f);
+            }
+            else
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(originRight, originRight + Vector3.down * rayDistance);
+            }
+            
+            if (TryGroundNormalCheck(originFront, rayDistance, layerMask, out hitInfo))
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawLine(originFront, hitInfo.point);
+                Gizmos.color = Color.blue;
+                Gizmos.DrawRay(hitInfo.point, hitInfo.normal * 0.5f);
+            }
+            else
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(originFront, originFront + Vector3.down * rayDistance);
+            }
+            
+            if (TryGroundNormalCheck(originBack, rayDistance, layerMask, out hitInfo))
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawLine(originBack, hitInfo.point);
+                Gizmos.color = Color.blue;
+                Gizmos.DrawRay(hitInfo.point, hitInfo.normal * 0.5f);
+            }
+            else
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(originBack, originBack + Vector3.down * rayDistance);
+            }
+            
+            // Hesaplanan ortalama ground normal'i çiz
+            Gizmos.color = Color.magenta;
+            var normalDrawPosition = characterBaseWorld;
+            Gizmos.DrawRay(normalDrawPosition, GroundNormal * 1f);
+        }
+        
         private void DrawCharacterControllerGizmo()
         {
             // Renk ve şeffaflık
@@ -743,17 +744,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 Gizmos.DrawSphere(hit.point, 0.06f);
             }
         }
-        
-        private void DrawWireCapsule(Vector3 start, Vector3 end, float radius)
-        {
-            // Unity 2020 ve sonrası için kullanışlı bir API yoksa:
-            Handles.DrawWireDisc(start, (end - start).normalized, radius);
-            Handles.DrawWireDisc(end, (end - start).normalized, radius);
-            Handles.DrawLine(start + Vector3.right * radius, end + Vector3.right * radius);
-            Handles.DrawLine(start - Vector3.right * radius, end - Vector3.right * radius);
-            Handles.DrawLine(start + Vector3.forward * radius, end + Vector3.forward * radius);
-            Handles.DrawLine(start - Vector3.forward * radius, end - Vector3.forward * radius);
-        }
 
         private void DrawCheckIsGroundedGizmo()
         {
@@ -768,6 +758,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             Gizmos.DrawWireSphere(origin, radius);
             
             // Edge detection visualization
+#if false
             if (Application.isPlaying)
             {
                 var supportRadius = radius * (1f - EdgeDetectionThreshold);
@@ -793,6 +784,18 @@ namespace Epitaph.Scripts.Player.MovementSystem
                     Gizmos.DrawLine(checkPoint, checkPoint + Vector3.down * radius * 0.5f);
                 }
             }
+#endif
+        }
+        
+        private void DrawWireCapsule(Vector3 start, Vector3 end, float radius)
+        {
+            // Unity 2020 ve sonrası için kullanışlı bir API yoksa:
+            Handles.DrawWireDisc(start, (end - start).normalized, radius);
+            Handles.DrawWireDisc(end, (end - start).normalized, radius);
+            Handles.DrawLine(start + Vector3.right * radius, end + Vector3.right * radius);
+            Handles.DrawLine(start - Vector3.right * radius, end - Vector3.right * radius);
+            Handles.DrawLine(start + Vector3.forward * radius, end + Vector3.forward * radius);
+            Handles.DrawLine(start - Vector3.forward * radius, end - Vector3.forward * radius);
         }
 #endif
 
