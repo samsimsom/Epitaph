@@ -67,6 +67,13 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // Edge Detection Variables
         public float EdgeDetectionThreshold = 0.3f; // Yarı çapın yüzdesi (0.3 = %30)
         private bool _isNearEdge = false;
+        
+        // Character Controller Variables
+        private CharacterController _cController;
+        private Vector3 _cPosition;
+        private Vector3 _cCenter;
+        private float _cHeight;
+        private float _cRaius;
 
         // ---------------------------------------------------------------------------- //
         
@@ -90,6 +97,15 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // Update metodunda çağırın
         public override void Update()
         {
+            // Character Controller Variables
+            // ------------------------------------------------------------------------ //
+            _cController = PlayerController.CharacterController;
+            _cPosition = _cController.transform.position;
+            _cCenter = _cController.center;
+            _cHeight = _cController.height;
+            _cRaius = _cController.radius;
+            // ------------------------------------------------------------------------ //
+            
             CheckIsGrounded();
             CheckIsFalling();
             CurrentState.UpdateState();
@@ -168,7 +184,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             VerticalMovement -= Gravity * 0.85f * gravityMultiplier * Time.fixedDeltaTime;
             VerticalMovement = Mathf.Max(VerticalMovement, VerticalMovementLimit);
         }
-
         
         // ---------------------------------------------------------------------------- //
         
@@ -587,85 +602,54 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             if (!Application.isPlaying) return;
             
-            var controller = PlayerController.CharacterController;
-            var controllerPosition = controller.transform.position;
-            var rayDistance = controller.radius * 2f;
-            var characterBaseWorld = controllerPosition + controller.center - 
-                                     Vector3.up * (controller.height / 2f - controller.radius);
-            
-            var originLeft = characterBaseWorld + (Vector3.left * controller.radius);
-            var originRight = characterBaseWorld + (Vector3.right * controller.radius);
-            var originFront = characterBaseWorld + (Vector3.forward * controller.radius);
-            var originBack = characterBaseWorld + (Vector3.back * controller.radius);
-            
+            var rayDistance = _cController.radius * 2f;
             var layerMask = ~LayerMask.GetMask("Player");
+            var characterBaseWorld = _cPosition + _cCenter - Vector3.up * 
+                (_cHeight / 2f - _cRaius);
             
-            // Raycast origin noktalarını çiz
+            // Raycast origin pozisyonları
+            var raycastOrigins = new[]
+            {
+                characterBaseWorld + (Vector3.left * _cRaius),
+                characterBaseWorld + (Vector3.right * _cRaius),
+                characterBaseWorld + (Vector3.forward * _cRaius),
+                characterBaseWorld + (Vector3.back * _cRaius)
+            };
+            
+            // Origin noktalarını çiz
             Gizmos.color = Color.cyan;
-            Gizmos.DrawWireSphere(originLeft, 0.025f);
-            Gizmos.DrawWireSphere(originRight, 0.025f);
-            Gizmos.DrawWireSphere(originFront, 0.025f);
-            Gizmos.DrawWireSphere(originBack, 0.025f);
-            
-            // Raycast sonuçlarını çiz
-            RaycastHit hitInfo;
-            
-            if (TryGroundNormalCheck(originLeft, rayDistance, layerMask, out hitInfo))
+            foreach (var origin in raycastOrigins)
             {
-                Gizmos.color = Color.green;
-                Gizmos.DrawLine(originLeft, hitInfo.point);
-                Gizmos.color = Color.blue;
-                Gizmos.DrawRay(hitInfo.point, hitInfo.normal * 0.5f);
-            }
-            else
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(originLeft, originLeft + Vector3.down * rayDistance);
+                Gizmos.DrawWireSphere(origin, 0.025f);
             }
             
-            if (TryGroundNormalCheck(originRight, rayDistance, layerMask, out hitInfo))
+            // Her origin için raycast yap ve sonucu çiz
+            foreach (var origin in raycastOrigins)
             {
-                Gizmos.color = Color.green;
-                Gizmos.DrawLine(originRight, hitInfo.point);
-                Gizmos.color = Color.blue;
-                Gizmos.DrawRay(hitInfo.point, hitInfo.normal * 0.5f);
-            }
-            else
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(originRight, originRight + Vector3.down * rayDistance);
-            }
-            
-            if (TryGroundNormalCheck(originFront, rayDistance, layerMask, out hitInfo))
-            {
-                Gizmos.color = Color.green;
-                Gizmos.DrawLine(originFront, hitInfo.point);
-                Gizmos.color = Color.blue;
-                Gizmos.DrawRay(hitInfo.point, hitInfo.normal * 0.5f);
-            }
-            else
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(originFront, originFront + Vector3.down * rayDistance);
-            }
-            
-            if (TryGroundNormalCheck(originBack, rayDistance, layerMask, out hitInfo))
-            {
-                Gizmos.color = Color.green;
-                Gizmos.DrawLine(originBack, hitInfo.point);
-                Gizmos.color = Color.blue;
-                Gizmos.DrawRay(hitInfo.point, hitInfo.normal * 0.5f);
-            }
-            else
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(originBack, originBack + Vector3.down * rayDistance);
+                DrawRaycastResult(origin, rayDistance, layerMask);
             }
             
             // Hesaplanan ortalama ground normal'i çiz
             Gizmos.color = Color.magenta;
-            var normalDrawPosition = characterBaseWorld;
-            Gizmos.DrawRay(normalDrawPosition, GroundNormal * 1f);
+            Gizmos.DrawRay(characterBaseWorld, GroundNormal * 1f);
+        }
+
+        private void DrawRaycastResult(Vector3 origin, float rayDistance, LayerMask layerMask)
+        {
+            if (TryGroundNormalCheck(origin, rayDistance, layerMask, out var hitInfo))
+            {
+                // Hit varsa - yeşil çizgi ve mavi normal
+                Gizmos.color = Color.green;
+                Gizmos.DrawLine(origin, hitInfo.point);
+                Gizmos.color = Color.blue;
+                Gizmos.DrawRay(hitInfo.point, hitInfo.normal * 0.5f);
+            }
+            else
+            {
+                // Hit yoksa - kırmızı çizgi
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(origin, origin + Vector3.down * rayDistance);
+            }
         }
         
         private void DrawCharacterControllerGizmo()
@@ -748,13 +732,14 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private void DrawCheckIsGroundedGizmo()
         {
             var controller = PlayerController.CharacterController;
+            var position = controller.transform.position;
+            var center = controller.center;
+            var height = controller.height;
             var radius = controller.radius;
-            var origin = controller.transform.position + controller.center - 
-                         Vector3.up * (controller.height / 2f);
+            var origin = position + center - Vector3.up * (height / 2f);
             
             // Ana ground check
-            Gizmos.color = IsGrounded ? new Color(0,1,0,0.25f) : 
-                new Color(1,0,0,0.25f);
+            Gizmos.color = IsGrounded ? Color.green : Color.red;
             Gizmos.DrawWireSphere(origin, radius);
             
             // Edge detection visualization
