@@ -1337,6 +1337,7 @@ GameObject:
   m_Component:
   - component: {fileID: 223005152}
   - component: {fileID: 223005153}
+  - component: {fileID: 223005154}
   m_Layer: 0
   m_Name: WorldEventsManager
   m_TagString: Untagged
@@ -1381,6 +1382,27 @@ MonoBehaviour:
   sunsetColor: {r: 1, g: 0.3, b: 0.2, a: 1}
   nightColor: {r: 0.2, g: 0.2, b: 0.4, a: 1}
   colorTransitionTime: 0.5
+--- !u!114 &223005154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 223005151}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71d010b0346f48099d00402e00b43ffd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dayMaterial: {fileID: 2100000, guid: 9873fbde6fe03504a9da2612241c5d71, type: 2}
+  nightMaterial: {fileID: 2100000, guid: 93b728e0b006d684783b38f2502714ca, type: 2}
+  sunsetMaterial: {fileID: 2100000, guid: 42d82a4dd81f71f4bb534641cbb934f0, type: 2}
+  dayLut: {fileID: 2800000, guid: f86cd5ea44b6f1f40bebd32074445866, type: 3}
+  duskLut: {fileID: 2800000, guid: 5612623660322224bb7e4ca11bbb5786, type: 3}
+  nightLut: {fileID: 2800000, guid: 876a887cf34cad1449dbcc38d4038962, type: 3}
+  postProcessVolume: {fileID: 8205231196952710558}
+  transitionDuration: 0.5
+  smoothTransitions: 1
 --- !u!1001 &268333139
 PrefabInstance:
   m_ObjectHideFlags: 0
