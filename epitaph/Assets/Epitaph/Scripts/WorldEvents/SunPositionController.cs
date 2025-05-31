@@ -1,5 +1,6 @@
 using Epitaph.Scripts.GameTimeManager;
 using UnityEngine;
+using System;
 
 namespace Epitaph.Scripts.WorldEvents
 {
@@ -17,6 +18,12 @@ namespace Epitaph.Scripts.WorldEvents
         [SerializeField] private Color nightColor = new Color(0.2f, 0.2f, 0.4f);
         [SerializeField] private float colorTransitionTime = 1.0f; // in game hours
 
+        [Header("Intensity Multipliers")]
+        [SerializeField] private float sunLightIntensityMultiplier = 1.0f;
+        [SerializeField] private float ambientIntensityMultiplier = 1.0f;
+        [SerializeField] private float maxSunLightIntensity = 1.0f;
+        [SerializeField] private float maxAmbientIntensity = 0.3f;
+
         [Header("Smooth Transitions")]
         [SerializeField] private float positionSmoothness = 2f;
         [SerializeField] private float colorSmoothness = 1f;
@@ -26,6 +33,9 @@ namespace Epitaph.Scripts.WorldEvents
         private Vector3 _targetRotation;
         private Color _targetColor;
         private float _targetIntensity;
+        
+        // Event for notifying other systems when sun data changes
+        public static event Action<float, float, float> OnSunDataUpdated; // timeOfDay, sunrise, sunset
 
         // Sunrise and sunset data by month (24-hour format)
         private readonly (float sunrise, float sunset)[] _sunriseSunsetData = new[]
@@ -61,7 +71,7 @@ namespace Epitaph.Scripts.WorldEvents
             // Initialize target values
             _targetRotation = sunTransform != null ? sunTransform.eulerAngles : Vector3.zero;
             _targetColor = daytimeColor;
-            _targetIntensity = 1f;
+            _targetIntensity = maxSunLightIntensity;
         }
 
         private void Update()
@@ -79,6 +89,9 @@ namespace Epitaph.Scripts.WorldEvents
 
             // Get sunrise and sunset times for current month (1-based index)
             var (sunrise, sunset) = _sunriseSunsetData[Mathf.Clamp(month - 1, 0, 11)];
+
+            // Notify other systems about sun data update
+            OnSunDataUpdated?.Invoke(timeOfDay, sunrise, sunset);
 
             // Calculate target sun position
             CalculateTargetSunPosition(timeOfDay, sunrise, sunset);
@@ -101,24 +114,24 @@ namespace Epitaph.Scripts.WorldEvents
             float rotationX;  // Height rotation
 
             // Calculate day length
-            float dayLength = sunset - sunrise;
+            var dayLength = sunset - sunrise;
             
             if (timeOfDay >= sunrise && timeOfDay <= sunset)
             {
                 // Daytime - sun moves from east to west
-                float dayProgress = (timeOfDay - sunrise) / dayLength;
+                var dayProgress = (timeOfDay - sunrise) / dayLength;
                 
                 // Smooth Y rotation from -90° (east) to 270° (west)
                 rotationY = Mathf.Lerp(-90f, 270f, dayProgress);
                 
                 // Calculate height using a curve for more realistic sun arc
-                float heightProgress = sunHeightCurve.Evaluate(Mathf.Sin(dayProgress * Mathf.PI));
+                var heightProgress = sunHeightCurve.Evaluate(Mathf.Sin(dayProgress * Mathf.PI));
                 rotationX = Mathf.Lerp(minHeight, maxHeight, heightProgress);
             }
             else
             {
                 // Nighttime - sun continues its path underground
-                float nightLength = 24f - dayLength;
+                var nightLength = 24f - dayLength;
                 float nightProgress;
                 
                 if (timeOfDay < sunrise)
@@ -146,10 +159,10 @@ namespace Epitaph.Scripts.WorldEvents
         private void CalculateTargetSunLighting(float timeOfDay, float sunrise, float sunset)
         {
             // Define transition periods
-            float sunriseStart = sunrise - colorTransitionTime;
-            float sunriseEnd = sunrise + colorTransitionTime;
-            float sunsetStart = sunset - colorTransitionTime;
-            float sunsetEnd = sunset + colorTransitionTime;
+            var sunriseStart = sunrise - colorTransitionTime;
+            var sunriseEnd = sunrise + colorTransitionTime;
+            var sunsetStart = sunset - colorTransitionTime;
+            var sunsetEnd = sunset + colorTransitionTime;
             
             Color targetColor;
             float targetIntensity;
@@ -163,7 +176,7 @@ namespace Epitaph.Scripts.WorldEvents
             else if (timeOfDay >= sunriseStart && timeOfDay <= sunriseEnd)
             {
                 // Sunrise transition
-                float t = Mathf.InverseLerp(sunriseStart, sunriseEnd, timeOfDay);
+                var t = Mathf.InverseLerp(sunriseStart, sunriseEnd, timeOfDay);
                 t = Mathf.SmoothStep(0f, 1f, t); // Smooth transition curve
                 
                 if (t < 0.5f)
@@ -176,20 +189,20 @@ namespace Epitaph.Scripts.WorldEvents
                 {
                     // Sunrise to day colors
                     targetColor = Color.Lerp(sunriseColor, daytimeColor, (t - 0.5f) * 2f);
-                    targetIntensity = Mathf.Lerp(0.6f, 1.0f, (t - 0.5f) * 2f);
+                    targetIntensity = Mathf.Lerp(0.6f, maxSunLightIntensity, (t - 0.5f) * 2f);
                 }
             }
             else if (timeOfDay >= sunsetStart && timeOfDay <= sunsetEnd)
             {
                 // Sunset transition
-                float t = Mathf.InverseLerp(sunsetStart, sunsetEnd, timeOfDay);
+                var t = Mathf.InverseLerp(sunsetStart, sunsetEnd, timeOfDay);
                 t = Mathf.SmoothStep(0f, 1f, t); // Smooth transition curve
                 
                 if (t < 0.5f)
                 {
                     // Day to sunset colors
                     targetColor = Color.Lerp(daytimeColor, sunsetColor, t * 2f);
-                    targetIntensity = Mathf.Lerp(1.0f, 0.6f, t * 2f);
+                    targetIntensity = Mathf.Lerp(maxSunLightIntensity, 0.6f, t * 2f);
                 }
                 else
                 {
@@ -202,7 +215,7 @@ namespace Epitaph.Scripts.WorldEvents
             {
                 // Full daytime
                 targetColor = daytimeColor;
-                targetIntensity = 1.0f;
+                targetIntensity = maxSunLightIntensity;
             }
             else
             {
@@ -218,13 +231,13 @@ namespace Epitaph.Scripts.WorldEvents
         private void ApplySmoothTransitions()
         {
             // Smooth sun position transition
-            Vector3 currentRotation = sunTransform.eulerAngles;
+            var currentRotation = sunTransform.eulerAngles;
             
             // Handle angle wrapping for smooth rotation
-            float deltaY = Mathf.DeltaAngle(currentRotation.y, _targetRotation.y);
-            float targetY = currentRotation.y + deltaY;
+            var deltaY = Mathf.DeltaAngle(currentRotation.y, _targetRotation.y);
+            var targetY = currentRotation.y + deltaY;
             
-            Vector3 smoothRotation = new Vector3(
+            var smoothRotation = new Vector3(
                 Mathf.LerpAngle(currentRotation.x, _targetRotation.x, Time.deltaTime * positionSmoothness),
                 Mathf.LerpAngle(currentRotation.y, targetY, Time.deltaTime * positionSmoothness),
                 0f
@@ -236,13 +249,18 @@ namespace Epitaph.Scripts.WorldEvents
             if (sunLight != null)
             {
                 sunLight.color = Color.Lerp(sunLight.color, _targetColor, Time.deltaTime * colorSmoothness);
-                sunLight.intensity = Mathf.Lerp(sunLight.intensity, _targetIntensity, Time.deltaTime * colorSmoothness);
                 
-                // Update ambient lighting smoothly
-                float targetAmbient = _targetIntensity > 0.1f ? _targetIntensity * 0.3f : 0.05f;
+                // Apply sun light intensity with multiplier
+                var finalSunIntensity = _targetIntensity * sunLightIntensityMultiplier;
+                sunLight.intensity = Mathf.Lerp(sunLight.intensity, finalSunIntensity, Time.deltaTime * colorSmoothness);
+                
+                // Update ambient lighting smoothly with multiplier
+                var baseAmbientTarget = _targetIntensity > 0.1f ? _targetIntensity * 0.3f : 0.05f;
+                var finalAmbientTarget = Mathf.Min(baseAmbientTarget * ambientIntensityMultiplier, maxAmbientIntensity);
+                
                 RenderSettings.ambientIntensity = Mathf.Lerp(
                     RenderSettings.ambientIntensity, 
-                    targetAmbient, 
+                    finalAmbientTarget, 
                     Time.deltaTime * colorSmoothness * 0.5f
                 );
             }
@@ -261,6 +279,8 @@ namespace Epitaph.Scripts.WorldEvents
             Debug.Log($"Sunrise: {sunrise:F2}h, Sunset: {sunset:F2}h");
             Debug.Log($"Target Rotation: {_targetRotation}");
             Debug.Log($"Target Color: {_targetColor}, Intensity: {_targetIntensity:F2}");
+            Debug.Log($"Final Sun Intensity: {_targetIntensity * sunLightIntensityMultiplier:F2}");
+            Debug.Log($"Final Ambient Intensity: {RenderSettings.ambientIntensity:F2}");
         }
 
         // Public methods for external control
@@ -274,6 +294,33 @@ namespace Epitaph.Scripts.WorldEvents
         {
             if (_gameTime == null) return (6f, 18f);
             return _sunriseSunsetData[Mathf.Clamp(_gameTime.GameMonth - 1, 0, 11)];
+        }
+        
+        // Get current time data for synchronization
+        public (float timeOfDay, float sunrise, float sunset) GetCurrentTimeData()
+        {
+            if (_gameTime == null) return (12f, 6f, 18f);
+            
+            var timeOfDay = GetCurrentTimeOfDay();
+            var (sunrise, sunset) = GetCurrentSunriseSunset();
+            return (timeOfDay, sunrise, sunset);
+        }
+
+        // Public methods to control multipliers at runtime
+        public void SetSunLightIntensityMultiplier(float multiplier)
+        {
+            sunLightIntensityMultiplier = Mathf.Max(0f, multiplier);
+        }
+
+        public void SetAmbientIntensityMultiplier(float multiplier)
+        {
+            ambientIntensityMultiplier = Mathf.Max(0f, multiplier);
+        }
+
+        public void SetMaxIntensities(float maxSunLight, float maxAmbient)
+        {
+            maxSunLightIntensity = Mathf.Max(0f, maxSunLight);
+            maxAmbientIntensity = Mathf.Max(0f, maxAmbient);
         }
     }
 }

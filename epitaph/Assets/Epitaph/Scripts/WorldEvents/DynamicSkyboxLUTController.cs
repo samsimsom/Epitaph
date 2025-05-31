@@ -29,27 +29,21 @@ namespace Epitaph.Scripts.WorldEvents
         private ColorLookup _colorLookup;
         private Material _currentSkybox;
         private bool _isTransitioning;
-
-        // Sunrise and sunset data by month (24-hour format) - copied from SunPositionController
-        private readonly (float sunrise, float sunset)[] _sunriseSunsetData = new[]
-        {
-            (8.25f, 17.5f),    // January
-            (7.75f, 18.0f),    // February
-            (7.0f, 18.5f),     // March
-            (6.33f, 19.0f),    // April
-            (5.67f, 19.5f),    // May
-            (5.5f, 20.0f),     // June
-            (5.75f, 20.17f),   // July
-            (6.25f, 19.75f),   // August
-            (6.75f, 19.0f),    // September
-            (7.25f, 18.25f),   // October
-            (7.75f, 17.5f),    // November
-            (8.17f, 17.25f)    // December
-        };
         
+        // Reference to SunPositionController for synchronized data
+        private SunPositionController _sunController;
+
         private void Awake()
         {
             _gameTime = GameTime.Instance;
+            
+            // Find SunPositionController for data synchronization
+            // _sunController = FindFirstObjectByType<SunPositionController>();
+            _sunController = GetComponent<SunPositionController>();
+            if (_sunController == null)
+            {
+                Debug.LogError("SunPositionController not found! Skybox controller requires it for synchronization.");
+            }
             
             // Post-processing volume'ü bulup ColorLookup komponentini al
             if (postProcessVolume != null && postProcessVolume.Profile != null)
@@ -62,16 +56,38 @@ namespace Epitaph.Scripts.WorldEvents
         
         private void Start()
         {
-            // İlk skybox ve LUT'u ayarla
-            UpdateSkyboxAndLut();
-        }
-#if true
-        
-        private void Update()
-        {
+            // Subscribe to time change events instead of Update
             if (_gameTime != null)
             {
+                // İlk skybox ve LUT'u ayarla
                 UpdateSkyboxAndLut();
+                
+                // Subscribe to time change events (if available)
+                // Note: This would require GameTime to have events
+                StartCoroutine(SynchronizedUpdateCoroutine());
+            }
+        }
+        
+        private void OnDestroy()
+        {
+            // Unsubscribe from events if implemented
+        }
+        
+        // Synchronized update coroutine that runs after SunPositionController
+        private IEnumerator SynchronizedUpdateCoroutine()
+        {
+            while (gameObject.activeInHierarchy)
+            {
+                // Wait for end of frame to ensure SunPositionController has updated
+                yield return new WaitForEndOfFrame();
+                
+                if (_gameTime != null)
+                {
+                    UpdateSkyboxAndLut();
+                }
+                
+                // Update every few frames instead of every frame for performance
+                yield return new WaitForSeconds(0.1f);
             }
         }
         
@@ -97,8 +113,10 @@ namespace Epitaph.Scripts.WorldEvents
             var minute = _gameTime.GameMinute;
             var timeOfDay = hour + (minute / 60f);
             
-            // Get sunrise and sunset times for current month
-            var (sunrise, sunset) = _sunriseSunsetData[month - 1];
+            // Get sunrise and sunset times from SunPositionController for synchronization
+            var (sunrise, sunset) = _sunController != null ? 
+                _sunController.GetCurrentSunriseSunset() : 
+                (8f, 18f); // fallback values
             
             // Determine which skybox and LUT to use based on time
             var (targetSkybox, targetLut) = DetermineTargetMaterials(timeOfDay, sunrise, sunset);
@@ -167,9 +185,6 @@ namespace Epitaph.Scripts.WorldEvents
         {
             _isTransitioning = true;
             
-            // Store current skybox
-            // var previousSkybox = RenderSettings.skybox;
-            
             // Create transition
             var transitionProgress = 0f;
             var transitionSpeed = 1f / (transitionDuration * 60f); // Convert game hours to real seconds
@@ -215,6 +230,15 @@ namespace Epitaph.Scripts.WorldEvents
             DynamicGI.UpdateEnvironment();
         }
         
+        // Method to force synchronization with SunPositionController
+        public void ForceSynchronize()
+        {
+            if (_sunController != null)
+            {
+                UpdateSkyboxAndLut();
+            }
+        }
+        
         // Debug method to check current time period
         [ContextMenu("Debug Current Time Period")]
         private void DebugCurrentTimePeriod()
@@ -222,12 +246,14 @@ namespace Epitaph.Scripts.WorldEvents
             if (_gameTime == null) return;
             
             var timeOfDay = _gameTime.GameHour + (_gameTime.GameMinute / 60f);
-            var (sunrise, sunset) = _sunriseSunsetData[_gameTime.GameMonth - 1];
+            var (sunrise, sunset) = _sunController != null ? 
+                _sunController.GetCurrentSunriseSunset() : 
+                (8f, 18f);
             var (skybox, lut) = DetermineTargetMaterials(timeOfDay, sunrise, sunset);
             
             Debug.Log($"Current Time: {timeOfDay:F2}h, Sunrise: {sunrise:F2}h, Sunset: {sunset:F2}h");
             Debug.Log($"Target Skybox: {skybox.name}, Target LUT: {lut.name}");
+            Debug.Log($"Synchronized with SunPositionController: {_sunController != null}");
         }
-#endif
     }
 }
