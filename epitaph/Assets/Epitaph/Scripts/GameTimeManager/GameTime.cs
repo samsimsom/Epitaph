@@ -18,16 +18,21 @@ namespace Epitaph.Scripts.GameTimeManager
         private const int HoursPerDay = 24;
         private const int DaysPerMonth = 30;
         private const int MonthsPerYear = 12;
-        
-        // Game time start values
-        private const int StartHour = 9;
-        private const int StartMinute = 30;
         #endregion
 
         #region Public Properties
         [Header("Game Speed")]
         [Tooltip("Real seconds needed for one game day to pass")]
         public float realSecondsPerGameDay = 60f * 120f; // 120 minutes = 1 game day
+        
+        [Header("Starting Time")]
+        [Tooltip("Starting hour of the game (0-23)")]
+        [Range(0, 23)]
+        public int startHour = 9;
+        
+        [Tooltip("Starting minute of the game (0-59)")]
+        [Range(0, 59)]
+        public int startMinute = 30;
         
         [Header("Elapsed Time")]
         public float elapsedGameSeconds;
@@ -148,7 +153,7 @@ namespace Epitaph.Scripts.GameTimeManager
         private void InitializeTime()
         {
             startElapsedGameSeconds = 0f;
-            elapsedGameSeconds = StartHour * MinutesPerHour * SecondsPerMinute + StartMinute * SecondsPerMinute;
+            elapsedGameSeconds = startHour * MinutesPerHour * SecondsPerMinute + startMinute * SecondsPerMinute;
             
             // Initialize tracking values
             _lastGameDay = GameDay;
