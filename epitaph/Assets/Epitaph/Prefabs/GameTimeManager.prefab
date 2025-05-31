@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   realSecondsPerGameDay: 7200
   startHour: 11
-  startMinute: 0
+  startMinute: 30
   elapsedGameSeconds: 0
   startElapsedGameSeconds: 0
   startYear: 1984
