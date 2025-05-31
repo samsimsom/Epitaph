@@ -255,7 +255,7 @@ Shader "Toon/TFF_ToonFire"
 				float _TessMaxDisp;
 			#endif
 			CBUFFER_END
-			uniform float4 _CameraDepthTexture_TexelSize;
+			// niform float4 _CameraDepthTexture_TexelSize;
 			sampler2D _NoiseTexture;
 			sampler2D _MaskTexture;
 
