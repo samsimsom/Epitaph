@@ -1384,8 +1384,8 @@ MonoBehaviour:
   colorTransitionTime: 0.5
   sunLightIntensityMultiplier: 1
   ambientIntensityMultiplier: 1
-  maxSunLightIntensity: 1.5
-  maxAmbientIntensity: 1
+  maxSunLightIntensity: 2
+  maxAmbientIntensity: 1.5
   positionSmoothness: 2
   colorSmoothness: 1
   sunHeightCurve:
@@ -2060,7 +2060,7 @@ Light:
   serializedVersion: 11
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 2
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -2069,7 +2069,7 @@ Light:
     m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
-    m_Strength: 0.75
+    m_Strength: 0.5
     m_Bias: 0.05
     m_NormalBias: 0.4
     m_NearPlane: 0.2
@@ -5872,7 +5872,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   realSecondsPerGameDay: 7200
-  startHour: 21
+  startHour: 14
   startMinute: 30
   elapsedGameSeconds: 0
   startElapsedGameSeconds: 0

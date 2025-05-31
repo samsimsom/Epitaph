@@ -66,8 +66,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   m_Settings:
-    AOMethod: 0
-    Downsample: 1
+    AOMethod: 1
+    Downsample: 0
     AfterOpaque: 0
     Source: 1
     NormalSamples: 1
