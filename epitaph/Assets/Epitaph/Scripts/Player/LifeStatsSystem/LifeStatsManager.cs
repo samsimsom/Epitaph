@@ -158,20 +158,24 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
 
         public void DecreaseThirst(float deltaTime, float activityLevel)
         {
-            AddStat("Thirst", _thirstPerGameMinute * deltaTime * (1 + activityLevel + (Temperature.IsTooHigh ? 1 : 0)));
+            AddStat("Thirst", _thirstPerGameMinute * deltaTime * 
+                              (1 + activityLevel + (Temperature.IsTooHigh ? 1 : 0)));
         }
         public void IncreaseThirst(float deltaTime, float activityLevel)
         {
-            AddStat("Thirst", -_thirstPerGameMinute * deltaTime * (1 + activityLevel + (Temperature.IsTooHigh ? 1 : 0)));
+            AddStat("Thirst", -_thirstPerGameMinute * deltaTime * 
+                              (1 + activityLevel + (Temperature.IsTooHigh ? 1 : 0)));
         }
 
         public void DecreaseFatique(float deltaTime, float activityLevel)
         {
-            AddStat("Fatique", _fatiquePerGameMinute * deltaTime * (1 + activityLevel + (Hunger.IsCritical ? 1 : 0) + (Thirst.IsCritical ? 1 : 0)));
+            AddStat("Fatique", _fatiquePerGameMinute * deltaTime * 
+                               (1 + activityLevel + (Hunger.IsCritical ? 1 : 0) + (Thirst.IsCritical ? 1 : 0)));
         }
         public void IncreaseFatique(float deltaTime, float activityLevel)
         {
-            AddStat("Fatique", -_fatiquePerGameMinute * deltaTime * (1 + activityLevel + (Hunger.IsCritical ? 1 : 0) + (Thirst.IsCritical ? 1 : 0)));
+            AddStat("Fatique", -_fatiquePerGameMinute * deltaTime * 
+                               (1 + activityLevel + (Hunger.IsCritical ? 1 : 0) + (Thirst.IsCritical ? 1 : 0)));
         }
         
         public void DecreaseHunger(float deltaTime, float activityLevel)
@@ -212,6 +216,7 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
                 }
             }
         }
+        
         public void UpdateVitality(float deltaTime)
         {
             // Health için normalleştirilmiş oran (1'e yaklaştıkça daha iyi)
@@ -262,6 +267,7 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
             //           $"Thirst: {thirstNormalized:F2}");
             // Debug.Log($"Vitality Change: {changeAmount:F2} | Vitality: {Vitality.Current:F2}");
         }
+        
         public void UpdateStatusEffects(float deltaTime)
         {
             for (var i = _statusEffects.Count - 1; i >= 0; i--)
@@ -354,7 +360,7 @@ namespace Epitaph.Scripts.Player.LifeStatsSystem
         {
             while (!token.IsCancellationRequested)
             {
-                // Stamina.SetMax(Vitality.Current);
+                Stamina.SetMax(Vitality.Current);
                 DecreaseHealth(0.01f);
                 await UniTask.Yield(PlayerLoopTiming.Update);
             }
