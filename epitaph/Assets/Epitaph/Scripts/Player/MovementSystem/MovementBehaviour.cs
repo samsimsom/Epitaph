@@ -143,16 +143,25 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         // ---------------------------------------------------------------------------- //
         
+        // Stamina-based restrictions
+        public bool IsStaminaRestricted { get; set; }
+        public bool IsJumpRestricted { get; set; }
+        
+        // Movement efficiency based on life stats
+        public float MovementEfficiency { get; set; } = 1f;
+        
+        // Modified HandleMovement method
         private void HandleMovement()
         {
             var moveDirection = new Vector3(AppliedMovementX, 0, AppliedMovementZ);
             
+            // Apply movement efficiency
+            moveDirection *= MovementEfficiency;
+            
             // Kamera yönüne göre döndür
             var cam = PlayerController.PlayerCamera.transform;
-            var forward = Vector3.ProjectOnPlane(cam.forward, 
-                Vector3.up).normalized;
-            var right = Vector3.ProjectOnPlane(cam.right, 
-                Vector3.up).normalized;
+            var forward = Vector3.ProjectOnPlane(cam.forward, Vector3.up).normalized;
+            var right = Vector3.ProjectOnPlane(cam.right, Vector3.up).normalized;
             moveDirection = moveDirection.z * forward + moveDirection.x * right;
             
             // Köşe tırmanmasını engelle
@@ -167,6 +176,13 @@ namespace Epitaph.Scripts.Player.MovementSystem
             // Update CurrentVelocity
             CapsulVelocity = PlayerController.CharacterController.velocity;
             CurrentSpeed = CapsulVelocity.magnitude;
+        }
+        
+        // Jump restriction check
+        public bool CanJump()
+        {
+            return !IsJumpRestricted && HasObstacleAboveForJump() && 
+                   (IsGrounded || CoyoteTimeCounter > 0f);
         }
 
         // ---------------------------------------------------------------------------- //
