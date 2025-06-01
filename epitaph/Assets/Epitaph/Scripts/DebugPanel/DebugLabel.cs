@@ -79,7 +79,7 @@ namespace Epitaph.Scripts.DebugPanel
 
         private void OnLifeStatsManagerOnOnStatCritical(string stat, float val)
         {
-            Debug.Log($"{stat} is now CRITICAL: {val}");
+            // Debug.Log($"{stat} is now CRITICAL: {val}");
         }
 
         private void OnLifeStatsManagerOnOnStatChanged(string stat, float cur, float old)
@@ -183,7 +183,7 @@ namespace Epitaph.Scripts.DebugPanel
             
             // DrawGuiLabel($"Stamina : {playerController.LifeStatsManager.Stamina.Current:F}");
             DrawGuiLabel($"Current Stamina: {playerController.LifeStatsManager.Stamina.Current:F1}");
-            var consumption = StaminaConsumptionCalculator.CalculateMovementConsumption(playerController.MovementBehaviour, 
+            var consumption = StaminaConsumptionCalculator.MovementConsumption(playerController.MovementBehaviour, 
                 playerController.LifeStatsManager);
             DrawGuiLabel($"Stamina Consumption: {consumption:F2}/s");
             DrawGuiLabel($"Can Run: {playerController.MovementBehaviour.CanRun()}");

@@ -210,46 +210,9 @@ namespace Epitaph.Scripts.Player
         private void HandleStaminaConsumption()
         {
             var deltaTime = Time.deltaTime;
-
-#if false
-            if (MovementBehaviour.IsRunning)
-            {
-                // Running consumes more stamina
-                var consumptionRate = STAMINA_RUN_RATE;
-                
-                // Increase consumption if fatigued
-                if (LifeStatsManager.Fatique.IsCritical)
-                    consumptionRate *= 1.5f;
-                
-                LifeStatsManager.DecreaseStamina(deltaTime, consumptionRate);
-                LifeStatsManager.DecreaseFatique(deltaTime, RUN_ACTIVITY);
-                LifeStatsManager.DecreaseThirst(deltaTime, RUN_ACTIVITY);
-                LifeStatsManager.DecreaseHunger(deltaTime, RUN_ACTIVITY);
-            }
-            else if (MovementBehaviour.IsWalking)
-            {
-                // Walking consumes less stamina
-                LifeStatsManager.DecreaseStamina(deltaTime, STAMINA_WALK_RATE);
-                LifeStatsManager.DecreaseFatique(deltaTime, WALK_ACTIVITY);
-                LifeStatsManager.DecreaseThirst(deltaTime, WALK_ACTIVITY);
-                LifeStatsManager.DecreaseHunger(deltaTime, WALK_ACTIVITY);
-            }
-            else if (MovementBehaviour.IsCrouching)
-            {
-                // Crouching activity
-                LifeStatsManager.DecreaseFatique(deltaTime, CROUCH_ACTIVITY);
-                LifeStatsManager.DecreaseThirst(deltaTime, CROUCH_ACTIVITY);
-                LifeStatsManager.DecreaseHunger(deltaTime, CROUCH_ACTIVITY);
-            }
-            else
-            {
-                // Resting - regenerate stamina
-                LifeStatsManager.IncreaseStamina(deltaTime);
-            }
-#endif
             
             // StaminaConsumptionCalculator kullanarak hareket tüketimini hesapla
-            var movementConsumption = StaminaConsumptionCalculator.CalculateMovementConsumption(
+            var movementConsumption = StaminaConsumptionCalculator.MovementConsumption(
                 MovementBehaviour, LifeStatsManager);
     
             if (movementConsumption > 0f)
@@ -272,7 +235,6 @@ namespace Epitaph.Scripts.Player
             if (MovementBehaviour.IsJumping && !MovementBehaviour.IsFalling)
             {
                 LifeStatsManager.AddStat("Stamina", -StaminaJumpCost);
-                // LifeStatsManager.DecreaseStamina(deltaTime, StaminaJumpCost);
             } 
         }
 
@@ -304,13 +266,13 @@ namespace Epitaph.Scripts.Player
         private void RestrictHighEnergyMovement()
         {
             // MovementBehaviour'a stamina restriction flag'i ekleyebilirsiniz
-            Debug.Log("Low stamina - restricting high energy movement");
+            // Debug.Log("Low stamina - restricting high energy movement");
         }
 
         private void RestrictJumping()
         {
             // Jump restriction logic
-            Debug.Log("Insufficient stamina for jumping");
+            // Debug.Log("Insufficient stamina for jumping");
         }
 
         
