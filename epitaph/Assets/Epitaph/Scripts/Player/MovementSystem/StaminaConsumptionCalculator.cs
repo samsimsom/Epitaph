@@ -7,8 +7,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
     {
         // Base consumption rates
         private const float BaseRunConsumption = 15f;
-        private const float BaseWalkConsumption = 5f;
-        private const float BaseCrouchConsumption = 3f;
+        private const float BaseWalkConsumption = 0.1f;
+        private const float BaseCrouchConsumption = 1f;
         private const float BaseJumpConsumption = 10f;
         
         public static float CalculateMovementConsumption(MovementBehaviour movement, 

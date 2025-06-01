@@ -467,22 +467,36 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // MovementBehaviour sınıfına yeni özellikler ekleyin
         public bool CanRun()
         {
-            var requiredStamina = StaminaConsumptionCalculator.CalculateMovementConsumption(
-                    this, PlayerController.LifeStatsManager);
-            return PlayerController.LifeStatsManager.Stamina.Current >= requiredStamina * 2f; // 2 saniye koşabilecek stamina
+            // Stamina çok düşükse koşamaz
+            if (PlayerController.LifeStatsManager.Stamina.Current <= 5f) 
+                return false;
+    
+            // Minimum stamina kontrolü - koşmak için en az 10 stamina gerekli
+            var minimumStaminaRequired = 10f;
+            return PlayerController.LifeStatsManager.Stamina.Current >= minimumStaminaRequired;
+
         }
 
         public bool CanJump()
         {
-            if (IsJumpRestricted) return false;
+            // Yerde değilse zıplayamaz
+            if (!IsGrounded) return false;
 
-            var jumpCost = StaminaConsumptionCalculator.CalculateJumpConsumption(
-                PlayerController.LifeStatsManager);
-            var hasEnoughStamina =
-                PlayerController.LifeStatsManager.Stamina.Current >= jumpCost;
-
-            return hasEnoughStamina && HasObstacleAboveForJump() &&
-                   (IsGrounded || CoyoteTimeCounter > 0f);
+            // Stamina kontrolü - zıplamak için minimum stamina gerekli
+            var jumpStaminaCost = StaminaConsumptionCalculator.CalculateJumpConsumption(PlayerController.LifeStatsManager);
+            if (PlayerController.LifeStatsManager.Stamina.Current < jumpStaminaCost) return false;
+            
+            return true;
+            
+            // if (IsJumpRestricted) return false;
+            //
+            // var jumpCost = StaminaConsumptionCalculator.CalculateJumpConsumption(
+            //     PlayerController.LifeStatsManager);
+            // var hasEnoughStamina =
+            //     PlayerController.LifeStatsManager.Stamina.Current >= jumpCost;
+            //
+            // return hasEnoughStamina && HasObstacleAboveForJump() &&
+            //        (IsGrounded || CoyoteTimeCounter > 0f);
         }
 
         // MovementEfficiency hesaplamasını dinamik hale getirin

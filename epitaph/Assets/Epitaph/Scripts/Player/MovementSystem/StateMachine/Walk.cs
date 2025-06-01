@@ -37,7 +37,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             }
             else if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame && 
                      Ctx.CoyoteTimeCounter > 0f &&
-                     Ctx.HasObstacleAboveForJump())
+                     Ctx.CanJump())
             {
                 SwitchState(Factory.Jump());
             }
@@ -46,7 +46,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 SwitchState(Factory.Idle());
             }
             else if (Ctx.PlayerController.PlayerInput.IsMoveInput && 
-                     Ctx.PlayerController.PlayerInput.IsRunPressed)
+                     Ctx.PlayerController.PlayerInput.IsRunPressed &&
+                     Ctx.CanRun())
             {
                 // if (Ctx.PlayerController.LifeStatsManager.Stamina.IsCritical) return;
                 SwitchState(Factory.Run());

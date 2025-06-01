@@ -30,12 +30,9 @@ namespace Epitaph.Scripts.Player
         private const float IdleActivity = 0f;
         private const float WalkActivity = 0.5f;
         private const float RunActivity = 1.5f;
-        private const float JumpActivity = 2.0f;
         private const float CrouchActivity = 0.3f;
         
         // Stamina consumption rates
-        private const float StaminaWalkRate = 5f;
-        private const float StaminaRunRate = 15f;
         private const float StaminaJumpCost = 10f;
         
         // Speed modifiers based on life stats
@@ -270,12 +267,12 @@ namespace Epitaph.Scripts.Player
                 // Dinlenme - stamina yenile
                 LifeStatsManager.IncreaseStamina(deltaTime);
             }
-
             
             // Jumping costs stamina
-            if (MovementBehaviour.IsJumping)
+            if (MovementBehaviour.IsJumping && !MovementBehaviour.IsFalling)
             {
                 LifeStatsManager.AddStat("Stamina", -StaminaJumpCost);
+                // LifeStatsManager.DecreaseStamina(deltaTime, StaminaJumpCost);
             } 
         }
 
