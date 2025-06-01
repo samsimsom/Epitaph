@@ -27,16 +27,16 @@ namespace Epitaph.Scripts.Player
         // ---------------------------------------------------------------------------- //
         
         // Activity levels for different movement states
-        private const float IDLE_ACTIVITY = 0f;
-        private const float WALK_ACTIVITY = 0.5f;
-        private const float RUN_ACTIVITY = 1.5f;
-        private const float JUMP_ACTIVITY = 2.0f;
-        private const float CROUCH_ACTIVITY = 0.3f;
+        private const float IdleActivity = 0f;
+        private const float WalkActivity = 0.5f;
+        private const float RunActivity = 1.5f;
+        private const float JumpActivity = 2.0f;
+        private const float CrouchActivity = 0.3f;
         
         // Stamina consumption rates
-        private const float STAMINA_WALK_RATE = 5f;
-        private const float STAMINA_RUN_RATE = 15f;
-        private const float STAMINA_JUMP_COST = 10f;
+        private const float StaminaWalkRate = 5f;
+        private const float StaminaRunRate = 15f;
+        private const float StaminaJumpCost = 10f;
         
         // Speed modifiers based on life stats
         private float _speedModifier = 1f;
@@ -213,7 +213,8 @@ namespace Epitaph.Scripts.Player
         private void HandleStaminaConsumption()
         {
             var deltaTime = Time.deltaTime;
-            
+
+#if false
             if (MovementBehaviour.IsRunning)
             {
                 // Running consumes more stamina
@@ -248,14 +249,43 @@ namespace Epitaph.Scripts.Player
                 // Resting - regenerate stamina
                 LifeStatsManager.IncreaseStamina(deltaTime);
             }
+#endif
+            
+            // StaminaConsumptionCalculator kullanarak hareket tüketimini hesapla
+            var movementConsumption = StaminaConsumptionCalculator.CalculateMovementConsumption(
+                MovementBehaviour, LifeStatsManager);
+    
+            if (movementConsumption > 0f)
+            {
+                LifeStatsManager.DecreaseStamina(deltaTime, movementConsumption);
+        
+                // Hareket türüne göre diğer istatistikleri azalt
+                var activityLevel = GetCurrentActivityLevel();
+                LifeStatsManager.DecreaseFatique(deltaTime, activityLevel);
+                LifeStatsManager.DecreaseThirst(deltaTime, activityLevel);
+                LifeStatsManager.DecreaseHunger(deltaTime, activityLevel);
+            }
+            else
+            {
+                // Dinlenme - stamina yenile
+                LifeStatsManager.IncreaseStamina(deltaTime);
+            }
+
             
             // Jumping costs stamina
             if (MovementBehaviour.IsJumping)
             {
-                LifeStatsManager.AddStat("Stamina", -STAMINA_JUMP_COST);
+                LifeStatsManager.AddStat("Stamina", -StaminaJumpCost);
             } 
         }
 
+        private float GetCurrentActivityLevel()
+        {
+            if (MovementBehaviour.IsRunning) return RunActivity;
+            if (MovementBehaviour.IsWalking) return WalkActivity;
+            if (MovementBehaviour.IsCrouching) return CrouchActivity;
+            return IdleActivity;
+        }
 
         private void ApplyMovementRestrictions()
         {
@@ -268,7 +298,7 @@ namespace Epitaph.Scripts.Player
             }
 
             // Prevent jumping if stamina is insufficient
-            if (LifeStatsManager.Stamina.Current < STAMINA_JUMP_COST)
+            if (LifeStatsManager.Stamina.Current < StaminaJumpCost)
             {
                 RestrictJumping();
             }

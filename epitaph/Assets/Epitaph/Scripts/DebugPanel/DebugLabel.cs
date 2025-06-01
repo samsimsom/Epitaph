@@ -1,6 +1,7 @@
 using System;
 using Epitaph.Scripts.GameTimeManager;
 using Epitaph.Scripts.Player;
+using Epitaph.Scripts.Player.MovementSystem;
 using UnityEngine;
 
 namespace Epitaph.Scripts.DebugPanel
@@ -180,7 +181,18 @@ namespace Epitaph.Scripts.DebugPanel
             
             _currentYPosition += 5f; // Bölümler arası küçük boşluk
             
-            DrawGuiLabel($"Stamina : {playerController.LifeStatsManager.Stamina.Current:F}");
+            // DrawGuiLabel($"Stamina : {playerController.LifeStatsManager.Stamina.Current:F}");
+            DrawGuiLabel($"Current Stamina: {playerController.LifeStatsManager.Stamina.Current:F1}");
+            var consumption = StaminaConsumptionCalculator.CalculateMovementConsumption(playerController.MovementBehaviour, 
+                playerController.LifeStatsManager);
+            DrawGuiLabel($"Stamina Consumption: {consumption:F2}/s");
+            DrawGuiLabel($"Can Run: {playerController.MovementBehaviour.CanRun()}");
+            DrawGuiLabel($"Can Jump: {playerController.MovementBehaviour.CanJump()}");
+            DrawGuiLabel($"Movement Efficiency: {playerController.MovementBehaviour.MovementEfficiency:F2}");
+
+            
+            _currentYPosition += 5f; // Bölümler arası küçük boşluk
+            
             DrawGuiLabel($"Hunger : {playerController.LifeStatsManager.Hunger.Current:F}");
             DrawGuiLabel($"Thirst : {playerController.LifeStatsManager.Thirst.Current:F}");
             DrawGuiLabel($"Fatique : {playerController.LifeStatsManager.Fatique.Current:F}");

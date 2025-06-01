@@ -178,12 +178,12 @@ namespace Epitaph.Scripts.Player.MovementSystem
             CurrentSpeed = CapsulVelocity.magnitude;
         }
         
-        // Jump restriction check
-        public bool CanJump()
-        {
-            return !IsJumpRestricted && HasObstacleAboveForJump() && 
-                   (IsGrounded || CoyoteTimeCounter > 0f);
-        }
+        // // Jump restriction check
+        // public virtual bool CanJump()
+        // {
+        //     return !IsJumpRestricted && HasObstacleAboveForJump() && 
+        //            (IsGrounded || CoyoteTimeCounter > 0f);
+        // }
 
         // ---------------------------------------------------------------------------- //
 
@@ -463,6 +463,44 @@ namespace Epitaph.Scripts.Player.MovementSystem
             }
         }
 
+
+        // MovementBehaviour sınıfına yeni özellikler ekleyin
+        public bool CanRun()
+        {
+            var requiredStamina = StaminaConsumptionCalculator.CalculateMovementConsumption(
+                    this, PlayerController.LifeStatsManager);
+            return PlayerController.LifeStatsManager.Stamina.Current >= requiredStamina * 2f; // 2 saniye koşabilecek stamina
+        }
+
+        public bool CanJump()
+        {
+            if (IsJumpRestricted) return false;
+
+            var jumpCost = StaminaConsumptionCalculator.CalculateJumpConsumption(
+                PlayerController.LifeStatsManager);
+            var hasEnoughStamina =
+                PlayerController.LifeStatsManager.Stamina.Current >= jumpCost;
+
+            return hasEnoughStamina && HasObstacleAboveForJump() &&
+                   (IsGrounded || CoyoteTimeCounter > 0f);
+        }
+
+        // MovementEfficiency hesaplamasını dinamik hale getirin
+        private void UpdateMovementEfficiency()
+        {
+            var fatigueRatio = PlayerController.LifeStatsManager.Fatique.Current /
+                               PlayerController.LifeStatsManager.Fatique.Max;
+            var healthRatio = PlayerController.LifeStatsManager.Health.Current /
+                              PlayerController.LifeStatsManager.Health.Max;
+            var staminaRatio = PlayerController.LifeStatsManager.Stamina.Current /
+                               PlayerController.LifeStatsManager.Stamina.Max;
+
+            // Kombinasyon faktörü hesapla
+            MovementEfficiency = (healthRatio * 0.4f + staminaRatio * 0.3f +
+                                  (1f - fatigueRatio) * 0.3f);
+            MovementEfficiency =
+                Mathf.Clamp(MovementEfficiency, 0.3f, 1f); // Minimum %30 hız
+        }
         
 #if UNITY_EDITOR
         public override void OnDrawGizmos()

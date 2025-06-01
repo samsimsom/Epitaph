@@ -10,11 +10,23 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         public override void EnterState()
         {
             // Debug.Log("RUN: Enter");
+            if (!Ctx.CanRun())
+            {
+                SwitchState(Factory.Walk());
+                return;
+            }
+            
             Ctx.IsRunning = true;
         }
 
         public override void UpdateState()
         {
+            if (!Ctx.CanRun())
+            {
+                SwitchState(Factory.Walk());
+                return;
+            }
+            
             HandleMovementInput();
             CheckSwitchStates();
         }
