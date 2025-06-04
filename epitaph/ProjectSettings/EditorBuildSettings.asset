@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Epitaph/Scenes/InteriorScene.unity
+    path: Assets/Epitaph/Scenes/EpitaphScene.unity
     guid: a673073e645fc42ae8ade57ea3ab8f79
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
