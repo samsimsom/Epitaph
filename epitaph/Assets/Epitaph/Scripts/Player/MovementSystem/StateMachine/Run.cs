@@ -9,24 +9,11 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         
         public override void EnterState()
         {
-            // Debug.Log("RUN: Enter");
-            if (!Ctx.CanRun())
-            {
-                SwitchState(Factory.Walk());
-                return;
-            }
-            
             Ctx.IsRunning = true;
         }
 
         public override void UpdateState()
         {
-            if (!Ctx.CanRun())
-            {
-                SwitchState(Factory.Walk());
-                return;
-            }
-            
             HandleMovementInput();
             CheckSwitchStates();
         }
@@ -48,8 +35,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 SwitchState(Factory.Crouch());
             }
             else if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame && 
-                     Ctx.CoyoteTimeCounter > 0f &&
-                     Ctx.CanJump())
+                     Ctx.CoyoteTimeCounter > 0f)
             {
                 SwitchState(Factory.Jump());
             }

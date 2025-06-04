@@ -55,9 +55,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float AppliedMovementX { get; internal set; }
         public float AppliedMovementZ { get; internal set; }
         
-        // Movement efficiency based on life stats
-        public float MovementEfficiency { get; set; } = 1f;
-        
         // Character Controller Variables
         private CharacterController _cController;
         private Vector3 _cPosition;
@@ -137,9 +134,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private void HandleMovement()
         {
             var moveDirection = new Vector3(AppliedMovementX, 0, AppliedMovementZ);
-            
-            // Apply movement efficiency
-            moveDirection *= MovementEfficiency;
             
             // Kamera yönüne göre döndür
             var cam = PlayerController.PlayerCamera.transform;
@@ -333,31 +327,31 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         // ---------------------------------------------------------------------------- //
         
-        public bool CanRun()
-        {
-            // Stamina çok düşükse koşamaz
-            if (PlayerController.LifeStatsManager.Stamina.Current <= 5f) 
-                return false;
-    
-            // Minimum stamina kontrolü - koşmak için en az 10 stamina gerekli
-            var minimumStaminaRequired = 10f;
-            return PlayerController.LifeStatsManager.Stamina.Current >= minimumStaminaRequired;
-
-        }
-
-        public bool CanJump()
-        {
-            // Yerde değilse zıplayamaz
-            if (!IsGrounded) return false;
-
-            // Stamina kontrolü - zıplamak için minimum stamina gerekli
-            var jumpStaminaCost = StaminaConsumptionCalculator.JumpConsumption(
-                PlayerController.LifeStatsManager);
-            if (PlayerController.LifeStatsManager.Stamina.Current < jumpStaminaCost)
-                return false;
-            
-            return true;
-        }
+        // public bool CanRun()
+        // {
+        //     // Stamina çok düşükse koşamaz
+        //     if (PlayerController.LifeStatsManager.Stamina.Current <= 5f) 
+        //         return false;
+        //
+        //     // Minimum stamina kontrolü - koşmak için en az 10 stamina gerekli
+        //     var minimumStaminaRequired = 10f;
+        //     return PlayerController.LifeStatsManager.Stamina.Current >= minimumStaminaRequired;
+        //
+        // }
+        //
+        // public bool CanJump()
+        // {
+        //     // Yerde değilse zıplayamaz
+        //     if (!IsGrounded) return false;
+        //
+        //     // Stamina kontrolü - zıplamak için minimum stamina gerekli
+        //     var jumpStaminaCost = StaminaConsumptionCalculator.JumpConsumption(
+        //         PlayerController.LifeStatsManager);
+        //     if (PlayerController.LifeStatsManager.Stamina.Current < jumpStaminaCost)
+        //         return false;
+        //     
+        //     return true;
+        // }
         
         // ---------------------------------------------------------------------------- //
         

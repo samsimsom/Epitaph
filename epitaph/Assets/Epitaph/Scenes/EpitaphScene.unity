@@ -5050,8 +5050,8 @@ GameObject:
   - component: {fileID: 3834025118459319705}
   - component: {fileID: 4837335879925085862}
   - component: {fileID: 8768385609451751402}
-  - component: {fileID: 2783694196183976748}
   - component: {fileID: 4623486744677542029}
+  - component: {fileID: 2783694196183976748}
   m_Layer: 3
   m_Name: FpCamera
   m_TagString: Untagged

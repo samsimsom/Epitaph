@@ -21,15 +21,12 @@ namespace Epitaph.Scripts.InputManager
         public bool IsRunPressed { get; private set; }
         
         private PlayerInputActions _playerInputActions;
-        private PlayerController _playerController;
 
         private void Awake()
         {
             if (_playerInputActions != null) return;
             _playerInputActions = new PlayerInputActions();
             _playerInputActions.Player.SetCallbacks(this);
-            
-            _playerController = GetComponent<PlayerController>();
         }
 
         private void LateUpdate()
@@ -87,7 +84,7 @@ namespace Epitaph.Scripts.InputManager
         {
             if (context.performed)
             {
-                _playerController.InteractionBehaviour.TryInteract();
+                //
             }
         }
 
@@ -121,9 +118,7 @@ namespace Epitaph.Scripts.InputManager
         {
             if (context.performed)
             {
-                _playerController.LifeStatsManager.AddStat("Thirst", -10f);
-                _playerController.LifeStatsManager.AddStat("Hunger", -10f);
-                _playerController.LifeStatsManager.AddStat("Fatique", -10f);
+                //
             }
         }
 
