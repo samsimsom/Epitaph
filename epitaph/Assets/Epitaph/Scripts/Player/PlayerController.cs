@@ -27,8 +27,8 @@ namespace Epitaph.Scripts.Player
         
         private readonly List<PlayerBehaviour> _playerBehaviours = new();
         
-        public MovementBehaviour MovementBehaviour { get; private set; }
         public ViewBehaviour ViewBehaviour { get; private set; }
+        public MovementBehaviour MovementBehaviour { get; private set; }
 
         #endregion
         
