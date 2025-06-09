@@ -54,13 +54,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public float AppliedMovementX { get; internal set; }
         public float AppliedMovementZ { get; internal set; }
-        
-        // Character Controller Variables
-        private CharacterController _cController;
-        private Vector3 _cPosition;
-        private Vector3 _cCenter;
-        private float _cHeight;
-        private float _cRaius;
 
         // ---------------------------------------------------------------------------- //
         
@@ -84,15 +77,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // Update metodunda çağırın
         public override void Update()
         {
-            // Character Controller Variables
-            // ------------------------------------------------------------------------ //
-            _cController = PlayerController.CharacterController;
-            _cPosition = _cController.transform.position;
-            _cCenter = _cController.center;
-            _cHeight = _cController.height;
-            _cRaius = _cController.radius;
-            // ------------------------------------------------------------------------ //
-            
             CheckIsGrounded();
             CheckIsFalling();
             CurrentState.UpdateState();
@@ -369,18 +353,19 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             if (!Application.isPlaying) return;
             
-            var rayDistance = _cController.radius * 2f;
+            var rayDistance = PlayerController.CharacterController.radius * 2f;
             var layerMask = ~LayerMask.GetMask("Player");
-            var characterBaseWorld = _cPosition + _cCenter - Vector3.up * 
-                (_cHeight / 2f - _cRaius);
+            var characterBaseWorld = PlayerController.CharacterController.transform.position + 
+                PlayerController.CharacterController.center - Vector3.up * (PlayerController.CharacterController.height / 2f - 
+                    PlayerController.CharacterController.radius);
             
             // Raycast origin pozisyonları
             var raycastOrigins = new[]
             {
-                characterBaseWorld + (Vector3.left * _cRaius),
-                characterBaseWorld + (Vector3.right * _cRaius),
-                characterBaseWorld + (Vector3.forward * _cRaius),
-                characterBaseWorld + (Vector3.back * _cRaius)
+                characterBaseWorld + (Vector3.left * PlayerController.CharacterController.radius),
+                characterBaseWorld + (Vector3.right * PlayerController.CharacterController.radius),
+                characterBaseWorld + (Vector3.forward * PlayerController.CharacterController.radius),
+                characterBaseWorld + (Vector3.back * PlayerController.CharacterController.radius)
             };
             
             // Origin noktalarını çiz
