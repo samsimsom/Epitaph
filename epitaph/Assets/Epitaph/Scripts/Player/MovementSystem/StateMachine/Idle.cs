@@ -29,17 +29,22 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void CheckSwitchStates()
         {
+            // Önce düşme kontrolü - en yüksek öncelik
+            if (!Ctx.IsGrounded && Ctx.IsFalling)
+            {
+                Ctx.StateManager.SwitchState(Factory.Fall());
+                return;
+            }
+
             if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame)
             {
                 Ctx.StateManager.SwitchState(Factory.Crouch());
             }
-            else if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame && 
-                     Ctx.CoyoteTimeCounter > 0f)
+            else if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame && Ctx.CoyoteTimeCounter > 0f)
             {
                 Ctx.StateManager.SwitchState(Factory.Jump());
             }
-            else if (Ctx.PlayerController.PlayerInput.IsMoveInput && 
-                     Ctx.PlayerController.PlayerInput.IsRunPressed)
+            else if (Ctx.PlayerController.PlayerInput.IsMoveInput && Ctx.PlayerController.PlayerInput.IsRunPressed)
             {
                 Ctx.StateManager.SwitchState(Factory.Run());
             }

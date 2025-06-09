@@ -31,6 +31,13 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void CheckSwitchStates()
         {
+            // Önce düşme kontrolü - en yüksek öncelik
+            if (!Ctx.IsGrounded && Ctx.IsFalling)
+            {
+                Ctx.StateManager.SwitchState(Factory.Fall());
+                return;
+            }
+
             if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame)
             {
                 Ctx.StateManager.SwitchState(Factory.Crouch());

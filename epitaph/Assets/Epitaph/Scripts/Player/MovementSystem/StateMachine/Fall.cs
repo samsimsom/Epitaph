@@ -1,14 +1,18 @@
 namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 {
-    public class Jump : StateBase
+    public class Fall : StateBase
     {
-        public Jump(MovementBehaviour currentContext, StateFactory stateFactory) 
+        public Fall(MovementBehaviour currentContext, StateFactory stateFactory) 
             : base(currentContext, stateFactory) { }
 
         public override void EnterState()
         {
-            Ctx.VerticalMovement = Ctx.JumpForce;
-            Ctx.IsJumping = true;
+            Ctx.IsFalling = true;
+            // Fall state'e girdiğinde jump state'den geliyorsak IsJumping'i false yap
+            if (Ctx.IsJumping)
+            {
+                Ctx.IsJumping = false;
+            }
         }
 
         public override void UpdateState()
@@ -21,15 +25,15 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         
         public override void ExitState()
         {
-            Ctx.IsJumping = false;
+            Ctx.IsFalling = false;
         }
 
         public override void InitializeSubState() { }
 
         public override void CheckSwitchStates()
         {
-            // Yere değdiğinde ve dikey hız negatif veya sıfıra yakınsa
-            if (Ctx.IsGrounded && Ctx.CapsulVelocity.y <= 0 && Ctx.VerticalMovement <= 0)
+            // Yere değdiğinde fall state'den çık
+            if (Ctx.IsGrounded && Ctx.VerticalMovement <= 0)
             {
                 if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame || Ctx.IsCrouching)
                 {
@@ -48,10 +52,12 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                     Ctx.StateManager.SwitchState(Factory.Idle());
                 }
             }
-            // Jump'tan Fall'a geçiş - dikey hız negatif olduğunda
-            else if (Ctx.IsFalling && Ctx.VerticalMovement < 0)
+            // Eğer havadayken jump tuşuna basılırsa ve coyote time varsa
+            else if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame && 
+                     Ctx.CoyoteTimeCounter > 0 && 
+                     !Ctx.PlayerController.MovementBehaviour.HasObstacleAboveForJump())
             {
-                Ctx.StateManager.SwitchState(Factory.Fall());
+                Ctx.StateManager.SwitchState(Factory.Jump());
             }
         }
 
@@ -60,8 +66,11 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             var input = Ctx.PlayerController.PlayerInput.MoveInput;
             var airControlFactor = Ctx.AirControlFactor;
             
-            Ctx.AppliedMovementX = input.x * (Ctx.StateManager.CurrentState is Run ? Ctx.RunSpeed * airControlFactor : Ctx.WalkSpeed * airControlFactor);
-            Ctx.AppliedMovementZ = input.y * (Ctx.StateManager.CurrentState is Run ? Ctx.RunSpeed * airControlFactor : Ctx.WalkSpeed* airControlFactor);
+            // Fall state'de daha az air control (jump'tan daha az)
+            var fallAirControlFactor = airControlFactor * 0.8f;
+            
+            Ctx.AppliedMovementX = input.x * Ctx.WalkSpeed * fallAirControlFactor;
+            Ctx.AppliedMovementZ = input.y * Ctx.WalkSpeed * fallAirControlFactor;
         }
     }
 }

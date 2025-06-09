@@ -14,6 +14,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public StateBase GetWalkState() => _states.Walk();
         public StateBase GetRunState() => _states.Run();
         public StateBase GetJumpState() => _states.Jump();
+        public StateBase GetFallState() => _states.Fall();
         public StateBase GetCrouchState() => _states.Crouch();
         
         public StateManager(MovementBehaviour movementBehaviour, PlayerController playerController)
