@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 {
     public class Jump : StateBase
@@ -36,23 +34,21 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             // Yere değdiğinde ve dikey hız negatif veya sıfıra yakınsa
             if (Ctx.IsGrounded && Ctx.CapsulVelocity.y <= 0)
             {
-                if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame || 
-                    Ctx.IsCrouching)
+                if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame || Ctx.IsCrouching)
                 {
-                    SwitchState(Factory.Crouch());
+                    Ctx.StateManager.SwitchState(Factory.Crouch());
                 }
-                else if (Ctx.PlayerController.PlayerInput.IsMoveInput && 
-                         Ctx.PlayerController.PlayerInput.IsRunPressed)
+                else if (Ctx.PlayerController.PlayerInput.IsMoveInput && Ctx.PlayerController.PlayerInput.IsRunPressed)
                 {
-                    SwitchState(Factory.Run());
+                    Ctx.StateManager.SwitchState(Factory.Run());
                 }
                 else if (Ctx.PlayerController.PlayerInput.IsMoveInput)
                 {
-                    SwitchState(Factory.Walk());
+                    Ctx.StateManager.SwitchState(Factory.Walk());
                 }
                 else
                 {
-                    SwitchState(Factory.Idle());
+                    Ctx.StateManager.SwitchState(Factory.Idle());
                 }
             }
             else
@@ -60,8 +56,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 if (Ctx.IsFalling)
                 {
                     Ctx.IsJumping = false;
-                    // Debug.Log("Fall State");
-                    // SwitchState(Factory.Idle());
                 }
             }
         }
@@ -71,17 +65,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             var input = Ctx.PlayerController.PlayerInput.MoveInput;
             var airControlFactor = Ctx.AirControlFactor;
             
-            Ctx.AppliedMovementX = input.x * (Ctx.CurrentState is Run ? 
-                Ctx.RunSpeed * airControlFactor : Ctx.WalkSpeed * airControlFactor);
-            Ctx.AppliedMovementZ = input.y * (Ctx.CurrentState is Run ? 
-                Ctx.RunSpeed * airControlFactor : Ctx.WalkSpeed* airControlFactor);
-        }
-
-        private void SwitchState(StateBase @new)
-        {
-            ExitState();
-            @new.EnterState();
-            Ctx.CurrentState = @new;
+            Ctx.AppliedMovementX = input.x * (Ctx.StateManager.CurrentState is Run ? Ctx.RunSpeed * airControlFactor : Ctx.WalkSpeed * airControlFactor);
+            Ctx.AppliedMovementZ = input.y * (Ctx.StateManager.CurrentState is Run ? Ctx.RunSpeed * airControlFactor : Ctx.WalkSpeed* airControlFactor);
         }
     }
 }

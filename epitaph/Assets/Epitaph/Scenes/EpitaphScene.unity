@@ -1123,6 +1123,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: DebugLabel
       objectReference: {fileID: 0}
+    - target: {fileID: 6857208702228822065, guid: 984336e5a6e8444788752a41fb95da9b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7577432926975020925, guid: 984336e5a6e8444788752a41fb95da9b, type: 3}
       propertyPath: playerController
       value: 

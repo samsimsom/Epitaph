@@ -58,7 +58,7 @@ namespace Epitaph.Scripts.DebugPanel
             DrawGuiLabel($"Current Movement Speed: {playerController.MovementBehaviour.CurrentSpeed:F1}");
 
             DrawGuiLabel($"Ground Normal : {playerController.MovementBehaviour.GroundNormal}");
-            DrawGuiLabel($"Movement State : {playerController.MovementBehaviour.CurrentState?.StateName ?? "N/A"}");
+            DrawGuiLabel($"Movement State : {playerController.MovementBehaviour.StateManager.CurrentState?.StateName ?? "N/A"}");
 
 #if true
             _currentYPosition += 10f; // Life stats öncesi daha büyük boşluk

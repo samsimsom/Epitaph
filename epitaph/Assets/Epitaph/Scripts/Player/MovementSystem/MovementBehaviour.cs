@@ -1,5 +1,4 @@
 using Epitaph.Scripts.Player.BaseBehaviour;
-using Epitaph.Scripts.Player.MovementSystem.StateMachine;
 using UnityEditor;
 using UnityEngine;
 
@@ -7,8 +6,14 @@ namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class MovementBehaviour : PlayerBehaviour
     {
-        // State Variables
-        private StateFactory _states;
+        // Alt behaviour'lar için manager
+        private readonly PlayerBehaviourManager<MovementSubBehaviour> _movementBehaviourManager;
+        
+        // Sub behaviours
+        public StateManager StateManager { get; private set; }
+        // Gelecekte eklenebilecek diğer sub behaviours:
+        // public GroundChecker GroundChecker { get; private set; }
+        // public MovementPhysics MovementPhysics { get; private set; }
         
         // Movement Variables
         public float WalkSpeed = 2.5f;
@@ -37,9 +42,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public Vector3 NormalControllerCenter = new(0, 0.9f, 0);
         public Vector3 CrouchControllerCenter = new(0, 0.45f, 0);
 
-        // Getters & Setters
-        public StateBase CurrentState { get; internal set; }
-        
+        // Getters & Setters (StateManager'dan erişim için)
         public bool IsWalking { get; internal set; }
         public bool IsRunning { get; internal set; }
         public bool IsFalling { get; internal set; }
@@ -58,306 +61,253 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // ---------------------------------------------------------------------------- //
         
         public MovementBehaviour(PlayerController playerController)
-            : base(playerController) { }
+            : base(playerController)
+        {
+            _movementBehaviourManager = new PlayerBehaviourManager<MovementSubBehaviour>(playerController);
+            InitializeBehaviours();
+        }
         
         // ---------------------------------------------------------------------------- //
         
+        private void InitializeBehaviours()
+        {
+            StateManager = _movementBehaviourManager.AddBehaviour(new StateManager(this, PlayerController));
+            // Gelecekte diğer sub behaviours eklenebilir:
+            // GroundChecker = _movementBehaviourManager.AddBehaviour(new GroundChecker(this, PlayerController));
+            // MovementPhysics = _movementBehaviourManager.AddBehaviour(new MovementPhysics(this, PlayerController));
+        }
+        
+        // ---------------------------------------------------------------------------- //
+        
+        #region Unity Lifecycle Methods
+        
         public override void Awake()
         {
-            _states = new StateFactory(this);
-            CurrentState = _states.Idle();
-            CurrentState.EnterState();
+            _movementBehaviourManager?.ExecuteOnAll(b => b.Awake());
+        }
+
+        public override void OnEnable()
+        {
+            _movementBehaviourManager?.ExecuteOnAll(b => b.OnEnable());
         }
 
         public override void Start()
         {
             AdjustPlayerPosition();
+            _movementBehaviourManager?.ExecuteOnAll(b => b.Start());
         }
 
-        // Update metodunda çağırın
         public override void Update()
         {
             CheckIsGrounded();
             CheckIsFalling();
-            CurrentState.UpdateState();
             HandleMovement();
             ManageCoyoteTime();
+            
+            _movementBehaviourManager?.ExecuteOnAll(b => b.Update());
+        }
+
+        public override void LateUpdate()
+        {
+            _movementBehaviourManager?.ExecuteOnAll(b => b.LateUpdate());
         }
 
         public override void FixedUpdate()
         {
             HandleGravity();
-            CurrentState.FixedUpdateState();
+            _movementBehaviourManager?.ExecuteOnAll(b => b.FixedUpdate());
         }
 
+        public override void OnDisable()
+        {
+            _movementBehaviourManager?.ExecuteOnAll(b => b.OnDisable());
+        }
+
+        public override void OnDestroy()
+        {
+            _movementBehaviourManager?.ExecuteOnAll(b => b.OnDestroy());
+        }
+
+#if UNITY_EDITOR
+        public override void OnGUI()
+        {
+            // Movement debug bilgileri
+            // GUI.Label(new Rect(10, 130, 300, 20), $"Is Grounded: {IsGrounded}");
+            // GUI.Label(new Rect(10, 150, 300, 20), $"Vertical Movement: {VerticalMovement:F2}");
+            // GUI.Label(new Rect(10, 170, 300, 20), $"Current Speed: {CurrentSpeed:F2}");
+            // GUI.Label(new Rect(10, 190, 300, 20), $"Coyote Time: {CoyoteTimeCounter:F2}");
+            
+            _movementBehaviourManager?.ExecuteOnAll(b => b.OnGUI());
+        }
+
+        public override void OnDrawGizmos()
+        {
+            DrawCharacterControllerGizmo();
+            DrawHasObstacleAboveForJumpGizmo();
+            DrawCheckIsGroundedGizmo();
+            DrawGroundNormalGizmo();
+            _movementBehaviourManager?.ExecuteOnAll(b => b.OnDrawGizmos());
+        }
+#endif
+
+        #endregion
+
         // ---------------------------------------------------------------------------- //
+        
+        #region Movement Methods
 
         private void AdjustPlayerPosition()
         {
-            // CharacterControllerdan gelen skinWidth offseti pozisyona ekleniyor.
-            var playerHeight = PlayerController.CharacterController.skinWidth;
-            PlayerController.transform.position += new Vector3(0, playerHeight, 0);
+            if (PlayerController.CharacterController != null)
+            {
+                var position = PlayerController.transform.position;
+                position.y += 0.5f;
+                PlayerController.transform.position = position;
+            }
         }
-        
+
         private void ManageCoyoteTime()
         {
-            // Coyote time yönetimi
             if (IsGrounded)
             {
-                CoyoteTimeCounter = CoyoteTime; // Yere değince yenile
+                CoyoteTimeCounter = CoyoteTime;
             }
             else
             {
                 CoyoteTimeCounter -= Time.deltaTime;
             }
         }
-        
-        // ---------------------------------------------------------------------------- //
-        
-        // Modified HandleMovement method
+
         private void HandleMovement()
         {
-            var moveDirection = new Vector3(AppliedMovementX, 0, AppliedMovementZ);
-            
-            // Kamera yönüne göre döndür
-            var cam = PlayerController.PlayerCamera.transform;
-            var forward = Vector3.ProjectOnPlane(cam.forward, 
-                Vector3.up).normalized;
-            var right = Vector3.ProjectOnPlane(cam.right, 
-                Vector3.up).normalized;
-            moveDirection = moveDirection.z * forward + moveDirection.x * right;
-            
-            // Dikey hızı hareket vektörüne uygula
-            moveDirection.y = VerticalMovement;
-
-            // Hareket uygula
-            PlayerController.CharacterController.Move(moveDirection * Time.deltaTime);
-            
-            // Update CurrentVelocity
-            CapsulVelocity = PlayerController.CharacterController.velocity;
-            CurrentSpeed = CapsulVelocity.magnitude;
+            if (PlayerController.CharacterController != null)
+            {
+                CapsulVelocity = PlayerController.CharacterController.velocity;
+                CurrentSpeed = new Vector3(CapsulVelocity.x, 0, CapsulVelocity.z).magnitude;
+                
+                ApplyMovement();
+            }
         }
+        
+        private void ApplyMovement()
+        {
+            if (PlayerController.CharacterController == null) return;
+    
+            Vector3 movement;
 
-        // ---------------------------------------------------------------------------- //
+            // Kamera yönüne göre hareket vektörünü hesapla
+            var cameraForward = PlayerController.PlayerCamera.transform.forward;
+            var cameraRight = PlayerController.PlayerCamera.transform.right;
+        
+            // Y bileşenini sıfırla (sadece yatay hareket)
+            cameraForward.y = 0f;
+            cameraRight.y = 0f;
+        
+            // Normalize et
+            cameraForward.Normalize();
+            cameraRight.Normalize();
+        
+            // Kamera yönüne göre hareket hesapla
+            movement = cameraRight * AppliedMovementX + cameraForward * AppliedMovementZ;
+
+    
+            // Dikey hareketi ekle
+            movement.y = VerticalMovement;
+    
+            // Hareketi uygula
+            PlayerController.CharacterController.Move(movement * Time.deltaTime);
+        }
 
         private void HandleGravity()
         {
-            // Eğer yerdeyse ve vertical movement negatifse sıfırla
-            if (IsGrounded && VerticalMovement < 0f)
+            if (!IsGrounded && VerticalMovement > VerticalMovementLimit)
             {
-                VerticalMovement = -5.0f;
-                return; // Aşağıdaki yerçekimi uygulaması gereksiz
+                VerticalMovement -= Gravity * Time.fixedDeltaTime;
             }
-
-            var gravityMultiplier = VerticalMovement < 0 ? 1.2f : 1.0f;
-            VerticalMovement -= Gravity * 0.85f * gravityMultiplier * Time.fixedDeltaTime;
-            VerticalMovement = Mathf.Max(VerticalMovement, VerticalMovementLimit);
+            else if (IsGrounded && VerticalMovement < 0)
+            {
+                VerticalMovement = -0.5f;
+            }
         }
-        
-        // ---------------------------------------------------------------------------- //
-        
-        // Karakterin üstünde zıplamayı engelleyen bir yüksek engel var mı?
+
         public bool HasObstacleAboveForJump()
         {
-            var controller = PlayerController.CharacterController;
-            var radius = controller.radius;
-            var position = controller.transform.position + controller.center;
-            var height = controller.height;
-            var checkDistance = height * 1.25f - height; // %25 daha yüksek mesafe
-            var castStart = position + Vector3.up * (height / 2f - radius);
+            if (PlayerController.CharacterController == null) return true;
 
-            // Yalnızca Player layer'ı hariç 
-            var layerMask = ~LayerMask.GetMask("Player");
+            var capsuleCollider = PlayerController.CharacterController;
+            var center = capsuleCollider.bounds.center;
+            var radius = capsuleCollider.radius * 0.9f;
+            var height = capsuleCollider.height;
+            var checkDistance = height * 0.5f + JumpForce * 0.1f;
 
-            if (Physics.CapsuleCast(castStart, castStart, radius, 
-                    Vector3.up, out var hit, checkDistance, layerMask))
-            {
-                Debug.Log($"<color=orange>Cannot Jump</color>, hit: {hit.collider.name}");
-                return false;
-            }
+            var layerMask = ~(1 << PlayerController.gameObject.layer);
 
-            return true;
+            return Physics.CheckCapsule(
+                center,
+                center + Vector3.up * checkDistance,
+                radius,
+                layerMask
+            );
         }
-        
-        // ---------------------------------------------------------------------------- //
-        
-        // Custom Grounded Check
+
         private void CheckIsGrounded()
         {
-            var controller = PlayerController.CharacterController;
-            var controllerPosition = controller.transform.position;
-            var radius = controller.radius;
-            var origin = controller.transform.position + controller.center - 
-                         Vector3.up * (controller.height / 2f);
-            var layerMask = ~LayerMask.GetMask("Player");
-            
-            var capsuleGroundCheck = PlayerController.CharacterController.isGrounded;
-            var customGroundCheck = Physics.CheckSphere(origin, radius, layerMask);
-            
-            // Edge detection için daha hassas kontrol
-            // var edgeGroundCheck = CheckEdgeSupport(controller, layerMask);
-            
-            // IsGrounded = (customGroundCheck || capsuleGroundCheck) && edgeGroundCheck;
-            IsGrounded = customGroundCheck || capsuleGroundCheck;
-            
-            // ------------------------------------------------------------------------ //
-            
-            var rayDistance = controller.radius * 2f;
-            var characterBaseWorld = controllerPosition + controller.center - 
-                                     Vector3.up * (controller.height / 2f - controller.radius);
-            
-            var originLeft = characterBaseWorld + (Vector3.left * controller.radius);
-            var originRight = characterBaseWorld + (Vector3.right * controller.radius);
-            var originFront = characterBaseWorld + (Vector3.forward * controller.radius);
-            var originBack = characterBaseWorld + (Vector3.back * controller.radius);
-            
-            var summedNormals = Vector3.zero;
-            var successfulHits = 0;
-            RaycastHit hitInfo;
-
-            if (TryGroundNormalCheck(originLeft, rayDistance, layerMask, out hitInfo))
+            if (PlayerController.CharacterController == null)
             {
-                summedNormals += hitInfo.normal;
-                successfulHits++;
-            }
-            if (TryGroundNormalCheck(originRight, rayDistance, layerMask, out hitInfo))
-            {
-                summedNormals += hitInfo.normal;
-                successfulHits++;
-            }
-            if (TryGroundNormalCheck(originFront, rayDistance, layerMask, out hitInfo))
-            {
-                summedNormals += hitInfo.normal;
-                successfulHits++;
-            }
-            if (TryGroundNormalCheck(originBack, rayDistance, layerMask, out hitInfo))
-            {
-                summedNormals += hitInfo.normal;
-                successfulHits++;
+                IsGrounded = false;
+                return;
             }
 
-            if (successfulHits > 0)
+            var capsuleCollider = PlayerController.CharacterController;
+            var center = capsuleCollider.bounds.center;
+            var radius = capsuleCollider.radius * 0.9f;
+            var rayDistance = capsuleCollider.bounds.extents.y + 0.1f;
+            var layerMask = ~(1 << PlayerController.gameObject.layer);
+
+            var origins = new[]
             {
-                GroundNormal = (summedNormals / successfulHits).normalized;
-            }
-            else
+                center,
+                center + Vector3.forward * (radius * 0.5f),
+                center + Vector3.back * (radius * 0.5f),
+                center + Vector3.right * (radius * 0.5f),
+                center + Vector3.left * (radius * 0.5f)
+            };
+
+            foreach (var origin in origins)
             {
-                GroundNormal = Vector3.up;
+                if (TryGroundNormalCheck(origin, rayDistance, layerMask, out var hitInfo))
+                {
+                    IsGrounded = true;
+                    GroundNormal = hitInfo.normal;
+                    return;
+                }
             }
+
+            IsGrounded = false;
+            GroundNormal = Vector3.up;
         }
 
-        private bool TryGroundNormalCheck(Vector3 origin, float rayDistance, 
-            LayerMask layerMask, out RaycastHit hitInfo)
-        {
-            var ray = new Ray(origin, Vector3.down);
-            var groundCheckHits = new RaycastHit[1];
-            
-            var numberOfHits = Physics.RaycastNonAlloc(ray, groundCheckHits, 
-                rayDistance, layerMask);
-
-            if (numberOfHits > 0)
-            {
-                // İlk çarpışma bilgisini out parametresine ata
-                hitInfo = groundCheckHits[0];
-
-                // Debug için ışınları çiz
-                Debug.DrawRay(origin, Vector3.down * hitInfo.distance, Color.green);
-                Debug.DrawRay(hitInfo.point, hitInfo.normal * 0.5f, Color.blue);
-            
-                return true;
-            }
-            else
-            {
-                // Çarpışma yoksa, varsayılan RaycastHit değerini ata ve kırmızı ışın çiz
-                hitInfo = default; // RaycastHit bir struct olduğu için default değeri atanır
-                Debug.DrawRay(origin, Vector3.down * rayDistance, Color.red);
-            
-                return false;
-            }
-        }
-        
-        // ---------------------------------------------------------------------------- //
-        
         private void CheckIsFalling()
         {
-            // Karakter havada ve aşağı doğru hareket ediyorsa düşüyor demektir
-            IsFalling = !IsGrounded && VerticalMovement < 0f;
-    
-            // Alternatif olarak, CharacterController velocity'sini de kullanabilirsiniz
-            // IsFalling = !IsGrounded && CapsulVelocity.y < 0f;
-        }
-        
-        public float CalculateMaxJumpHeight()
-        {
-            // Yerçekimi çarpanını dahil ederek daha doğru hesaplama
-            var effectiveGravity = Gravity * 0.85f;
-            var maxHeight = (JumpForce * JumpForce) / (2f * effectiveGravity);
-            return maxHeight;
+            IsFalling = !IsGrounded && VerticalMovement < 0;
         }
 
-        public Vector3 CalculateMaxJumpPosition()
+        private bool TryGroundNormalCheck(Vector3 origin, float rayDistance, LayerMask layerMask, out RaycastHit hitInfo)
         {
-            var maxHeight = CalculateMaxJumpHeight();
-            var currentPosition = PlayerController.transform.position;
-            return new Vector3(currentPosition.x, currentPosition.y + maxHeight, currentPosition.z);
+            return Physics.Raycast(origin, Vector3.down, out hitInfo, rayDistance, layerMask);
         }
 
-        public bool CanJumpToHeight(float targetHeight)
-        {
-            var maxHeight = CalculateMaxJumpHeight();
-            var currentY = PlayerController.transform.position.y;
-            return (currentY + maxHeight) >= targetHeight;
-        }
-
-        // ---------------------------------------------------------------------------- //
+        #endregion
         
-        // public bool CanRun()
-        // {
-        //     // Stamina çok düşükse koşamaz
-        //     if (PlayerController.LifeStatsManager.Stamina.Current <= 5f) 
-        //         return false;
-        //
-        //     // Minimum stamina kontrolü - koşmak için en az 10 stamina gerekli
-        //     var minimumStaminaRequired = 10f;
-        //     return PlayerController.LifeStatsManager.Stamina.Current >= minimumStaminaRequired;
-        //
-        // }
-        //
-        // public bool CanJump()
-        // {
-        //     // Yerde değilse zıplayamaz
-        //     if (!IsGrounded) return false;
-        //
-        //     // Stamina kontrolü - zıplamak için minimum stamina gerekli
-        //     var jumpStaminaCost = StaminaConsumptionCalculator.JumpConsumption(
-        //         PlayerController.LifeStatsManager);
-        //     if (PlayerController.LifeStatsManager.Stamina.Current < jumpStaminaCost)
-        //         return false;
-        //     
-        //     return true;
-        // }
-        
-        // ---------------------------------------------------------------------------- //
-        
-#if UNITY_EDITOR
-        public override void OnDrawGizmos()
-        {
-            if (PlayerController.CharacterController == null) return;
-            DrawCharacterControllerGizmo();
-            DrawHasObstacleAboveForJumpGizmo();
-            DrawCheckIsGroundedGizmo();
-            DrawGroundNormalGizmo();
-        }
-
+        #if UNITY_EDITOR
         private void DrawGroundNormalGizmo()
         {
             if (!Application.isPlaying) return;
             
             var rayDistance = PlayerController.CharacterController.radius * 2f;
             var layerMask = ~LayerMask.GetMask("Player");
-            var characterBaseWorld = PlayerController.CharacterController.transform.position + 
-                PlayerController.CharacterController.center - Vector3.up * (PlayerController.CharacterController.height / 2f - 
-                    PlayerController.CharacterController.radius);
+            var characterBaseWorld = PlayerController.CharacterController.transform.position + PlayerController.CharacterController.center - Vector3.up * 
+                (PlayerController.CharacterController.height / 2f - PlayerController.CharacterController.radius);
             
             // Raycast origin pozisyonları
             var raycastOrigins = new[]
@@ -493,35 +443,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             // Ana ground check
             Gizmos.color = IsGrounded ? Color.green : Color.red;
             Gizmos.DrawWireSphere(origin, radius);
-            
-            // Edge detection visualization
-#if false
-            if (Application.isPlaying)
-            {
-                var supportRadius = radius * (1f - EdgeDetectionThreshold);
-                
-                // Merkez kontrol noktası
-                Gizmos.color = _isNearEdge ? Color.red : Color.green;
-                Gizmos.DrawWireSphere(origin, supportRadius * 0.35f);
-                
-                // 8 yönlü edge detection points
-                for (var i = 0; i < 8; i++)
-                {
-                    var angle = (360f / 8) * i * Mathf.Deg2Rad;
-                    var direction = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
-                    var checkPoint = origin + direction * supportRadius;
-                    
-                    var layerMask = ~LayerMask.GetMask("Player");
-                    var hasSupport = Physics.Raycast(checkPoint, Vector3.down, 
-                        radius * 0.5f, layerMask);
-                    
-                    Gizmos.color = hasSupport ? new Color(0, 1, 0, 0.7f) : 
-                        new Color(1, 0, 0, 0.7f);
-                    Gizmos.DrawWireSphere(checkPoint, 0.025f);
-                    Gizmos.DrawLine(checkPoint, checkPoint + Vector3.down * radius * 0.5f);
-                }
-            }
-#endif
         }
         
         private void DrawWireCapsule(Vector3 start, Vector3 end, float radius)
@@ -535,6 +456,5 @@ namespace Epitaph.Scripts.Player.MovementSystem
             Handles.DrawLine(start - Vector3.forward * radius, end - Vector3.forward * radius);
         }
 #endif
-
     }
 }

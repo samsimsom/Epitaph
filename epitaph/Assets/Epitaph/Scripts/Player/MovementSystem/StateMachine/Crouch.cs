@@ -52,15 +52,15 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 if (Ctx.PlayerController.PlayerInput.IsMoveInput && 
                     Ctx.PlayerController.PlayerInput.IsRunPressed)
                 {
-                    SwitchState(Factory.Run());
+                    Ctx.StateManager.SwitchState(Factory.Run());
                 }
                 else if (Ctx.PlayerController.PlayerInput.IsMoveInput)
                 {
-                    SwitchState(Factory.Walk());
+                    Ctx.StateManager.SwitchState(Factory.Walk());
                 }
                 else
                 {
-                    SwitchState(Factory.Idle());
+                    Ctx.StateManager.SwitchState(Factory.Idle());
                 }
                 return;
             } else if (!Ctx.PlayerController.PlayerInput.IsMoveInput)
@@ -76,15 +76,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 CanStandUp())
             {
                 Ctx.IsCrouching = false;
-                SwitchState(Factory.Jump());
+                Ctx.StateManager.SwitchState(Factory.Jump());
             }
-        }
-
-        private void SwitchState(StateBase @new)
-        {
-            ExitState();
-            @new.EnterState();
-            Ctx.CurrentState = @new;
         }
 
         #endregion

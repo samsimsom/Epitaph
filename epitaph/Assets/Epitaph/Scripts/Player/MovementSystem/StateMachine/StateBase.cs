@@ -24,5 +24,10 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         
         public virtual void CheckSwitchStates() {  }
         public virtual void InitializeSubState() {  }
+        
+        // Debug metodları ekle
+        public virtual void OnDrawGizmos() { }
+        public virtual void OnGUI() { }
+
     }
 }

@@ -11,5 +11,17 @@ namespace Epitaph.Scripts.Player.ViewSystem
         {
             ViewBehaviour = viewBehaviour;
         }
+        
+        public override void Awake() { }
+        public override void OnEnable() { }
+        public override void Start() { }
+        public override void Update() { }
+        public override void LateUpdate() { }
+        public override void FixedUpdate() { }
+        public override void OnDisable() { }
+        public override void OnDestroy() { }
+        public override void OnGUI() { }
+        public override void OnDrawGizmos() { }
+
     }
 }

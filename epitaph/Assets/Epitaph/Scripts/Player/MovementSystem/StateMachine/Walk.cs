@@ -33,22 +33,22 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         {
             if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame)
             {
-                SwitchState(Factory.Crouch());
+                Ctx.StateManager.SwitchState(Factory.Crouch());
             }
             else if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame && 
                      Ctx.CoyoteTimeCounter > 0f)
             {
-                SwitchState(Factory.Jump());
+                Ctx.StateManager.SwitchState(Factory.Jump());
             }
             else if (!Ctx.PlayerController.PlayerInput.IsMoveInput)
             {
-                SwitchState(Factory.Idle());
+                Ctx.StateManager.SwitchState(Factory.Idle());
             }
             else if (Ctx.PlayerController.PlayerInput.IsMoveInput && 
                      Ctx.PlayerController.PlayerInput.IsRunPressed)
             {
                 // if (Ctx.PlayerController.LifeStatsManager.Stamina.IsCritical) return;
-                SwitchState(Factory.Run());
+                Ctx.StateManager.SwitchState(Factory.Run());
             }
         }
 
@@ -59,13 +59,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 input.x * Ctx.WalkSpeed, Ctx.SpeedTransitionDuration);
             Ctx.AppliedMovementZ = Mathf.Lerp(Ctx.AppliedMovementZ, 
                 input.y * Ctx.WalkSpeed, Ctx.SpeedTransitionDuration);
-        }
-
-        private void SwitchState(StateBase @new)
-        {
-            ExitState();
-            @new.EnterState();
-            Ctx.CurrentState = @new;
         }
     }
 }

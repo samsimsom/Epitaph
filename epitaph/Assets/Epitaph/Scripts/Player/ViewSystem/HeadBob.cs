@@ -92,7 +92,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
 
         private void UpdateHeadBobAmount()
         {
-            var stateName = PlayerController.MovementBehaviour.CurrentState.StateName;
+            var stateName = PlayerController.MovementBehaviour.StateManager.CurrentState.StateName;
             
             if (HeadBobAmounts.TryGetValue(stateName, out var amount))
             {
