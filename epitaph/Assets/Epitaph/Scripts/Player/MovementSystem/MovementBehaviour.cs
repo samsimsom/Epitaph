@@ -12,6 +12,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // Sub behaviours
         public StateManager StateManager { get; private set; }
         public PlayerStepDetection PlayerStepDetection { get; private set; }
+        public PlayerGroundDetection PlayerGroundDetection { get; private set; }
         // Gelecekte eklenebilecek diğer sub behaviours:
         // public GroundChecker GroundChecker { get; private set; }
         // public MovementPhysics MovementPhysics { get; private set; }
@@ -49,7 +50,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public bool IsFalling { get; internal set; }
         public bool IsJumping { get; internal set; }
         public bool IsCrouching { get; internal set; }
-        public bool IsGrounded { get; private set; }
+        public bool IsGrounded => PlayerGroundDetection.IsGrounded;
         public Vector3 GroundNormal { get; private set; }
         
         public Vector3 CapsulVelocity { get; private set; }
@@ -74,6 +75,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             StateManager = _movementBehaviourManager.AddBehaviour(new StateManager(this, PlayerController));
             PlayerStepDetection = _movementBehaviourManager.AddBehaviour(new PlayerStepDetection(this, PlayerController));
+            PlayerGroundDetection = _movementBehaviourManager.AddBehaviour(new PlayerGroundDetection(this, PlayerController));
             // Gelecekte diğer sub behaviours eklenebilir:
             // GroundChecker = _movementBehaviourManager.AddBehaviour(new GroundChecker(this, PlayerController));
             // MovementPhysics = _movementBehaviourManager.AddBehaviour(new MovementPhysics(this, PlayerController));
@@ -101,7 +103,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public override void Update()
         {
-            CheckIsGrounded();
+            // CheckIsGrounded();
             CheckIsFalling();
             HandleMovement();
             ManageCoyoteTime();
@@ -256,46 +258,46 @@ namespace Epitaph.Scripts.Player.MovementSystem
             );
         }
 
-        private void CheckIsGrounded()
-        {
-            if (PlayerController.CharacterController == null)
-            {
-                IsGrounded = false;
-                return;
-            }
-
-            var capsuleCollider = PlayerController.CharacterController;
-            var center = capsuleCollider.bounds.center;
-            var radius = capsuleCollider.radius * 0.9f;
-            var rayDistance = capsuleCollider.bounds.extents.y + 0.1f;
-            var layerMask = ~(1 << PlayerController.gameObject.layer);
-
-            var origins = new[]
-            {
-                center,
-                center + Vector3.forward * (radius * 0.5f),
-                center + Vector3.back * (radius * 0.5f),
-                center + Vector3.right * (radius * 0.5f),
-                center + Vector3.left * (radius * 0.5f)
-            };
-
-            foreach (var origin in origins)
-            {
-                if (TryGroundNormalCheck(origin, rayDistance, layerMask, out var hitInfo))
-                {
-                    IsGrounded = true;
-                    GroundNormal = hitInfo.normal;
-                    return;
-                }
-            }
-
-            IsGrounded = false;
-            GroundNormal = Vector3.up;
-        }
+        // private void CheckIsGrounded()
+        // {
+        //     if (PlayerController.CharacterController == null)
+        //     {
+        //         IsGrounded = false;
+        //         return;
+        //     }
+        //
+        //     var capsuleCollider = PlayerController.CharacterController;
+        //     var center = capsuleCollider.bounds.center;
+        //     var radius = capsuleCollider.radius * 0.9f;
+        //     var rayDistance = capsuleCollider.bounds.extents.y + 0.1f;
+        //     var layerMask = ~(1 << PlayerController.gameObject.layer);
+        //
+        //     var origins = new[]
+        //     {
+        //         center,
+        //         center + Vector3.forward * (radius * 0.5f),
+        //         center + Vector3.back * (radius * 0.5f),
+        //         center + Vector3.right * (radius * 0.5f),
+        //         center + Vector3.left * (radius * 0.5f)
+        //     };
+        //
+        //     foreach (var origin in origins)
+        //     {
+        //         if (TryGroundNormalCheck(origin, rayDistance, layerMask, out var hitInfo))
+        //         {
+        //             IsGrounded = true;
+        //             GroundNormal = hitInfo.normal;
+        //             return;
+        //         }
+        //     }
+        //
+        //     IsGrounded = false;
+        //     GroundNormal = Vector3.up;
+        // }
 
         private void CheckIsFalling()
         {
-            IsFalling = !IsGrounded && VerticalMovement < 0;
+            IsFalling = !PlayerGroundDetection.IsGrounded && VerticalMovement < 0;
         }
 
         private bool TryGroundNormalCheck(Vector3 origin, float rayDistance, LayerMask layerMask, out RaycastHit hitInfo)

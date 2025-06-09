@@ -2,11 +2,12 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 {
     public class Jump : StateBase
     {
-        public Jump(MovementBehaviour currentContext, StateFactory stateFactory) 
+        public Jump(MovementBehaviour currentContext, StateFactory stateFactory)
             : base(currentContext, stateFactory) { }
 
         public override void EnterState()
         {
+            Ctx.PlayerGroundDetection.OnJumpStarted();
             Ctx.VerticalMovement = Ctx.JumpForce;
             Ctx.IsJumping = true;
         }
