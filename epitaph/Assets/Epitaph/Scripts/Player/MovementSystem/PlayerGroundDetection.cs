@@ -162,12 +162,19 @@ namespace Epitaph.Scripts.Player.MovementSystem
             }
         }
         
-        // Renkli debug için jump buffer durumunu göster
+        // ---------------------------------------------------------------------------- //
+
+        #region Gizmos
+
 #if UNITY_EDITOR
         public override void OnGUI()
         {
             if (!Application.isPlaying) return;
+            // DisplayJumpBufferInfo();
+        }
 
+        private void DisplayJumpBufferInfo()
+        {
             var style = new GUIStyle();
             style.fontSize = 12;
             style.normal.textColor = Color.white;
@@ -180,13 +187,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 GUI.Label(new Rect(10, 240, 300, 20), "Jump Buffer Active - Ground Check Disabled", style);
             }
         }
-#endif
-        
-        // ---------------------------------------------------------------------------- //
 
-        #region Gizmos
-
-#if UNITY_EDITOR
         public override void OnDrawGizmos()
         {
             DrawCheckIsGroundedGizmo();
@@ -233,16 +234,16 @@ namespace Epitaph.Scripts.Player.MovementSystem
             var raycastOrigins = new[]
             {
                 // Ana 4 yön
-                characterBaseWorld + (Vector3.left * radius * radiusMultiplier),
-                characterBaseWorld + (Vector3.right * radius * radiusMultiplier),
-                characterBaseWorld + (Vector3.forward * radius * radiusMultiplier),
-                characterBaseWorld + (Vector3.back * radius * radiusMultiplier),
+                characterBaseWorld + (Vector3.left * (radius * radiusMultiplier)),
+                characterBaseWorld + (Vector3.right * (radius * radiusMultiplier)),
+                characterBaseWorld + (Vector3.forward * (radius * radiusMultiplier)),
+                characterBaseWorld + (Vector3.back * (radius * radiusMultiplier)),
                 
                 // Diagonal 4 yön
-                characterBaseWorld + ((Vector3.forward + Vector3.left).normalized * radius * radiusMultiplier),
-                characterBaseWorld + ((Vector3.forward + Vector3.right).normalized * radius * radiusMultiplier),
-                characterBaseWorld + ((Vector3.back + Vector3.left).normalized * radius * radiusMultiplier),
-                characterBaseWorld + ((Vector3.back + Vector3.right).normalized * radius * radiusMultiplier)
+                characterBaseWorld + ((Vector3.forward + Vector3.left).normalized * (radius * radiusMultiplier)),
+                characterBaseWorld + ((Vector3.forward + Vector3.right).normalized * (radius * radiusMultiplier)),
+                characterBaseWorld + ((Vector3.back + Vector3.left).normalized * (radius * radiusMultiplier)),
+                characterBaseWorld + ((Vector3.back + Vector3.right).normalized * (radius * radiusMultiplier))
             };
             
             // Origin noktalarını çiz
