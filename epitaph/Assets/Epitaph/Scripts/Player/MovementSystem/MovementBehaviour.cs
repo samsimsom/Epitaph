@@ -11,6 +11,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         // Sub behaviours
         public StateManager StateManager { get; private set; }
+        public PlayerStepDetection PlayerStepDetection { get; private set; }
         // Gelecekte eklenebilecek diğer sub behaviours:
         // public GroundChecker GroundChecker { get; private set; }
         // public MovementPhysics MovementPhysics { get; private set; }
@@ -72,6 +73,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private void InitializeBehaviours()
         {
             StateManager = _movementBehaviourManager.AddBehaviour(new StateManager(this, PlayerController));
+            PlayerStepDetection = _movementBehaviourManager.AddBehaviour(new PlayerStepDetection(this, PlayerController));
             // Gelecekte diğer sub behaviours eklenebilir:
             // GroundChecker = _movementBehaviourManager.AddBehaviour(new GroundChecker(this, PlayerController));
             // MovementPhysics = _movementBehaviourManager.AddBehaviour(new MovementPhysics(this, PlayerController));
@@ -185,6 +187,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 CapsulVelocity = PlayerController.CharacterController.velocity;
                 CurrentSpeed = new Vector3(CapsulVelocity.x, 0, CapsulVelocity.z).magnitude;
                 
+                // Step detection için input al (InputBehaviour'dan gelecek)
+                var moveInput = new Vector2(AppliedMovementX, AppliedMovementZ);
+                PlayerStepDetection.HandleStepOffset(moveInput);
+
                 ApplyMovement();
             }
         }
