@@ -232,10 +232,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
             {
                 VerticalMovement -= Gravity * Time.fixedDeltaTime;
             }
-            else if (IsGrounded && VerticalMovement < 0)
-            {
-                VerticalMovement = -0.5f;
-            }
+            // else if (IsGrounded && VerticalMovement < 0)
+            // {
+            //     VerticalMovement = -0.5f;
+            // }
         }
 
         public bool HasObstacleAboveForJump()

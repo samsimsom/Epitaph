@@ -65,9 +65,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
             _rayBasedGroundCheck = rayBasedGroundCheck;
             
             // Tüm kontrolleri birleştir
-            // IsGrounded = _customGroundCheck || _capsuleGroundCheck || _rayBasedGroundCheck;
-            // IsGrounded = _rayBasedGroundCheck;
-            IsGrounded = _capsuleGroundCheck;
+            IsGrounded = _capsuleGroundCheck || _customGroundCheck || _rayBasedGroundCheck;
+            // IsGrounded = _capsuleGroundCheck;
+            // IsGrounded = _customGroundCheck;
             
             // Normal'i ayarla
             GroundNormal = normalCalculated;
@@ -88,16 +88,16 @@ namespace Epitaph.Scripts.Player.MovementSystem
             var origins = new Vector3[]
             {
                 // Ana 4 yön
-                characterBaseWorld + (Vector3.left * controller.radius * radiusMultiplier),
-                characterBaseWorld + (Vector3.right * controller.radius * radiusMultiplier),
-                characterBaseWorld + (Vector3.forward * controller.radius * radiusMultiplier),
-                characterBaseWorld + (Vector3.back * controller.radius * radiusMultiplier),
+                characterBaseWorld + Vector3.left * (controller.radius * radiusMultiplier),
+                characterBaseWorld + Vector3.right * (controller.radius * radiusMultiplier),
+                characterBaseWorld + Vector3.forward * (controller.radius * radiusMultiplier),
+                characterBaseWorld + Vector3.back * (controller.radius * radiusMultiplier),
                 
                 // Diagonal 4 yön
-                characterBaseWorld + ((Vector3.forward + Vector3.left).normalized * controller.radius * radiusMultiplier),
-                characterBaseWorld + ((Vector3.forward + Vector3.right).normalized * controller.radius * radiusMultiplier),
-                characterBaseWorld + ((Vector3.back + Vector3.left).normalized * controller.radius * radiusMultiplier),
-                characterBaseWorld + ((Vector3.back + Vector3.right).normalized * controller.radius * radiusMultiplier)
+                characterBaseWorld + (Vector3.forward + Vector3.left).normalized * (controller.radius * radiusMultiplier),
+                characterBaseWorld + (Vector3.forward + Vector3.right).normalized * (controller.radius * radiusMultiplier),
+                characterBaseWorld + (Vector3.back + Vector3.left).normalized * (controller.radius * radiusMultiplier),
+                characterBaseWorld + (Vector3.back + Vector3.right).normalized * (controller.radius * radiusMultiplier)
             };
             
             var summedNormals = Vector3.zero;
