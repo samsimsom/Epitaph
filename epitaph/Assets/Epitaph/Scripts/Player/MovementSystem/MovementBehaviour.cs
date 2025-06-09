@@ -23,7 +23,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float IdleTransitionDuration = 0.25f;
 
         // Jump Variables
-        public float JumpForce = 4.0f;
+        public float JumpForce = 5.0f;
         public float AirControlFactor = 1.25f;
         public float Gravity = 20.0f;
         
