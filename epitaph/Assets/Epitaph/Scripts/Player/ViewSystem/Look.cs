@@ -10,7 +10,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
         private CinemachineCamera _cinemachineCamera;
         private CinemachineInputAxisController _inputAxis;
 
-        public Vector2 LookSensivity => new(15f, 15f);
+        public Vector2 LookSensivity => new(0.5f, 0.5f);
 
         public Look(ViewBehaviour viewBehaviour, PlayerController playerController)
             : base(playerController)
