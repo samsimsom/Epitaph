@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.ViewSystem
 {
-    public class HeadBob : PlayerBehaviour
+    public class HeadBob : ViewSubBehaviour
     {
         private readonly ViewBehaviour _viewBehaviour;
         private Vector3 _headBobOffset = Vector3.zero;
@@ -27,7 +27,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
         private const float MinOffsetMagnitudeToZero = 0.001f;
 
         public HeadBob(ViewBehaviour viewBehaviour, PlayerController playerController)
-            : base(playerController)
+            : base(viewBehaviour, playerController)
         {
             _viewBehaviour = viewBehaviour;
         }

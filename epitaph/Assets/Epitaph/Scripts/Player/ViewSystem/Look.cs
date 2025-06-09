@@ -4,19 +4,19 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.ViewSystem
 {
-    public class Look : PlayerBehaviour
+    public class Look : ViewSubBehaviour
     {
-        private ViewBehaviour _viewBehaviour;
         private CinemachineCamera _cinemachineCamera;
         private CinemachineInputAxisController _inputAxis;
 
         public Vector2 LookSensivity => new(0.4f, 0.4f);
 
+        // ---------------------------------------------------------------------------- //
+        
         public Look(ViewBehaviour viewBehaviour, PlayerController playerController)
-            : base(playerController)
-        {
-            _viewBehaviour = viewBehaviour;
-        }
+            : base(viewBehaviour, playerController) { }
+        
+        // ---------------------------------------------------------------------------- //
         
         public override void Awake()
         {

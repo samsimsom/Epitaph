@@ -6,9 +6,13 @@ namespace Epitaph.Scripts.Player.ViewSystem
 {
     public class ViewBehaviour : PlayerBehaviour
     {
-        // Properties
+        // Alt behaviour'lar için manager
+        private readonly PlayerBehaviourManager<ViewSubBehaviour> _viewBehaviourManager;
+        
+        // Properties - artık manager üzerinden erişilecek
         public Look Look { get; private set; }
         public HeadBob HeadBob { get; private set; }
+        // public CameraShake CameraShake { get; private set; } // Yeni eklenebilecek
         
         // Head Bob Configuration
         public float HeadBobAmount = 0.02f;
@@ -36,19 +40,50 @@ namespace Epitaph.Scripts.Player.ViewSystem
         public ViewBehaviour(PlayerController playerController)
             : base(playerController)
         {
+            // Manager'ı önce başlat
+            _viewBehaviourManager = new PlayerBehaviourManager<ViewSubBehaviour>(playerController);
+            
             InitializeCameraBasePosition();
             InitializeBehaviours();
         }
 
         // ---------------------------------------------------------------------------- //
         
+        public void InitializeBehaviours()
+        {
+            if (PlayerController.CameraTransform != null)
+            {
+                Look = _viewBehaviourManager.AddBehaviour(new Look(this, PlayerController));
+                HeadBob = _viewBehaviourManager.AddBehaviour(new HeadBob(this, PlayerController));
+                // CameraShake = _viewBehaviourManager.AddBehaviour(new CameraShake(this, PlayerController));
+            }
+            else
+            {
+                Debug.LogError("PlayerCameraTransform is null in ViewBehaviour." +
+                               "InitializeBehaviours. View behaviours cannot be " +
+                               "initialized.", PlayerController);
+            }
+        }
+        
+        // ---------------------------------------------------------------------------- //
+        
         #region Camera Position Methods
         
         private void InitializeCameraBasePosition()
         {
-            _basePosition = PlayerController.CameraTransform.localPosition;
-            _currentHeight = _basePosition.y;
-            _targetHeight = _currentHeight;
+            if (PlayerController?.CameraTransform != null)
+            {
+                _basePosition = PlayerController.CameraTransform.localPosition;
+                _currentHeight = _basePosition.y;
+                _targetHeight = _currentHeight;
+            }
+            else
+            {
+                Debug.LogWarning("CameraTransform is null during InitializeCameraBasePosition", PlayerController);
+                _basePosition = Vector3.zero;
+                _currentHeight = 0f;
+                _targetHeight = 0f;
+            }
         }
 
         public void SetHeadBobOffset(Vector3 offset)
@@ -65,6 +100,8 @@ namespace Epitaph.Scripts.Player.ViewSystem
 
         public void UpdateCameraPosition()
         {
+            if (PlayerController?.CameraTransform == null) return;
+            
             // Smooth height transition
             _currentHeight = Mathf.Lerp(_currentHeight, _targetHeight, 
                 Time.deltaTime * CameraTransitonSmooth);
@@ -96,74 +133,58 @@ namespace Epitaph.Scripts.Player.ViewSystem
         
         public override void Awake()
         {
-            foreach (var behaviour in _viewBehaviours) behaviour.Awake();
+            _viewBehaviourManager?.ExecuteOnAll(b => b.Awake());
         }
 
         public override void OnEnable()
         {
-            foreach (var behaviour in _viewBehaviours) behaviour.OnEnable();
+            _viewBehaviourManager?.ExecuteOnAll(b => b.OnEnable());
         }
 
         public override void Start()
         {
-            foreach (var behaviour in _viewBehaviours) behaviour.Start();
+            _viewBehaviourManager?.ExecuteOnAll(b => b.Start());
         }
 
         public override void Update()
         {
-            foreach (var behaviour in _viewBehaviours) behaviour.Update();
+            _viewBehaviourManager?.ExecuteOnAll(b => b.Update());
         }
 
         public override void LateUpdate()
         {
             UpdateCameraPosition();
-            foreach (var behaviour in _viewBehaviours) behaviour.LateUpdate();
+            _viewBehaviourManager?.ExecuteOnAll(b => b.LateUpdate());
         }
 
         public override void FixedUpdate()
         {
-            foreach (var behaviour in _viewBehaviours) behaviour.FixedUpdate();
+            _viewBehaviourManager?.ExecuteOnAll(b => b.FixedUpdate());
         }
 
         public override void OnDisable()
         {
-            foreach (var behaviour in _viewBehaviours) behaviour.OnDisable();
+            _viewBehaviourManager?.ExecuteOnAll(b => b.OnDisable());
         }
 
         public override void OnDestroy()
         {
-            foreach (var behaviour in _viewBehaviours) behaviour.OnDestroy();
+            _viewBehaviourManager?.ExecuteOnAll(b => b.OnDestroy());
         }
 
 #if UNITY_EDITOR
         public override void OnDrawGizmos()
         {
-            foreach (var behaviour in _viewBehaviours) behaviour.OnDrawGizmos();
+            _viewBehaviourManager?.ExecuteOnAll(b => b.OnDrawGizmos());
+        }
+
+        public override void OnGUI()
+        {
+            _viewBehaviourManager?.ExecuteOnAll(b => b.OnGUI());
         }
 #endif
 
         #endregion
         
-        // ---------------------------------------------------------------------------- //
-        public void InitializeBehaviours()
-        {
-            if (PlayerController.CameraTransform != null)
-            {
-                Look = AddViewBehaviour(new Look(this, PlayerController));
-                HeadBob = AddViewBehaviour(new HeadBob(this, PlayerController));
-            }
-            else
-            {
-                Debug.LogError("PlayerCameraTransform is null in ViewBehaviour." +
-                               "InitializeBehaviours. View behaviours cannot be " +
-                               "initialized.", PlayerController);
-            }
-        }
-        
-        private T AddViewBehaviour<T>(T behaviour) where T : PlayerBehaviour
-        {
-            _viewBehaviours.Add(behaviour);
-            return behaviour;
-        }
     }
 }
