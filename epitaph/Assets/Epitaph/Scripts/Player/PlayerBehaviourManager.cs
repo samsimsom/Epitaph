@@ -34,5 +34,6 @@ namespace Epitaph.Scripts.Player
                 action?.Invoke(behaviour);
             }
         }
+        
     }
 }
