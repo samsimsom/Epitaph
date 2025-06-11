@@ -73,9 +73,12 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         private void InitializeBehaviours()
         {
-            StateManager = _movementBehaviourManager.AddBehaviour(new StateManager(this, PlayerController));
-            PlayerStepDetection = _movementBehaviourManager.AddBehaviour(new PlayerStepDetection(this, PlayerController));
-            PlayerGroundDetection = _movementBehaviourManager.AddBehaviour(new PlayerGroundDetection(this, PlayerController));
+            StateManager = _movementBehaviourManager
+                .AddBehaviour(new StateManager(this, PlayerController));
+            PlayerStepDetection = _movementBehaviourManager
+                .AddBehaviour(new PlayerStepDetection(this, PlayerController));
+            PlayerGroundDetection = _movementBehaviourManager
+                .AddBehaviour(new PlayerGroundDetection(this, PlayerController));
         }
         
         // ---------------------------------------------------------------------------- //
@@ -205,8 +208,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
             // Kamera yönüne göre hareket hesapla
             movement = cameraRight * AppliedMovementX + cameraForward * AppliedMovementZ;
-
-    
+            
             // Dikey hareketi ekle
             movement.y = VerticalMovement;
     
