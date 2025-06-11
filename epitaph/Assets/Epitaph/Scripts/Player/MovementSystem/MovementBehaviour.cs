@@ -165,7 +165,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             if (PlayerController.CharacterController != null)
             {
                 var position = PlayerController.transform.position;
-                position.y += 0.5f;
+                position.y += PlayerController.CharacterController.skinWidth;
                 PlayerController.transform.position = position;
             }
         }
