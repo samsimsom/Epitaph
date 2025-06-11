@@ -51,7 +51,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public bool IsJumping { get; internal set; }
         public bool IsCrouching { get; internal set; }
         public bool IsGrounded => PlayerGroundDetection.IsGrounded;
-        public Vector3 GroundNormal { get; private set; }
+        public Vector3 GroundNormal => PlayerGroundDetection.GroundNormal;
         
         public Vector3 CapsulVelocity { get; private set; }
         public float CurrentSpeed { get; private set; }
