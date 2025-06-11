@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Epitaph.Scripts.InputManager;
 using Epitaph.Scripts.Player.BaseBehaviour;
 using Epitaph.Scripts.Player.MovementSystem;
@@ -94,13 +93,7 @@ namespace Epitaph.Scripts.Player
         // ---------------------------------------------------------------------------- //
         
         #region Initialization
-
-        // private T AddBehaviour<T>(T behaviour) where T : PlayerBehaviour
-        // {
-        //     _playerBehaviours.Add(behaviour);
-        //     return behaviour;
-        // }
-
+        
         private void InitializeBehaviours()
         {
             _behaviourManager = new PlayerBehaviourManager<PlayerBehaviour>(this);
