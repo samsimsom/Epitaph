@@ -8,14 +8,14 @@ namespace Epitaph.Scripts.Player.MovementSystem
     {
         // Alt behaviour'lar için manager
         private readonly PlayerBehaviourManager<MovementSubBehaviour> _movementBehaviourManager;
-        
-        // Sub behaviours
+
+        #region Sub behaviours
+
         public StateManager StateManager { get; private set; }
         public PlayerStepDetection PlayerStepDetection { get; private set; }
         public PlayerGroundDetection PlayerGroundDetection { get; private set; }
-        // Gelecekte eklenebilecek diğer sub behaviours:
-        // public GroundChecker GroundChecker { get; private set; }
-        // public MovementPhysics MovementPhysics { get; private set; }
+
+        #endregion
         
         // Movement Variables
         public float WalkSpeed = 2.5f;
@@ -76,9 +76,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             StateManager = _movementBehaviourManager.AddBehaviour(new StateManager(this, PlayerController));
             PlayerStepDetection = _movementBehaviourManager.AddBehaviour(new PlayerStepDetection(this, PlayerController));
             PlayerGroundDetection = _movementBehaviourManager.AddBehaviour(new PlayerGroundDetection(this, PlayerController));
-            // Gelecekte diğer sub behaviours eklenebilir:
-            // GroundChecker = _movementBehaviourManager.AddBehaviour(new GroundChecker(this, PlayerController));
-            // MovementPhysics = _movementBehaviourManager.AddBehaviour(new MovementPhysics(this, PlayerController));
         }
         
         // ---------------------------------------------------------------------------- //
@@ -103,7 +100,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public override void Update()
         {
-            // CheckIsGrounded();
             CheckIsFalling();
             HandleMovement();
             ManageCoyoteTime();
@@ -135,12 +131,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
 #if UNITY_EDITOR
         public override void OnGUI()
         {
-            // Movement debug bilgileri
-            // GUI.Label(new Rect(10, 130, 300, 20), $"Is Grounded: {IsGrounded}");
-            // GUI.Label(new Rect(10, 150, 300, 20), $"Vertical Movement: {VerticalMovement:F2}");
-            // GUI.Label(new Rect(10, 170, 300, 20), $"Current Speed: {CurrentSpeed:F2}");
-            // GUI.Label(new Rect(10, 190, 300, 20), $"Coyote Time: {CoyoteTimeCounter:F2}");
-            
             _movementBehaviourManager?.ExecuteOnAll(b => b.OnGUI());
         }
 
@@ -148,8 +138,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         {
             DrawCharacterControllerGizmo();
             DrawHasObstacleAboveForJumpGizmo();
-            DrawCheckIsGroundedGizmo();
-            DrawGroundNormalGizmo();
             _movementBehaviourManager?.ExecuteOnAll(b => b.OnDrawGizmos());
         }
 #endif
@@ -232,10 +220,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             {
                 VerticalMovement -= Gravity * Time.fixedDeltaTime;
             }
-            // else if (IsGrounded && VerticalMovement < 0)
-            // {
-            //     VerticalMovement = -0.5f;
-            // }
         }
 
         public bool HasObstacleAboveForJump()
@@ -258,109 +242,14 @@ namespace Epitaph.Scripts.Player.MovementSystem
             );
         }
 
-        // private void CheckIsGrounded()
-        // {
-        //     if (PlayerController.CharacterController == null)
-        //     {
-        //         IsGrounded = false;
-        //         return;
-        //     }
-        //
-        //     var capsuleCollider = PlayerController.CharacterController;
-        //     var center = capsuleCollider.bounds.center;
-        //     var radius = capsuleCollider.radius * 0.9f;
-        //     var rayDistance = capsuleCollider.bounds.extents.y + 0.1f;
-        //     var layerMask = ~(1 << PlayerController.gameObject.layer);
-        //
-        //     var origins = new[]
-        //     {
-        //         center,
-        //         center + Vector3.forward * (radius * 0.5f),
-        //         center + Vector3.back * (radius * 0.5f),
-        //         center + Vector3.right * (radius * 0.5f),
-        //         center + Vector3.left * (radius * 0.5f)
-        //     };
-        //
-        //     foreach (var origin in origins)
-        //     {
-        //         if (TryGroundNormalCheck(origin, rayDistance, layerMask, out var hitInfo))
-        //         {
-        //             IsGrounded = true;
-        //             GroundNormal = hitInfo.normal;
-        //             return;
-        //         }
-        //     }
-        //
-        //     IsGrounded = false;
-        //     GroundNormal = Vector3.up;
-        // }
-
         private void CheckIsFalling()
         {
             IsFalling = !PlayerGroundDetection.IsGrounded && VerticalMovement < 0;
         }
 
-        private bool TryGroundNormalCheck(Vector3 origin, float rayDistance, LayerMask layerMask, out RaycastHit hitInfo)
-        {
-            return Physics.Raycast(origin, Vector3.down, out hitInfo, rayDistance, layerMask);
-        }
-
         #endregion
         
-        #if UNITY_EDITOR
-        private void DrawGroundNormalGizmo()
-        {
-            if (!Application.isPlaying) return;
-            
-            var rayDistance = PlayerController.CharacterController.radius * 2f;
-            var layerMask = ~LayerMask.GetMask("Player");
-            var characterBaseWorld = PlayerController.CharacterController.transform.position + PlayerController.CharacterController.center - Vector3.up * 
-                (PlayerController.CharacterController.height / 2f - PlayerController.CharacterController.radius);
-            
-            // Raycast origin pozisyonları
-            var raycastOrigins = new[]
-            {
-                characterBaseWorld + (Vector3.left * PlayerController.CharacterController.radius),
-                characterBaseWorld + (Vector3.right * PlayerController.CharacterController.radius),
-                characterBaseWorld + (Vector3.forward * PlayerController.CharacterController.radius),
-                characterBaseWorld + (Vector3.back * PlayerController.CharacterController.radius)
-            };
-            
-            // Origin noktalarını çiz
-            Gizmos.color = Color.cyan;
-            foreach (var origin in raycastOrigins)
-            {
-                Gizmos.DrawWireSphere(origin, 0.025f);
-            }
-            
-            // Her origin için raycast yap ve sonucu çiz
-            foreach (var origin in raycastOrigins)
-            {
-                DrawRaycastResult(origin, rayDistance, layerMask);
-            }
-            
-            // Hesaplanan ortalama ground normal'i çiz
-            Gizmos.color = Color.magenta;
-            Gizmos.DrawRay(characterBaseWorld, GroundNormal * 1f);
-        }
-
-        private void DrawRaycastResult(Vector3 origin, float rayDistance, LayerMask layerMask)
-        {
-            if (TryGroundNormalCheck(origin, rayDistance, layerMask, out var hitInfo))
-            {
-                // Hit varsa - yeşil çizgi ve mavi normal
-                Gizmos.color = Color.green;
-                Gizmos.DrawLine(origin, hitInfo.point);
-                Gizmos.color = Color.blue;
-                Gizmos.DrawRay(hitInfo.point, hitInfo.normal * 0.5f);
-            }
-            else
-            {
-                // Hit yoksa - kırmızı çizgi
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(origin, origin + Vector3.down * rayDistance);
-            }
-        }
+    #if UNITY_EDITOR
         
         private void DrawCharacterControllerGizmo()
         {
@@ -438,20 +327,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 Gizmos.DrawSphere(hit.point, 0.06f);
             }
         }
-
-        private void DrawCheckIsGroundedGizmo()
-        {
-            var controller = PlayerController.CharacterController;
-            var position = controller.transform.position;
-            var center = controller.center;
-            var height = controller.height;
-            var radius = controller.radius;
-            var origin = position + center - Vector3.up * (height / 2f);
-            
-            // Ana ground check
-            Gizmos.color = IsGrounded ? Color.green : Color.red;
-            Gizmos.DrawWireSphere(origin, radius);
-        }
         
         private void DrawWireCapsule(Vector3 start, Vector3 end, float radius)
         {
@@ -463,6 +338,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             Handles.DrawLine(start + Vector3.forward * radius, end + Vector3.forward * radius);
             Handles.DrawLine(start - Vector3.forward * radius, end - Vector3.forward * radius);
         }
+        
 #endif
+        
     }
 }

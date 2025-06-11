@@ -170,7 +170,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public override void OnGUI()
         {
             if (!Application.isPlaying) return;
-            // DisplayJumpBufferInfo();
+            DisplayJumpBufferInfo();
         }
 
         private void DisplayJumpBufferInfo()
@@ -288,6 +288,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 #endif
         
         #endregion
+        
         // ---------------------------------------------------------------------------- //
     }
 }
