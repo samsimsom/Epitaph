@@ -249,7 +249,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         #endregion
         
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
         
         private void DrawCharacterControllerGizmo()
         {
