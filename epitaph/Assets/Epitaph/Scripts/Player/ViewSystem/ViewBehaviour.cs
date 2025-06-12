@@ -15,7 +15,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
         // public CameraShake CameraShake { get; private set; } // Yeni eklenebilecek
         
         // Head Bob Configuration
-        public float HeadBobAmount = 0.02f;
+        public float HeadBobAmount = 0.1f;
         public float HeadBobFrequency = 7.5f;
         public float HeadBobSmooth = 10.0f;
         public float HeadBobThreshold = 1.5f;
@@ -103,8 +103,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
             if (PlayerController?.CameraTransform == null) return;
             
             // Smooth height transition
-            _currentHeight = Mathf.Lerp(_currentHeight, _targetHeight, 
-                Time.deltaTime * CameraTransitonSmooth);
+            _currentHeight = Mathf.Lerp(_currentHeight, _targetHeight, Time.deltaTime * CameraTransitonSmooth);
             
             // Combine all effects
             var finalPosition = new Vector3

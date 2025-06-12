@@ -38,53 +38,53 @@ namespace Epitaph.Scripts.Player
         {
             InitializeBehaviours();
             
-            _behaviourManager.ExecuteOnAll(behaviour => behaviour.Awake());
+            _behaviourManager.ExecuteOnAll(b => b.Awake());
         }
 
         private void OnEnable()
         {
-            _behaviourManager.ExecuteOnAll(behaviour => behaviour.OnEnable());
+            _behaviourManager.ExecuteOnAll(b => b.OnEnable());
         }
 
         private void Start()
         {
-            _behaviourManager.ExecuteOnAll(behaviour => behaviour.Start());
+            _behaviourManager.ExecuteOnAll(b => b.Start());
         }
 
         private void Update()
         {
-            _behaviourManager.ExecuteOnAll(behaviour => behaviour.Update());
+            _behaviourManager.ExecuteOnAll(b => b.Update());
         }
 
         private void LateUpdate()
         {
-            _behaviourManager.ExecuteOnAll(behaviour => behaviour.LateUpdate());
+            _behaviourManager.ExecuteOnAll(b => b.LateUpdate());
         }
 
         private void FixedUpdate()
         {
-            _behaviourManager.ExecuteOnAll(behaviour => behaviour.FixedUpdate());
+            _behaviourManager.ExecuteOnAll(b => b.FixedUpdate());
         }
 
         private void OnDisable()
         {
-            _behaviourManager.ExecuteOnAll(behaviour => behaviour.OnDisable());
+            _behaviourManager.ExecuteOnAll(b => b.OnDisable());
         }
 
         private void OnDestroy()
         {
-            _behaviourManager.ExecuteOnAll(behaviour => behaviour.OnDestroy());
+            _behaviourManager.ExecuteOnAll(b => b.OnDestroy());
         }
 
 #if UNITY_EDITOR
         private void OnGUI()
         {
-            _behaviourManager?.ExecuteOnAll(behaviour => behaviour?.OnGUI());
+            _behaviourManager?.ExecuteOnAll(b => b?.OnGUI());
         }
 
         private void OnDrawGizmos()
         {
-            _behaviourManager?.ExecuteOnAll(behaviour => behaviour?.OnDrawGizmos());
+            _behaviourManager?.ExecuteOnAll(b => b?.OnDrawGizmos());
         }
 #endif
 
