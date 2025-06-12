@@ -17,6 +17,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public GravityHandler GravityHandler { get; private set; }
         public JumpHandler JumpHandler { get; private set; }
         public CrouchHandler CrouchHandler { get; private set; }
+        public LocomotionHandler LocomotionHandler { get; private set; }
 
         #endregion
         
@@ -40,8 +41,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public bool IsGrounded => PlayerGroundDetection.IsGrounded;
         public Vector3 GroundNormal => PlayerGroundDetection.GroundNormal;
         
-        public Vector3 CapsulVelocity { get; private set; }
-        public float CurrentSpeed { get; private set; }
+        public Vector3 CapsulVelocity { get; internal set; }
+        public float CurrentSpeed { get; internal set; }
         public float VerticalMovement { get; internal set; }
 
         public float AppliedMovementX { get; internal set; }
@@ -72,6 +73,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 .AddBehaviour(new JumpHandler(this, PlayerController));
             CrouchHandler = _movementBehaviourManager
                 .AddBehaviour(new CrouchHandler(this, PlayerController));
+            LocomotionHandler = _movementBehaviourManager
+                .AddBehaviour(new LocomotionHandler(this, PlayerController));
         }
         
         // ---------------------------------------------------------------------------- //
@@ -96,7 +99,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public override void Update()
         {
-            HandleMovement();
             ManageCoyoteTime();
             
             _movementBehaviourManager?.ExecuteOnAll(b => b.Update());
@@ -131,7 +133,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public override void OnDrawGizmos()
         {
             DrawCharacterControllerGizmo();
-            // DrawHasObstacleAboveForJumpGizmo() metodu artık JumpHandler içinde
             _movementBehaviourManager?.ExecuteOnAll(b => b.OnDrawGizmos());
         }
 #endif
@@ -162,36 +163,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             {
                 CoyoteTimeCounter -= Time.deltaTime;
             }
-        }
-
-        private void HandleMovement()
-        {
-            if (PlayerController.CharacterController != null)
-            {
-                CapsulVelocity = PlayerController.CharacterController.velocity;
-                CurrentSpeed = new Vector3(CapsulVelocity.x, 0, CapsulVelocity.z).magnitude;
-                
-                var moveInput = new Vector2(AppliedMovementX, AppliedMovementZ);
-                PlayerStepDetection.HandleStepOffset(moveInput);
-
-                ApplyMovement();
-            }
-        }
-        
-        private void ApplyMovement()
-        {
-            if (PlayerController.CharacterController == null) return;
-    
-            Vector3 movement;
-            var cameraForward = PlayerController.PlayerCamera.transform.forward;
-            var cameraRight = PlayerController.PlayerCamera.transform.right;
-            cameraForward.y = 0f;
-            cameraRight.y = 0f;
-            cameraForward.Normalize();
-            cameraRight.Normalize();
-            movement = cameraRight * AppliedMovementX + cameraForward * AppliedMovementZ;
-            movement.y = VerticalMovement;
-            PlayerController.CharacterController.Move(movement * Time.deltaTime);
         }
 
         #endregion
