@@ -1,4 +1,3 @@
-using Epitaph.Scripts.Player.BaseBehaviour;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
