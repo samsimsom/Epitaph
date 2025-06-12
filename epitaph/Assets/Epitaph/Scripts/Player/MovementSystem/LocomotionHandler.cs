@@ -40,6 +40,28 @@ namespace Epitaph.Scripts.Player.MovementSystem
             var cameraRight = Vector3.Scale(cameraTransform.right, new Vector3(1, 0, 1)).normalized;
             
             var movement = cameraRight * MovementBehaviour.AppliedMovementX + cameraForward * MovementBehaviour.AppliedMovementZ;
+
+            // Tırmanılamayan yüzeylerde hareketi engellemek için eğim kontrolü
+            // if (MovementBehaviour.IsGrounded)
+            // {
+            //     var slopeAngle = Vector3.Angle(Vector3.up, MovementBehaviour.GroundNormal);
+            //     if (slopeAngle > PlayerController.CharacterController.slopeLimit)
+            //     {
+            //         // Hareketi eğim düzlemine yansıtarak tırmanmayı engelle ve kaymasını sağla
+            //         var horizontalMovement = new Vector3(movement.x, 0, movement.z);
+            //         var projectedMovement = Vector3.ProjectOnPlane(horizontalMovement, MovementBehaviour.GroundNormal);
+            //
+            //         movement.x = projectedMovement.x;
+            //         movement.z = projectedMovement.z;
+            //
+            //         // Eğer zıplamıyorsak ve StepHandler'dan kaynaklanan bir yükselme varsa bunu engelle
+            //         if (MovementBehaviour.VerticalMovement > 0 && !MovementBehaviour.IsJumping)
+            //         {
+            //             MovementBehaviour.VerticalMovement = 0;
+            //         }
+            //     }
+            // }
+            
             movement.y = MovementBehaviour.VerticalMovement;
             
             PlayerController.CharacterController.Move(movement * Time.deltaTime);
