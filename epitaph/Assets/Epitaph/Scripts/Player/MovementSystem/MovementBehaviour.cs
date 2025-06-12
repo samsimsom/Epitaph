@@ -18,6 +18,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public JumpHandler JumpHandler { get; private set; }
         public CrouchHandler CrouchHandler { get; private set; }
         public LocomotionHandler LocomotionHandler { get; private set; }
+        public CoyoteTimeHandler CoyoteTimeHandler { get; private set; }
 
         #endregion
         
@@ -27,11 +28,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float CrouchSpeed = 1.5f;
         public float SpeedTransitionDuration = 0.1f;
         public float IdleTransitionDuration = 0.25f;
-        
-        // Coyote Time Counter
-        public float CoyoteTime = 0.2f;
-        public float CoyoteTimeCounter;
-        
+
         // Getters & Setters (Alt davranışlar tarafından yönetilecek)
         public bool IsWalking { get; internal set; }
         public bool IsRunning { get; internal set; }
@@ -40,6 +37,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public bool IsCrouching { get; internal set; }
         public bool IsGrounded => PlayerGroundDetection.IsGrounded;
         public Vector3 GroundNormal => PlayerGroundDetection.GroundNormal;
+        
+        public float CoyoteTimeCounter => CoyoteTimeHandler.CoyoteTimeCounter;
         
         public Vector3 CapsulVelocity { get; internal set; }
         public float CurrentSpeed { get; internal set; }
@@ -75,6 +74,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 .AddBehaviour(new CrouchHandler(this, PlayerController));
             LocomotionHandler = _movementBehaviourManager
                 .AddBehaviour(new LocomotionHandler(this, PlayerController));
+            CoyoteTimeHandler = _movementBehaviourManager
+                .AddBehaviour(new CoyoteTimeHandler(this, PlayerController));
         }
         
         // ---------------------------------------------------------------------------- //
@@ -99,8 +100,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public override void Update()
         {
-            ManageCoyoteTime();
-            
             _movementBehaviourManager?.ExecuteOnAll(b => b.Update());
         }
 
@@ -152,19 +151,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 PlayerController.transform.position = position;
             }
         }
-
-        private void ManageCoyoteTime()
-        {
-            if (IsGrounded)
-            {
-                CoyoteTimeCounter = CoyoteTime;
-            }
-            else
-            {
-                CoyoteTimeCounter -= Time.deltaTime;
-            }
-        }
-
+        
         #endregion
         
 #if UNITY_EDITOR
