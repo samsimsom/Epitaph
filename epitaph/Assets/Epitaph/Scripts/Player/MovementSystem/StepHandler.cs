@@ -172,8 +172,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
 #if UNITY_EDITOR
         public override void OnDrawGizmos()
         {
-            DrawCharacterControllerGizmo();
-            
             if (_hasValidData)
             {
                 DrawDebugVisualization(_lastRaycastData, _lastRaycastResults);
@@ -211,36 +209,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             Gizmos.DrawRay(data.StepOffsetPosition, Vector3.up * 0.1f);
         }
         
-        private void DrawCharacterControllerGizmo()
-        {
-            // Renk ve şeffaflık
-            Gizmos.color = new Color(0.2f, 0.6f, 1f, 1.0f);
-
-            // Capsule bilgileri
-            var center = PlayerController.CharacterController.transform.position 
-                         + PlayerController.CharacterController.center;
-            var height = PlayerController.CharacterController.height;
-            var radius = PlayerController.CharacterController.radius;
-
-            // Kapsülün üst ve alt merkezleri
-            var cylinderHeight = Mathf.Max(0, height / 2f - radius);
-            var up = PlayerController.CharacterController.transform.up;
-
-            var top = center + up * cylinderHeight;
-            var bottom = center - up * cylinderHeight;
-
-            // Kapsül çizimi
-            Gizmos.DrawWireSphere(top, radius);       // Üst küre
-            Gizmos.DrawWireSphere(bottom, radius);    // Alt küre
-            Gizmos.DrawLine(top + PlayerController.CharacterController.transform.right * radius, bottom 
-                + PlayerController.CharacterController.transform.right * radius);
-            Gizmos.DrawLine(top - PlayerController.CharacterController.transform.right * radius, bottom 
-                - PlayerController.CharacterController.transform.right * radius);
-            Gizmos.DrawLine(top + PlayerController.CharacterController.transform.forward * radius, bottom 
-                + PlayerController.CharacterController.transform.forward * radius);
-            Gizmos.DrawLine(top - PlayerController.CharacterController.transform.forward * radius, bottom
-                - PlayerController.CharacterController.transform.forward * radius);
-        }
 #endif
       
         // ---------------------------------------------------------------------------- //
@@ -249,7 +217,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public override void OnGUI()
         {
             if (!Application.isPlaying) return;
-
             // DisplayStepDetectionInfo();
         }
 

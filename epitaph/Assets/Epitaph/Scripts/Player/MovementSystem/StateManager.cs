@@ -47,8 +47,13 @@ namespace Epitaph.Scripts.Player.MovementSystem
 #if UNITY_EDITOR
         public override void OnGUI()
         {
+            // DisplayCurrentStateInfo();
+        }
+
+        private void DisplayCurrentStateInfo()
+        {
             GUI.Label(new Rect(10, 90, 300, 20), $"Current State: {CurrentState?.StateName ?? "None"}");
-            
+
             if (CurrentState != null)
             {
                 GUI.Label(new Rect(10, 110, 300, 20), $"State Type: {CurrentState.GetType().Name}");

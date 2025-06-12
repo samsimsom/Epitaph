@@ -1,4 +1,3 @@
-using Epitaph.Scripts.Player.BaseBehaviour;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
@@ -10,9 +9,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float AirControlFactor = 1.25f;
 
         public JumpHandler(MovementBehaviour movementBehaviour, 
-            PlayerController playerController) : base(movementBehaviour, playerController)
-        {
-        }
+            PlayerController playerController) : base(movementBehaviour, playerController) { }
         
         public void PerformJump()
         {
@@ -43,12 +40,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
             var layerMask = ~(1 << PlayerController.gameObject.layer);
 
-            return Physics.CheckCapsule(
-                center,
-                center + Vector3.up * checkDistance,
-                radius,
-                layerMask
-            );
+            return Physics.CheckCapsule(center, center + Vector3.up * checkDistance,
+                radius, layerMask);
         }
+        
     }
 }
