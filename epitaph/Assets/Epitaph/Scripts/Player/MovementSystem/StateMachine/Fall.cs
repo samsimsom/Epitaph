@@ -39,7 +39,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 {
                     Ctx.StateManager.SwitchState(Factory.Crouch());
                 }
-                else if (Ctx.PlayerController.PlayerInput.IsMoveInput && Ctx.PlayerController.PlayerInput.IsRunPressed)
+                else if (Ctx.PlayerController.PlayerInput.IsMoveInput && 
+                         Ctx.PlayerController.PlayerInput.IsRunPressed)
                 {
                     Ctx.StateManager.SwitchState(Factory.Run());
                 }
@@ -52,10 +53,9 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                     Ctx.StateManager.SwitchState(Factory.Idle());
                 }
             }
-            // Eğer havadayken jump tuşuna basılırsa ve coyote time varsa
+            // Eğer havadayken jump tuşuna basılırsa ve zıplayabiliyorsa
             else if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame && 
-                     Ctx.CoyoteTimeCounter > 0 && 
-                     !Ctx.PlayerController.MovementBehaviour.HasObstacleAboveForJump())
+                     Ctx.JumpHandler.CanJump())
             {
                 Ctx.StateManager.SwitchState(Factory.Jump());
             }
@@ -64,10 +64,9 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         private void HandleAirborneMovement()
         {
             var input = Ctx.PlayerController.PlayerInput.MoveInput;
-            var airControlFactor = Ctx.AirControlFactor;
             
             // Fall state'de daha az air control (jump'tan daha az)
-            var fallAirControlFactor = airControlFactor * 0.8f;
+            var fallAirControlFactor = Ctx.JumpHandler.AirControlFactor * 0.8f;
             
             Ctx.AppliedMovementX = input.x * Ctx.WalkSpeed * fallAirControlFactor;
             Ctx.AppliedMovementZ = input.y * Ctx.WalkSpeed * fallAirControlFactor;

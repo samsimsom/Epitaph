@@ -22,7 +22,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void ExitState()
         {
-            // Debug.Log("RUN: Exit");
             Ctx.IsRunning = false;
         }
 
@@ -30,7 +29,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void CheckSwitchStates()
         {
-            // Önce düşme kontrolü - en yüksek öncelik
             if (!Ctx.IsGrounded && Ctx.IsFalling)
             {
                 Ctx.StateManager.SwitchState(Factory.Fall());
@@ -41,8 +39,9 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             {
                 Ctx.StateManager.SwitchState(Factory.Crouch());
             }
+            // Zıplama kontrolünü JumpHandler'a devret
             else if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame && 
-                     Ctx.CoyoteTimeCounter > 0f)
+                     Ctx.JumpHandler.CanJump())
             {
                 Ctx.StateManager.SwitchState(Factory.Jump());
             }

@@ -9,7 +9,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void EnterState()
         {
-            // Debug.Log("WALK: Enter");
             Ctx.IsWalking = true;
         }
 
@@ -23,7 +22,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         
         public override void ExitState()
         {
-            // Debug.Log("WALK: Exit");
             Ctx.IsWalking = false;
         }
 
@@ -31,7 +29,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void CheckSwitchStates()
         {
-            // Önce düşme kontrolü - en yüksek öncelik
             if (!Ctx.IsGrounded && Ctx.IsFalling)
             {
                 Ctx.StateManager.SwitchState(Factory.Fall());
@@ -42,8 +39,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             {
                 Ctx.StateManager.SwitchState(Factory.Crouch());
             }
-            else if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame && 
-                     Ctx.CoyoteTimeCounter > 0f)
+            // Zıplama kontrolünü JumpHandler'a devret
+            else if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame && Ctx.JumpHandler.CanJump())
             {
                 Ctx.StateManager.SwitchState(Factory.Jump());
             }
@@ -54,7 +51,6 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             else if (Ctx.PlayerController.PlayerInput.IsMoveInput && 
                      Ctx.PlayerController.PlayerInput.IsRunPressed)
             {
-                // if (Ctx.PlayerController.LifeStatsManager.Stamina.IsCritical) return;
                 Ctx.StateManager.SwitchState(Factory.Run());
             }
         }

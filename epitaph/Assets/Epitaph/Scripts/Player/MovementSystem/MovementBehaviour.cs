@@ -15,6 +15,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public PlayerStepDetection PlayerStepDetection { get; private set; }
         public PlayerGroundDetection PlayerGroundDetection { get; private set; }
         public GravityHandler GravityHandler { get; private set; }
+        public JumpHandler JumpHandler { get; private set; }
 
         #endregion
         
@@ -24,10 +25,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float CrouchSpeed = 1.5f;
         public float SpeedTransitionDuration = 0.1f;
         public float IdleTransitionDuration = 0.25f;
-
-        // Jump Variables
-        public float JumpForce = 5.0f;
-        public float AirControlFactor = 1.25f;
         
         // Coyote Time Counter
         public float CoyoteTime = 0.2f;
@@ -78,6 +75,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 .AddBehaviour(new PlayerGroundDetection(this, PlayerController));
             GravityHandler = _movementBehaviourManager
                 .AddBehaviour(new GravityHandler(this, PlayerController));
+            JumpHandler = _movementBehaviourManager
+                .AddBehaviour(new JumpHandler(this, PlayerController));
         }
         
         // ---------------------------------------------------------------------------- //
@@ -137,7 +136,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public override void OnDrawGizmos()
         {
             DrawCharacterControllerGizmo();
-            DrawHasObstacleAboveForJumpGizmo();
+            // DrawHasObstacleAboveForJumpGizmo() metodu artık JumpHandler içinde
             _movementBehaviourManager?.ExecuteOnAll(b => b.OnDrawGizmos());
         }
 #endif
@@ -177,7 +176,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 CapsulVelocity = PlayerController.CharacterController.velocity;
                 CurrentSpeed = new Vector3(CapsulVelocity.x, 0, CapsulVelocity.z).magnitude;
                 
-                // Step detection için input al (InputBehaviour'dan gelecek)
                 var moveInput = new Vector2(AppliedMovementX, AppliedMovementZ);
                 PlayerStepDetection.HandleStepOffset(moveInput);
 
@@ -190,47 +188,15 @@ namespace Epitaph.Scripts.Player.MovementSystem
             if (PlayerController.CharacterController == null) return;
     
             Vector3 movement;
-
-            // Kamera yönüne göre hareket vektörünü hesapla
             var cameraForward = PlayerController.PlayerCamera.transform.forward;
             var cameraRight = PlayerController.PlayerCamera.transform.right;
-        
-            // Y bileşenini sıfırla (sadece yatay hareket)
             cameraForward.y = 0f;
             cameraRight.y = 0f;
-        
-            // Normalize et
             cameraForward.Normalize();
             cameraRight.Normalize();
-        
-            // Kamera yönüne göre hareket hesapla
             movement = cameraRight * AppliedMovementX + cameraForward * AppliedMovementZ;
-            
-            // Dikey hareketi ekle
             movement.y = VerticalMovement;
-    
-            // Hareketi uygula
             PlayerController.CharacterController.Move(movement * Time.deltaTime);
-        }
-
-        public bool HasObstacleAboveForJump()
-        {
-            if (PlayerController.CharacterController == null) return true;
-
-            var capsuleCollider = PlayerController.CharacterController;
-            var center = capsuleCollider.bounds.center;
-            var radius = capsuleCollider.radius * 0.9f;
-            var height = capsuleCollider.height;
-            var checkDistance = height * 0.5f + JumpForce * 0.1f;
-
-            var layerMask = ~(1 << PlayerController.gameObject.layer);
-
-            return Physics.CheckCapsule(
-                center,
-                center + Vector3.up * checkDistance,
-                radius,
-                layerMask
-            );
         }
 
         #endregion
@@ -239,25 +205,17 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         private void DrawCharacterControllerGizmo()
         {
-            // Renk ve şeffaflık
             Gizmos.color = new Color(0.2f, 0.6f, 1f, 1.0f);
-
-            // Capsule bilgileri
             var center = PlayerController.CharacterController.transform.position 
                          + PlayerController.CharacterController.center;
             var height = PlayerController.CharacterController.height;
             var radius = PlayerController.CharacterController.radius;
-
-            // Kapsülün üst ve alt merkezleri
             var cylinderHeight = Mathf.Max(0, height / 2f - radius);
             var up = PlayerController.CharacterController.transform.up;
-
             var top = center + up * cylinderHeight;
             var bottom = center - up * cylinderHeight;
-
-            // Kapsül çizimi
-            Gizmos.DrawWireSphere(top, radius);       // Üst küre
-            Gizmos.DrawWireSphere(bottom, radius);    // Alt küre
+            Gizmos.DrawWireSphere(top, radius);
+            Gizmos.DrawWireSphere(bottom, radius);
             Gizmos.DrawLine(top + PlayerController.CharacterController.transform.right * radius, bottom 
                 + PlayerController.CharacterController.transform.right * radius);
             Gizmos.DrawLine(top - PlayerController.CharacterController.transform.right * radius, bottom 
@@ -268,55 +226,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 - PlayerController.CharacterController.transform.forward * radius);
         }
 
-        private void DrawHasObstacleAboveForJumpGizmo()
-        {
-            // Controller parametreleri
-            var controller = PlayerController.CharacterController;
-            var radius = controller.radius;
-            var position = controller.transform.position + controller.center;
-            var height = controller.height;
-            var checkDistance = height * 1.25f - height; // %25 daha yüksek mesafe
-
-            // Cast başlangıç ve bitiş pozisyonları (HasObstacleAboveForJump() ile aynı)
-            var castStart = position + Vector3.up * (height / 2f - radius);
-            // var castEnd = castStart + Vector3.up * checkDistance;
-
-            // Mevcut kapsülü çizer (mavi)
-            Gizmos.color = new Color(0.2f, 0.6f, 1f, 0.6f);
-            DrawWireCapsule(
-                position + Vector3.up * (-(height / 2f - radius)),
-                position + Vector3.up * (height / 2f - radius),
-                radius
-            );
-
-            // Yukarıya yapılacak cast kapsülünü çizer (sarı)
-            Gizmos.color = Color.yellow;
-            DrawWireCapsule(
-                castStart,
-                castStart + Vector3.up * checkDistance,
-                radius
-            );
-
-            // İstenirse çarpışma varsa kırmızı bir nokta gösterebiliriz:
-            var layerMask = ~LayerMask.GetMask("Player");
-            if (Physics.CapsuleCast(
-                    castStart,
-                    castStart,
-                    radius,
-                    Vector3.up,
-                    out var hit,
-                    checkDistance,
-                    layerMask
-                ))
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawSphere(hit.point, 0.06f);
-            }
-        }
-        
         private void DrawWireCapsule(Vector3 start, Vector3 end, float radius)
         {
-            // Unity 2020 ve sonrası için kullanışlı bir API yoksa:
             Handles.DrawWireDisc(start, (end - start).normalized, radius);
             Handles.DrawWireDisc(end, (end - start).normalized, radius);
             Handles.DrawLine(start + Vector3.right * radius, end + Vector3.right * radius);
