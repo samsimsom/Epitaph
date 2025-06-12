@@ -44,7 +44,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private void CheckIsGroundedWithNormal()
         {
             // Jump buffer aktifse ve karakter yukarı hareket ediyorsa ground check yapma
-            if (_jumpBuffer > 0 && MovementBehaviour.VerticalMovement > 0)
+            if (_jumpBuffer > 0 && MovementBehaviour.VerticalMovement > 0.5f)
             {
                 IsGrounded = false;
                 GroundNormal = Vector3.up;
