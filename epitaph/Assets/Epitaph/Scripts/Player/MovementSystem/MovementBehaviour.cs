@@ -14,6 +14,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public StateManager StateManager { get; private set; }
         public PlayerStepDetection PlayerStepDetection { get; private set; }
         public PlayerGroundDetection PlayerGroundDetection { get; private set; }
+        public GravityHandler GravityHandler { get; private set; }
 
         #endregion
         
@@ -27,14 +28,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // Jump Variables
         public float JumpForce = 5.0f;
         public float AirControlFactor = 1.25f;
-        public float Gravity = 20.0f;
         
         // Coyote Time Counter
         public float CoyoteTime = 0.2f;
         public float CoyoteTimeCounter;
-
-        // Gravity Variables
-        public float VerticalMovementLimit = -10.0f;
 
         // Crouch Variables
         public float NormalHeight = 1.8f;
@@ -44,7 +41,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public Vector3 NormalControllerCenter = new(0, 0.9f, 0);
         public Vector3 CrouchControllerCenter = new(0, 0.45f, 0);
 
-        // Getters & Setters (StateManager'dan erişim için)
+        // Getters & Setters (Alt davranışlar tarafından yönetilecek)
         public bool IsWalking { get; internal set; }
         public bool IsRunning { get; internal set; }
         public bool IsFalling { get; internal set; }
@@ -79,6 +76,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 .AddBehaviour(new PlayerStepDetection(this, PlayerController));
             PlayerGroundDetection = _movementBehaviourManager
                 .AddBehaviour(new PlayerGroundDetection(this, PlayerController));
+            GravityHandler = _movementBehaviourManager
+                .AddBehaviour(new GravityHandler(this, PlayerController));
         }
         
         // ---------------------------------------------------------------------------- //
@@ -103,7 +102,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public override void Update()
         {
-            CheckIsFalling();
             HandleMovement();
             ManageCoyoteTime();
             
@@ -117,7 +115,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public override void FixedUpdate()
         {
-            HandleGravity();
             _movementBehaviourManager?.ExecuteOnAll(b => b.FixedUpdate());
         }
 
@@ -216,14 +213,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             PlayerController.CharacterController.Move(movement * Time.deltaTime);
         }
 
-        private void HandleGravity()
-        {
-            if (!IsGrounded && VerticalMovement > VerticalMovementLimit)
-            {
-                VerticalMovement -= Gravity * Time.fixedDeltaTime;
-            }
-        }
-
         public bool HasObstacleAboveForJump()
         {
             if (PlayerController.CharacterController == null) return true;
@@ -242,11 +231,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 radius,
                 layerMask
             );
-        }
-
-        private void CheckIsFalling()
-        {
-            IsFalling = !PlayerGroundDetection.IsGrounded && VerticalMovement < 0;
         }
 
         #endregion
