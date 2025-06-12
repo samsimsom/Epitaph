@@ -170,7 +170,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public override void OnGUI()
         {
             if (!Application.isPlaying) return;
-            DisplayJumpBufferInfo();
+            // DisplayJumpBufferInfo();
         }
 
         private void DisplayJumpBufferInfo()
@@ -190,10 +190,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public override void OnDrawGizmos()
         {
-            DrawCheckIsGroundedGizmo();
-            DrawGroundNormalGizmo();
+            // DrawCheckIsGroundedGizmo();
+            // DrawGroundNormalGizmo();
         }
-        
+
+#if false
         private void DrawCheckIsGroundedGizmo()
         {
             var controller = PlayerController.CharacterController;
@@ -285,6 +286,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 Gizmos.DrawLine(origin, origin + Vector3.down * rayDistance);
             }
         }
+#endif
+
 #endif
         
         #endregion

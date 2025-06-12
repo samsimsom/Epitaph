@@ -17,6 +17,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             MovementBehaviour.VerticalMovement = 0f;
             
             // Zıplama kuvvetini uygula.
+            MovementBehaviour.GroundHandler.OnJumpStarted();
             MovementBehaviour.VerticalMovement += JumpForce;
             MovementBehaviour.IsJumping = true;
         }
@@ -40,8 +41,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
             var layerMask = ~(1 << PlayerController.gameObject.layer);
 
-            return Physics.CheckCapsule(center, center + Vector3.up * checkDistance,
-                radius, layerMask);
+            return Physics.CheckCapsule(center, center + Vector3.up * checkDistance, radius, layerMask);
         }
         
     }

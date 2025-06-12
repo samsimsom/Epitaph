@@ -1,5 +1,3 @@
-using Epitaph.Scripts.Player.MovementSystem;
-
 namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 {
     public class Jump : StateBase
@@ -18,25 +16,55 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void UpdateState()
         {
+            HandleAirborneMovement();
             CheckSwitchStates();
         }
         
-        public override void FixedUpdateState() { }
+        // public override void FixedUpdateState() { }
 
         public override void ExitState()
         {
             Ctx.IsJumping = false;
         }
         
-        public override void InitializeSubState() { }
+        // public override void InitializeSubState() { }
 
         public override void CheckSwitchStates()
         {
-            // Dikey hareket negatif olduğunda (yani karakter düşmeye başladığında) Fall durumuna geç.
-            if (Ctx.VerticalMovement < 0.0f)
+            // Yere değdiğinde ve dikey hız negatif veya sıfıra yakınsa
+            if (Ctx.IsGrounded && Ctx.CapsulVelocity.y <= 0 && Ctx.VerticalMovement <= 0)
+            {
+                if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame || Ctx.IsCrouching)
+                {
+                    Ctx.StateManager.SwitchState(Factory.Crouch());
+                }
+                else if (Ctx.PlayerController.PlayerInput.IsMoveInput && Ctx.PlayerController.PlayerInput.IsRunPressed)
+                {
+                    Ctx.StateManager.SwitchState(Factory.Run());
+                }
+                else if (Ctx.PlayerController.PlayerInput.IsMoveInput)
+                {
+                    Ctx.StateManager.SwitchState(Factory.Walk());
+                }
+                else
+                {
+                    Ctx.StateManager.SwitchState(Factory.Idle());
+                }
+            }
+            // Jump'tan Fall'a geçiş - dikey hız negatif olduğunda
+            else if (Ctx.IsFalling && Ctx.VerticalMovement < 0)
             {
                 Ctx.StateManager.SwitchState(Factory.Fall());
             }
+        }
+        
+        private void HandleAirborneMovement()
+        {
+            var input = Ctx.PlayerController.PlayerInput.MoveInput;
+            var airControlFactor = Ctx.JumpHandler.AirControlFactor;
+            
+            Ctx.AppliedMovementX = input.x * (Ctx.StateManager.CurrentState is Run ? Ctx.LocomotionHandler.RunSpeed * airControlFactor : Ctx.LocomotionHandler.WalkSpeed * airControlFactor);
+            Ctx.AppliedMovementZ = input.y * (Ctx.StateManager.CurrentState is Run ? Ctx.LocomotionHandler.RunSpeed * airControlFactor : Ctx.LocomotionHandler.WalkSpeed* airControlFactor);
         }
     }
 }
