@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
 {
-    public class PlayerGroundDetection : MovementSubBehaviour
+    public class GroundHandler : MovementSubBehaviour
     {
         public bool IsGrounded { get; private set; }
         public Vector3 GroundNormal { get; private set; }
@@ -17,7 +17,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private bool _rayBasedGroundCheck;
         private int _successfulHits;
         
-        public PlayerGroundDetection(MovementBehaviour movementBehaviour, PlayerController playerController) 
+        public GroundHandler(MovementBehaviour movementBehaviour, PlayerController playerController) 
             : base(movementBehaviour, playerController){ }
 
         public override void Update()

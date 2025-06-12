@@ -35,7 +35,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         private void CheckIsFalling()
         {
-            MovementBehaviour.IsFalling = !MovementBehaviour.PlayerGroundDetection.IsGrounded && 
+            MovementBehaviour.IsFalling = !MovementBehaviour.GroundHandler.IsGrounded && 
                                           MovementBehaviour.VerticalMovement < 0;
         }
     }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
 {
-    public class PlayerStepDetection : MovementSubBehaviour
+    public class StepHandler : MovementSubBehaviour
     {
         public float RayDistanceOffset { get; set; } = 0.1f;
         public float RaySpreadAngle { get; set; } = 35.0f;
@@ -19,7 +19,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private RaycastResults _lastRaycastResults;
         private bool _hasValidData;
 
-        public PlayerStepDetection(MovementBehaviour movementBehaviour, PlayerController playerController) 
+        public StepHandler(MovementBehaviour movementBehaviour, PlayerController playerController) 
             : base(movementBehaviour, playerController)
         {
             _stepOffset = PlayerController.CharacterController.stepOffset;

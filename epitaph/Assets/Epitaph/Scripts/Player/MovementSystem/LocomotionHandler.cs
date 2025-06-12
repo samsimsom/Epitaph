@@ -23,7 +23,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             MovementBehaviour.CurrentSpeed = new Vector3(MovementBehaviour.CapsulVelocity.x, 0, MovementBehaviour.CapsulVelocity.z).magnitude;
                 
             var moveInput = new Vector2(MovementBehaviour.AppliedMovementX, MovementBehaviour.AppliedMovementZ);
-            MovementBehaviour.PlayerStepDetection.HandleStepOffset(moveInput);
+            MovementBehaviour.StepHandler.HandleStepOffset(moveInput);
 
             ApplyMovement();
         }

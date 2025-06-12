@@ -1,5 +1,4 @@
 using Epitaph.Scripts.Player.BaseBehaviour;
-using UnityEditor;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
@@ -12,8 +11,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
         #region Sub behaviours
 
         public StateManager StateManager { get; private set; }
-        public PlayerStepDetection PlayerStepDetection { get; private set; }
-        public PlayerGroundDetection PlayerGroundDetection { get; private set; }
+        public StepHandler StepHandler { get; private set; }
+        public GroundHandler GroundHandler { get; private set; }
         public GravityHandler GravityHandler { get; private set; }
         public JumpHandler JumpHandler { get; private set; }
         public CrouchHandler CrouchHandler { get; private set; }
@@ -35,8 +34,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public bool IsFalling { get; internal set; }
         public bool IsJumping { get; internal set; }
         public bool IsCrouching { get; internal set; }
-        public bool IsGrounded => PlayerGroundDetection.IsGrounded;
-        public Vector3 GroundNormal => PlayerGroundDetection.GroundNormal;
+        public bool IsGrounded => GroundHandler.IsGrounded;
+        public Vector3 GroundNormal => GroundHandler.GroundNormal;
         
         public float CoyoteTimeCounter => CoyoteTimeHandler.CoyoteTimeCounter;
         
@@ -60,22 +59,14 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         private void InitializeBehaviours()
         {
-            StateManager = _movementBehaviourManager
-                .AddBehaviour(new StateManager(this, PlayerController));
-            PlayerStepDetection = _movementBehaviourManager
-                .AddBehaviour(new PlayerStepDetection(this, PlayerController));
-            PlayerGroundDetection = _movementBehaviourManager
-                .AddBehaviour(new PlayerGroundDetection(this, PlayerController));
-            GravityHandler = _movementBehaviourManager
-                .AddBehaviour(new GravityHandler(this, PlayerController));
-            JumpHandler = _movementBehaviourManager
-                .AddBehaviour(new JumpHandler(this, PlayerController));
-            CrouchHandler = _movementBehaviourManager
-                .AddBehaviour(new CrouchHandler(this, PlayerController));
-            LocomotionHandler = _movementBehaviourManager
-                .AddBehaviour(new LocomotionHandler(this, PlayerController));
-            CoyoteTimeHandler = _movementBehaviourManager
-                .AddBehaviour(new CoyoteTimeHandler(this, PlayerController));
+            StateManager = _movementBehaviourManager.AddBehaviour(new StateManager(this, PlayerController));
+            StepHandler = _movementBehaviourManager.AddBehaviour(new StepHandler(this, PlayerController));
+            GroundHandler = _movementBehaviourManager.AddBehaviour(new GroundHandler(this, PlayerController));
+            GravityHandler = _movementBehaviourManager.AddBehaviour(new GravityHandler(this, PlayerController));
+            JumpHandler = _movementBehaviourManager.AddBehaviour(new JumpHandler(this, PlayerController));
+            CrouchHandler = _movementBehaviourManager.AddBehaviour(new CrouchHandler(this, PlayerController));
+            LocomotionHandler = _movementBehaviourManager.AddBehaviour(new LocomotionHandler(this, PlayerController));
+            CoyoteTimeHandler = _movementBehaviourManager.AddBehaviour(new CoyoteTimeHandler(this, PlayerController));
         }
         
         // ---------------------------------------------------------------------------- //
