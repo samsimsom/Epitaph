@@ -1,14 +1,17 @@
-using Epitaph.Scripts.Player.BaseBehaviour;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class LocomotionHandler : MovementSubBehaviour
     {
+        public float WalkSpeed = 2.5f;
+        public float RunSpeed = 4.0f;
+        public float CrouchSpeed = 1.5f;
+        public float SpeedTransitionDuration = 0.1f;
+        public float IdleTransitionDuration = 0.25f;
+
         public LocomotionHandler(MovementBehaviour movementBehaviour, PlayerController playerController) 
-            : base(movementBehaviour, playerController)
-        {
-        }
+            : base(movementBehaviour, playerController) { }
 
         public override void Update()
         {

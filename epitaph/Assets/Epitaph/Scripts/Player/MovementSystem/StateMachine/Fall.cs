@@ -68,8 +68,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             // Fall state'de daha az air control (jump'tan daha az)
             var fallAirControlFactor = Ctx.JumpHandler.AirControlFactor * 0.8f;
             
-            Ctx.AppliedMovementX = input.x * Ctx.WalkSpeed * fallAirControlFactor;
-            Ctx.AppliedMovementZ = input.y * Ctx.WalkSpeed * fallAirControlFactor;
+            Ctx.AppliedMovementX = input.x * Ctx.LocomotionHandler.WalkSpeed * fallAirControlFactor;
+            Ctx.AppliedMovementZ = input.y * Ctx.LocomotionHandler.WalkSpeed * fallAirControlFactor;
         }
     }
 }

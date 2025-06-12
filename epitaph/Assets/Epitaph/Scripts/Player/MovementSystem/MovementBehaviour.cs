@@ -1,3 +1,4 @@
+using System;
 using Epitaph.Scripts.Player.BaseBehaviour;
 using UnityEngine;
 
@@ -20,13 +21,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public CoyoteTimeHandler CoyoteTimeHandler { get; private set; }
 
         #endregion
-        
-        // Movement Variables
-        public float WalkSpeed = 2.5f;
-        public float RunSpeed = 4.0f;
-        public float CrouchSpeed = 1.5f;
-        public float SpeedTransitionDuration = 0.1f;
-        public float IdleTransitionDuration = 0.25f;
 
         // Getters & Setters (Alt davranışlar tarafından yönetilecek)
         public bool IsWalking { get; internal set; }
@@ -59,14 +53,20 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         private void InitializeBehaviours()
         {
-            StateManager = _movementBehaviourManager.AddBehaviour(new StateManager(this, PlayerController));
-            StepHandler = _movementBehaviourManager.AddBehaviour(new StepHandler(this, PlayerController));
-            GroundHandler = _movementBehaviourManager.AddBehaviour(new GroundHandler(this, PlayerController));
-            GravityHandler = _movementBehaviourManager.AddBehaviour(new GravityHandler(this, PlayerController));
-            JumpHandler = _movementBehaviourManager.AddBehaviour(new JumpHandler(this, PlayerController));
-            CrouchHandler = _movementBehaviourManager.AddBehaviour(new CrouchHandler(this, PlayerController));
-            LocomotionHandler = _movementBehaviourManager.AddBehaviour(new LocomotionHandler(this, PlayerController));
-            CoyoteTimeHandler = _movementBehaviourManager.AddBehaviour(new CoyoteTimeHandler(this, PlayerController));
+            StateManager = CreateAndAddBehaviour<StateManager>();
+            StepHandler = CreateAndAddBehaviour<StepHandler>();
+            GroundHandler = CreateAndAddBehaviour<GroundHandler>();
+            GravityHandler = CreateAndAddBehaviour<GravityHandler>();
+            JumpHandler = CreateAndAddBehaviour<JumpHandler>();
+            CrouchHandler = CreateAndAddBehaviour<CrouchHandler>();
+            LocomotionHandler = CreateAndAddBehaviour<LocomotionHandler>();
+            CoyoteTimeHandler = CreateAndAddBehaviour<CoyoteTimeHandler>();
+        }
+        
+        private T CreateAndAddBehaviour<T>() where T : MovementSubBehaviour
+        {
+            var behaviour = (T)Activator.CreateInstance(typeof(T), this, PlayerController);
+            return _movementBehaviourManager.AddBehaviour(behaviour);
         }
         
         // ---------------------------------------------------------------------------- //
@@ -160,14 +160,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
             var bottom = center - up * cylinderHeight;
             Gizmos.DrawWireSphere(top, radius);
             Gizmos.DrawWireSphere(bottom, radius);
-            Gizmos.DrawLine(top + PlayerController.CharacterController.transform.right * radius, bottom 
-                + PlayerController.CharacterController.transform.right * radius);
-            Gizmos.DrawLine(top - PlayerController.CharacterController.transform.right * radius, bottom 
-                - PlayerController.CharacterController.transform.right * radius);
-            Gizmos.DrawLine(top + PlayerController.CharacterController.transform.forward * radius, bottom 
-                + PlayerController.CharacterController.transform.forward * radius);
-            Gizmos.DrawLine(top - PlayerController.CharacterController.transform.forward * radius, bottom
-                - PlayerController.CharacterController.transform.forward * radius);
+            Gizmos.DrawLine(top + PlayerController.CharacterController.transform.right * radius, bottom + PlayerController.CharacterController.transform.right * radius);
+            Gizmos.DrawLine(top - PlayerController.CharacterController.transform.right * radius, bottom - PlayerController.CharacterController.transform.right * radius);
+            Gizmos.DrawLine(top + PlayerController.CharacterController.transform.forward * radius, bottom + PlayerController.CharacterController.transform.forward * radius);
+            Gizmos.DrawLine(top - PlayerController.CharacterController.transform.forward * radius, bottom - PlayerController.CharacterController.transform.forward * radius);
         }
         
 #endif

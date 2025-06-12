@@ -58,10 +58,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         private void HandleMovementInput()
         {
             var input = Ctx.PlayerController.PlayerInput.MoveInput;
-            Ctx.AppliedMovementX = Mathf.Lerp(Ctx.AppliedMovementX, 
-                input.x * Ctx.WalkSpeed, Ctx.SpeedTransitionDuration);
-            Ctx.AppliedMovementZ = Mathf.Lerp(Ctx.AppliedMovementZ, 
-                input.y * Ctx.WalkSpeed, Ctx.SpeedTransitionDuration);
+            Ctx.AppliedMovementX = Mathf.Lerp(Ctx.AppliedMovementX, input.x * Ctx.LocomotionHandler.WalkSpeed, Ctx.LocomotionHandler.SpeedTransitionDuration);
+            Ctx.AppliedMovementZ = Mathf.Lerp(Ctx.AppliedMovementZ, input.y * Ctx.LocomotionHandler.WalkSpeed, Ctx.LocomotionHandler.SpeedTransitionDuration);
         }
     }
 }
