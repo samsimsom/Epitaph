@@ -16,6 +16,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public PlayerGroundDetection PlayerGroundDetection { get; private set; }
         public GravityHandler GravityHandler { get; private set; }
         public JumpHandler JumpHandler { get; private set; }
+        public CrouchHandler CrouchHandler { get; private set; }
 
         #endregion
         
@@ -29,15 +30,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         // Coyote Time Counter
         public float CoyoteTime = 0.2f;
         public float CoyoteTimeCounter;
-
-        // Crouch Variables
-        public float NormalHeight = 1.8f;
-        public float CrouchHeight = 0.9f;
-        public float NormalCameraHeight = 1.5f;
-        public float CrouchCameraHeight = 0.7f;
-        public Vector3 NormalControllerCenter = new(0, 0.9f, 0);
-        public Vector3 CrouchControllerCenter = new(0, 0.45f, 0);
-
+        
         // Getters & Setters (Alt davranışlar tarafından yönetilecek)
         public bool IsWalking { get; internal set; }
         public bool IsRunning { get; internal set; }
@@ -77,6 +70,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 .AddBehaviour(new GravityHandler(this, PlayerController));
             JumpHandler = _movementBehaviourManager
                 .AddBehaviour(new JumpHandler(this, PlayerController));
+            CrouchHandler = _movementBehaviourManager
+                .AddBehaviour(new CrouchHandler(this, PlayerController));
         }
         
         // ---------------------------------------------------------------------------- //
@@ -224,16 +219,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 + PlayerController.CharacterController.transform.forward * radius);
             Gizmos.DrawLine(top - PlayerController.CharacterController.transform.forward * radius, bottom
                 - PlayerController.CharacterController.transform.forward * radius);
-        }
-
-        private void DrawWireCapsule(Vector3 start, Vector3 end, float radius)
-        {
-            Handles.DrawWireDisc(start, (end - start).normalized, radius);
-            Handles.DrawWireDisc(end, (end - start).normalized, radius);
-            Handles.DrawLine(start + Vector3.right * radius, end + Vector3.right * radius);
-            Handles.DrawLine(start - Vector3.right * radius, end - Vector3.right * radius);
-            Handles.DrawLine(start + Vector3.forward * radius, end + Vector3.forward * radius);
-            Handles.DrawLine(start - Vector3.forward * radius, end - Vector3.forward * radius);
         }
         
 #endif

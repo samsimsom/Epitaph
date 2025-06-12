@@ -6,8 +6,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
     {
         protected MovementBehaviour MovementBehaviour { get; }
 
-        protected MovementSubBehaviour(MovementBehaviour movementBehaviour, PlayerController playerController)
-            : base(playerController)
+        protected MovementSubBehaviour(MovementBehaviour movementBehaviour, 
+            PlayerController playerController) : base(playerController)
         {
             MovementBehaviour = movementBehaviour;
         }
