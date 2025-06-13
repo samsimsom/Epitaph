@@ -15,7 +15,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
         // public CameraShake CameraShake { get; private set; } // Yeni eklenebilecek
         
         // Head Bob Configuration
-        public float HeadBobAmount = 0.1f;
+        public float HeadBobAmount = 0.2f;
         public float HeadBobFrequency = 7.5f;
         public float HeadBobSmooth = 10.0f;
         public float HeadBobThreshold = 1.5f;
@@ -37,8 +37,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
         
         // ---------------------------------------------------------------------------- //
 
-        public ViewBehaviour(PlayerController playerController)
-            : base(playerController)
+        public ViewBehaviour(PlayerController playerController) : base(playerController)
         {
             // Manager'ı önce başlat
             _viewBehaviourManager = new PlayerBehaviourManager<ViewSubBehaviour>(playerController);

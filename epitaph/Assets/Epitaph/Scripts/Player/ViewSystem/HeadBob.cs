@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Epitaph.Scripts.Player.BaseBehaviour;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.ViewSystem
@@ -20,16 +19,21 @@ namespace Epitaph.Scripts.Player.ViewSystem
         };
 
         // Constants for HeadBob calculations
-        private const float VerticalBobMultiplier = 1.4f;
-        private const float HorizontalBobMultiplier = 1.6f;
+        private const float VerticalBobMultiplier = 2.4f;
+        private const float HorizontalBobMultiplier = 2.6f;
         private const float BobInterpolationSpeed = 15f;
         private const float ResetSpeedMultiplier = 2f;
         private const float MinOffsetMagnitudeToZero = 0.001f;
 
-        public HeadBob(ViewBehaviour viewBehaviour, PlayerController playerController)
+        public HeadBob(ViewBehaviour viewBehaviour, PlayerController playerController) 
             : base(viewBehaviour, playerController)
         {
             _viewBehaviour = viewBehaviour;
+        }
+
+        public override void Start()
+        {
+            Debug.Log("Head Bob Started");
         }
 
         public override void Update()

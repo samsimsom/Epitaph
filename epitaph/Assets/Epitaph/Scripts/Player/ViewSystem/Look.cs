@@ -1,4 +1,3 @@
-using Epitaph.Scripts.Player.BaseBehaviour;
 using Unity.Cinemachine;
 using UnityEngine;
 
