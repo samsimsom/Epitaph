@@ -147,8 +147,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 hitInfo = groundCheckHits[0];
 
                 // Debug için ışınları çiz
-                Debug.DrawRay(origin, Vector3.down * hitInfo.distance, Color.green);
-                Debug.DrawRay(hitInfo.point, hitInfo.normal * 0.5f, Color.blue);
+                // Debug.DrawRay(origin, Vector3.down * hitInfo.distance, Color.green);
+                // Debug.DrawRay(hitInfo.point, hitInfo.normal * 0.5f, Color.blue);
             
                 return true;
             }
@@ -156,7 +156,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             {
                 // Çarpışma yoksa, varsayılan RaycastHit değerini ata ve kırmızı ışın çiz
                 hitInfo = default; // RaycastHit bir struct olduğu için default değeri atanır
-                Debug.DrawRay(origin, Vector3.down * rayDistance, Color.red);
+                // Debug.DrawRay(origin, Vector3.down * rayDistance, Color.red);
             
                 return false;
             }
@@ -191,10 +191,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public override void OnDrawGizmos()
         {
             // DrawCheckIsGroundedGizmo();
-            // DrawGroundNormalGizmo();
+            DrawGroundNormalGizmo();
         }
 
-#if false
+#if true
         private void DrawCheckIsGroundedGizmo()
         {
             var controller = PlayerController.CharacterController;
@@ -246,7 +246,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 characterBaseWorld + ((Vector3.back + Vector3.left).normalized * (radius * radiusMultiplier)),
                 characterBaseWorld + ((Vector3.back + Vector3.right).normalized * (radius * radiusMultiplier))
             };
-            
+
+#if false
             // Origin noktalarını çiz
             Gizmos.color = _jumpBuffer > 0 ? Color.yellow : Color.cyan;
             foreach (var origin in raycastOrigins)
@@ -263,6 +264,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
                     DrawRaycastResult(origin, rayDistance, layerMask);
                 }
             }
+#endif
             
             // Hesaplanan ortalama ground normal'i çiz
             Gizmos.color = Color.magenta;

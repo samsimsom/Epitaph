@@ -70,6 +70,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
 #if UNITY_EDITOR
         public override void OnDrawGizmos()
         {
+            VisualizeCrouchSpace();
+        }
+
+        private void VisualizeCrouchSpace()
+        {
             if (!MovementBehaviour.IsCrouching || !Application.isPlaying) return;
 
             // Visualize the space needed to stand up
