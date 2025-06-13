@@ -34,7 +34,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             // Yere değdiğinde ve dikey hız negatif veya sıfıra yakınsa
             if (Ctx.GroundHandler.IsGrounded && Ctx.LocomotionHandler.CapsulVelocity.y <= 0 && Ctx.GravityHandler.VerticalMovement <= 0)
             {
-                if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame || Ctx.CrouchHandler.IsCrouching)
+                if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame && Ctx.PlayerController.PlayerInput.IsCrouchPressed || Ctx.CrouchHandler.IsCrouching)
                 {
                     Ctx.StateManager.SwitchState(Factory.Crouch());
                 }

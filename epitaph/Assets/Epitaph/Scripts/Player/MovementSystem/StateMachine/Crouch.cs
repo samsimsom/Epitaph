@@ -40,20 +40,26 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 return;
             }
 
-            // Oyuncu çömelme tuşuna basmıyorsa VE ayağa kalkabiliyorsa, normal state'e dön
-            if (!Ctx.PlayerController.PlayerInput.IsCrouchPressed && Ctx.CrouchHandler.CanStandUp())
+            // Toggle sistemi için: Oyuncu tekrar çömelme tuşuna bastıysa VE ayağa kalkabiliyorsa
+            if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame && 
+                Ctx.CrouchHandler.CanStandUp())
             {
-                if (Ctx.PlayerController.PlayerInput.IsMoveInput && Ctx.PlayerController.PlayerInput.IsRunPressed)
+                // IsCrouchPressed toggle edildi, false oldu, ayağa kalk
+                if (!Ctx.PlayerController.PlayerInput.IsCrouchPressed)
                 {
-                    Ctx.StateManager.SwitchState(Factory.Run());
-                }
-                else if (Ctx.PlayerController.PlayerInput.IsMoveInput)
-                {
-                    Ctx.StateManager.SwitchState(Factory.Walk());
-                }
-                else
-                {
-                    Ctx.StateManager.SwitchState(Factory.Idle());
+                    if (Ctx.PlayerController.PlayerInput.IsMoveInput && 
+                        Ctx.PlayerController.PlayerInput.IsRunPressed)
+                    {
+                        Ctx.StateManager.SwitchState(Factory.Run());
+                    }
+                    else if (Ctx.PlayerController.PlayerInput.IsMoveInput)
+                    {
+                        Ctx.StateManager.SwitchState(Factory.Walk());
+                    }
+                    else
+                    {
+                        Ctx.StateManager.SwitchState(Factory.Idle());
+                    }
                 }
             }
         }

@@ -36,7 +36,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 return;
             }
 
-            if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame)
+            if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame && Ctx.PlayerController.PlayerInput.IsCrouchPressed)
             {
                 Ctx.StateManager.SwitchState(Factory.Crouch());
             }

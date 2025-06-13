@@ -85,7 +85,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
             var castDistance = (NormalHeight - controller.height);
             var radius = controller.radius;
             
-            Gizmos.color = Color.red;
+            // Check if player can stand up to determine gizmo color
+            var canStandUp = CanStandUp();
+            Gizmos.color = canStandUp ? Color.magenta : Color.green;
             Gizmos.DrawWireSphere(origin + Vector3.up * castDistance, radius);
         }
 #endif

@@ -89,14 +89,10 @@ namespace Epitaph.Scripts.InputManager
 
         public void OnCrouch(InputAction.CallbackContext context)
         {
-            if (context.started)
+            if (context.performed) // Toggle için sadece performed kullanıyoruz
             {
                 IsCrouchPressedThisFrame = true;
-                IsCrouchPressed = true;
-            }
-            else if (context.canceled)
-            {
-                IsCrouchPressed = false;
+                IsCrouchPressed = !IsCrouchPressed; // Toggle işlemi
             }
         }
 

@@ -36,7 +36,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             // Yere değdiğinde fall state'den çık
             if (Ctx.GroundHandler.IsGrounded && Ctx.GravityHandler.VerticalMovement <= 0)
             {
-                if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame || Ctx.CrouchHandler.IsCrouching)
+                if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame && Ctx.PlayerController.PlayerInput.IsCrouchPressed || Ctx.CrouchHandler.IsCrouching)
                 {
                     Ctx.StateManager.SwitchState(Factory.Crouch());
                 }
