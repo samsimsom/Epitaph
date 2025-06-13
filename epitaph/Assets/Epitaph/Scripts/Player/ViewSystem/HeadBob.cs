@@ -31,11 +31,6 @@ namespace Epitaph.Scripts.Player.ViewSystem
             _viewBehaviour = viewBehaviour;
         }
 
-        public override void Start()
-        {
-            Debug.Log("Head Bob Started");
-        }
-
         public override void Update()
         {
             if (IsPlayerMovingAboveThreshold())

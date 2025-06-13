@@ -118,7 +118,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         private void DrawCharacterControllerGizmos()
         {
-            Gizmos.color = new Color(0.2f, 0.6f, 1f, 1.0f);
+            Gizmos.color = new Color(0.2f, 0.6f, 1f, 0.5f);
             var center = PlayerController.CharacterController.transform.position + PlayerController.CharacterController.center;
             var height = PlayerController.CharacterController.height;
             var radius = PlayerController.CharacterController.radius;
