@@ -7,10 +7,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public bool IsGrounded { get; private set; }
         public Vector3 GroundNormal { get; private set; }
         
-        // Jump buffer - zıplama sonrası kısa süre ground check'i devre dışı bırak
-        private float _jumpBuffer;
-        private const float JumpBufferTime = 0.2f; // 200ms
-        
         // Debug bilgileri için ek özellikler
         private bool _capsuleGroundCheck;
         private bool _customGroundCheck;
@@ -22,57 +18,17 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public override void Update()
         {
-            // Jump buffer'ı azalt
-            if (_jumpBuffer > 0)
-            {
-                _jumpBuffer -= Time.deltaTime;
-            }
+            var (normalCalculated, rayBasedGroundCheck) = CalculateGroundNormalWithGroundCheck();
             
-            CheckIsGroundedWithNormal();
+            _capsuleGroundCheck = PlayerController.CharacterController.isGrounded;
+            _rayBasedGroundCheck = rayBasedGroundCheck;
+            IsGrounded = _capsuleGroundCheck && _rayBasedGroundCheck;
+            
+            GroundNormal = normalCalculated;
         }
-        
-        // Zıplama başladığında çağrılacak metod
-        // public void OnJumpStarted()
-        // {
-        //     _jumpBuffer = JumpBufferTime;
-        //     IsGrounded = false; // Anında grounded durumunu false yap
-        // }
         
         // ---------------------------------------------------------------------------- //
         
-        // Ground check ve normal hesaplamasını birleştiren fonksiyon
-        private void CheckIsGroundedWithNormal()
-        {
-            // Jump buffer aktifse ve karakter yukarı hareket ediyorsa ground check yapma
-            // if (_jumpBuffer > 0 && MovementBehaviour.GravityHandler.VerticalMovement > 0.5f)
-            // {
-            //     IsGrounded = false;
-            //     GroundNormal = Vector3.up;
-            //     return;
-            // }
-            
-            var controller = PlayerController.CharacterController;
-            var radius = controller.radius;
-            var origin = controller.transform.position + controller.center - Vector3.up * (controller.height / 2f);
-            var layerMask = ~LayerMask.GetMask("Player");
-            
-            // Orijinal ground check'ler
-            _capsuleGroundCheck = PlayerController.CharacterController.isGrounded;
-            _customGroundCheck = Physics.CheckSphere(origin, radius, layerMask); // Radius biraz küçült
-            
-            // Ground normal hesaplaması ve ek ground kontrolü
-            var (normalCalculated, rayBasedGroundCheck) = CalculateGroundNormalWithGroundCheck();
-            _rayBasedGroundCheck = rayBasedGroundCheck;
-            
-            // Tüm kontrolleri birleştir
-            // IsGrounded = _capsuleGroundCheck || _customGroundCheck || _rayBasedGroundCheck;
-            IsGrounded = _capsuleGroundCheck;
-            // IsGrounded = _customGroundCheck;
-            
-            // Normal'i ayarla
-            GroundNormal = normalCalculated;
-        }
-
         private (Vector3 normal, bool isGrounded) CalculateGroundNormalWithGroundCheck()
         {
             var controller = PlayerController.CharacterController;
@@ -85,7 +41,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             
             // 8 ray origin pozisyonu - radius'u biraz küçült
             var radiusMultiplier = 0.8f; // Radius'un %80'ini kullan
-            var origins = new Vector3[]
+            var origins = new[]
             {
                 // Ana 4 yön
                 characterBaseWorld + Vector3.left * (controller.radius * radiusMultiplier),
@@ -169,52 +125,14 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public override void OnGUI()
         {
             if (!Application.isPlaying) return;
-            // DisplayJumpBufferInfo();
-        }
-
-        private void DisplayJumpBufferInfo()
-        {
-            var style = new GUIStyle();
-            style.fontSize = 12;
-            style.normal.textColor = Color.white;
-            
-            GUI.Label(new Rect(10, 220, 300, 20), $"Jump Buffer: {_jumpBuffer:F2}s", style);
-            
-            if (_jumpBuffer > 0)
-            {
-                style.normal.textColor = Color.yellow;
-                GUI.Label(new Rect(10, 240, 300, 20), "Jump Buffer Active - Ground Check Disabled", style);
-            }
         }
 
         public override void OnDrawGizmos()
         {
-            // DrawCheckIsGroundedGizmo();
             DrawGroundNormalGizmo();
         }
 
 #if true
-        private void DrawCheckIsGroundedGizmo()
-        {
-            var controller = PlayerController.CharacterController;
-            var position = controller.transform.position;
-            var center = controller.center;
-            var height = controller.height;
-            var radius = controller.radius;
-            var origin = position + center - Vector3.up * (height / 2f);
-            
-            // Jump buffer aktifse sarı, değilse normal renk
-            if (_jumpBuffer > 0)
-            {
-                Gizmos.color = Color.yellow;
-            }
-            else
-            {
-                Gizmos.color = IsGrounded ? Color.green : Color.red;
-            }
-            Gizmos.DrawWireSphere(origin, radius);
-        }
-        
         private void DrawGroundNormalGizmo()
         {
             if (!Application.isPlaying) return;
@@ -246,22 +164,17 @@ namespace Epitaph.Scripts.Player.MovementSystem
                 characterBaseWorld + ((Vector3.back + Vector3.right).normalized * (radius * radiusMultiplier))
             };
 
-#if false
+#if true
             // Origin noktalarını çiz
-            Gizmos.color = _jumpBuffer > 0 ? Color.yellow : Color.cyan;
+            Gizmos.color = Color.yellow;
             foreach (var origin in raycastOrigins)
             {
                 Gizmos.DrawWireSphere(origin, 0.025f);
             }
             
-            // Jump buffer aktifse ray'leri çizme
-            if (_jumpBuffer <= 0)
+            foreach (var origin in raycastOrigins)
             {
-                // Her origin için raycast yap ve sonucu çiz
-                foreach (var origin in raycastOrigins)
-                {
-                    DrawRaycastResult(origin, rayDistance, layerMask);
-                }
+                DrawRaycastResult(origin, rayDistance, layerMask);
             }
 #endif
             
