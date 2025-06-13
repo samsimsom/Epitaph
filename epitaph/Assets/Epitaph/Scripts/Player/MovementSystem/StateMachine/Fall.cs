@@ -2,11 +2,17 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 {
     public class Fall : StateBase
     {
+        
+        private bool _wasRunningBeforeJump;
+
         public Fall(MovementBehaviour currentContext, StateFactory stateFactory) 
             : base(currentContext, stateFactory) { }
 
         public override void EnterState()
         {
+            // Zıplamadan önce koşuyor muydu?
+            _wasRunningBeforeJump = Ctx.PlayerController.PlayerInput.IsRunPressed;
+            
             Ctx.FallHandler.IsFalling = true;
             
             // Fall state'e girdiğinde jump state'den geliyorsak IsJumping'i false yap
@@ -69,8 +75,14 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             // Fall state'de daha az air control (jump'tan daha az)
             var fallAirControlFactor = Ctx.JumpHandler.AirControlFactor * 0.8f;
             
-            Ctx.LocomotionHandler.AppliedMovementX = input.x * Ctx.LocomotionHandler.WalkSpeed * fallAirControlFactor;
-            Ctx.LocomotionHandler.AppliedMovementZ = input.y * Ctx.LocomotionHandler.WalkSpeed * fallAirControlFactor;
+            // Zıplamadan önce koşuyorsa veya şu anda run tuşuna basılıyorsa run hızını kullan
+            var baseSpeed = (_wasRunningBeforeJump || Ctx.PlayerController.PlayerInput.IsRunPressed) 
+                ? Ctx.LocomotionHandler.RunSpeed 
+                : Ctx.LocomotionHandler.WalkSpeed;
+            
+            Ctx.LocomotionHandler.AppliedMovementX = input.x * baseSpeed * fallAirControlFactor;
+            Ctx.LocomotionHandler.AppliedMovementZ = input.y * baseSpeed * fallAirControlFactor;
+            
         }
     }
 }

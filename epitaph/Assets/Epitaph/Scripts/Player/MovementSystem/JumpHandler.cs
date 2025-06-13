@@ -7,7 +7,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public bool IsJumping { get; set; }
         
         // Jump Variables
-        public float JumpForce = 5.0f;
+        public float JumpForce = 6.0f;
         public float AirControlFactor = 1.25f;
 
         public JumpHandler(MovementBehaviour movementBehaviour, 
@@ -19,7 +19,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             MovementBehaviour.GravityHandler.VerticalMovement = 0f;
             
             // Zıplama kuvvetini uygula.
-            MovementBehaviour.GroundHandler.OnJumpStarted();
+            // MovementBehaviour.GroundHandler.OnJumpStarted();
             MovementBehaviour.GravityHandler.VerticalMovement += JumpForce;
             IsJumping = true;
         }

@@ -2,6 +2,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 {
     public class Jump : StateBase
     {
+        private bool _wasRunningBeforeJump;
+        
         public Jump(MovementBehaviour currentContext, StateFactory stateFactory) 
             : base(currentContext, stateFactory) { }
 
@@ -10,6 +12,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             // JumpHandler üzerinden zıplama eylemini çağır.
             if (Ctx.JumpHandler.CanJump())
             {
+                // Zıplamadan önce koşuyor muydu?
+                _wasRunningBeforeJump = Ctx.PlayerController.PlayerInput.IsRunPressed;
                 Ctx.JumpHandler.PerformJump();
             }
         }
@@ -20,14 +24,14 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             CheckSwitchStates();
         }
         
-        // public override void FixedUpdateState() { }
+        public override void FixedUpdateState() { }
 
         public override void ExitState()
         {
             Ctx.JumpHandler.IsJumping = false;
         }
         
-        // public override void InitializeSubState() { }
+        public override void InitializeSubState() { }
 
         public override void CheckSwitchStates()
         {
@@ -63,8 +67,13 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             var input = Ctx.PlayerController.PlayerInput.MoveInput;
             var airControlFactor = Ctx.JumpHandler.AirControlFactor;
             
-            Ctx.LocomotionHandler.AppliedMovementX = input.x * (Ctx.StateManager.CurrentState is Run ? Ctx.LocomotionHandler.RunSpeed * airControlFactor : Ctx.LocomotionHandler.WalkSpeed * airControlFactor);
-            Ctx.LocomotionHandler.AppliedMovementZ = input.y * (Ctx.StateManager.CurrentState is Run ? Ctx.LocomotionHandler.RunSpeed * airControlFactor : Ctx.LocomotionHandler.WalkSpeed* airControlFactor);
+            // Zıplamadan önce koşuyorsa veya şu anda run tuşuna basılıyorsa run hızını kullan
+            var baseSpeed = (_wasRunningBeforeJump || Ctx.PlayerController.PlayerInput.IsRunPressed) 
+                ? Ctx.LocomotionHandler.RunSpeed 
+                : Ctx.LocomotionHandler.WalkSpeed;
+            
+            Ctx.LocomotionHandler.AppliedMovementX = input.x * baseSpeed * airControlFactor;
+            Ctx.LocomotionHandler.AppliedMovementZ = input.y * baseSpeed * airControlFactor;
         }
     }
 }

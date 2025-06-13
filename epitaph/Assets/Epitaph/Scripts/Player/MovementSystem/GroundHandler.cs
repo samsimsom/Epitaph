@@ -32,11 +32,11 @@ namespace Epitaph.Scripts.Player.MovementSystem
         }
         
         // Zıplama başladığında çağrılacak metod
-        public void OnJumpStarted()
-        {
-            _jumpBuffer = JumpBufferTime;
-            IsGrounded = false; // Anında grounded durumunu false yap
-        }
+        // public void OnJumpStarted()
+        // {
+        //     _jumpBuffer = JumpBufferTime;
+        //     IsGrounded = false; // Anında grounded durumunu false yap
+        // }
         
         // ---------------------------------------------------------------------------- //
         
@@ -44,12 +44,12 @@ namespace Epitaph.Scripts.Player.MovementSystem
         private void CheckIsGroundedWithNormal()
         {
             // Jump buffer aktifse ve karakter yukarı hareket ediyorsa ground check yapma
-            if (_jumpBuffer > 0 && MovementBehaviour.GravityHandler.VerticalMovement > 0.5f)
-            {
-                IsGrounded = false;
-                GroundNormal = Vector3.up;
-                return;
-            }
+            // if (_jumpBuffer > 0 && MovementBehaviour.GravityHandler.VerticalMovement > 0.5f)
+            // {
+            //     IsGrounded = false;
+            //     GroundNormal = Vector3.up;
+            //     return;
+            // }
             
             var controller = PlayerController.CharacterController;
             var radius = controller.radius;
@@ -65,8 +65,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
             _rayBasedGroundCheck = rayBasedGroundCheck;
             
             // Tüm kontrolleri birleştir
-            IsGrounded = _capsuleGroundCheck || _customGroundCheck || _rayBasedGroundCheck;
-            // IsGrounded = _capsuleGroundCheck;
+            // IsGrounded = _capsuleGroundCheck || _customGroundCheck || _rayBasedGroundCheck;
+            IsGrounded = _capsuleGroundCheck;
             // IsGrounded = _customGroundCheck;
             
             // Normal'i ayarla
@@ -138,8 +138,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
             var ray = new Ray(origin, Vector3.down);
             var groundCheckHits = new RaycastHit[1];
             
-            var numberOfHits = Physics.RaycastNonAlloc(ray, groundCheckHits, 
-                rayDistance, layerMask);
+            var numberOfHits = Physics.RaycastNonAlloc(ray, groundCheckHits, rayDistance, layerMask);
 
             if (numberOfHits > 0)
             {
