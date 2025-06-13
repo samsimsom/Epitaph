@@ -49,7 +49,7 @@ namespace Epitaph.Scripts.Player.ViewSystem
 
         private bool IsPlayerMovingAboveThreshold()
         {
-            return PlayerController.MovementBehaviour.CapsulVelocity.sqrMagnitude >= 
+            return PlayerController.MovementBehaviour.LocomotionHandler.CapsulVelocity.sqrMagnitude >= 
                    _viewBehaviour.HeadBobThreshold;
         }
         

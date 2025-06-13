@@ -13,9 +13,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         private static float GetBaseConsumption(MovementBehaviour movement)
         {
-            if (movement.IsRunning) return BaseRunConsumption;
-            if (movement.IsWalking) return BaseWalkConsumption;
-            if (movement.IsCrouching) return BaseCrouchConsumption;
+            if (movement.LocomotionHandler.IsRunning) return BaseRunConsumption;
+            if (movement.LocomotionHandler.IsWalking) return BaseWalkConsumption;
+            if (movement.CrouchHandler.IsCrouching) return BaseCrouchConsumption;
             return 0f; // Idle
         }
         

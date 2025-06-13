@@ -42,22 +42,22 @@ namespace Epitaph.Scripts.DebugPanel
             
             _currentYPosition += 5f; // Bölümler arası küçük boşluk
             
-            DrawGuiLabel($"Is Walking : {playerController.MovementBehaviour.IsWalking}");
-            DrawGuiLabel($"Is Running : {playerController.MovementBehaviour.IsRunning}");
-            DrawGuiLabel($"Is Jumping : {playerController.MovementBehaviour.IsJumping}");
-            DrawGuiLabel($"Is Falling : {playerController.MovementBehaviour.IsFalling}");
+            DrawGuiLabel($"Is Walking : {playerController.MovementBehaviour.LocomotionHandler.IsWalking}");
+            DrawGuiLabel($"Is Running : {playerController.MovementBehaviour.LocomotionHandler.IsRunning}");
+            DrawGuiLabel($"Is Jumping : {playerController.MovementBehaviour.JumpHandler.IsJumping}");
+            DrawGuiLabel($"Is Falling : {playerController.MovementBehaviour.FallHandler.IsFalling}");
             
-            DrawGuiLabel($"Is Crouching : {playerController.MovementBehaviour.IsCrouching}");
-            DrawGuiLabel($"Is Grounded (Custom): {playerController.MovementBehaviour.IsGrounded}");
+            DrawGuiLabel($"Is Crouching : {playerController.MovementBehaviour.CrouchHandler.IsCrouching}");
+            DrawGuiLabel($"Is Grounded (Custom): {playerController.MovementBehaviour.GroundHandler.IsGrounded}");
             DrawGuiLabel($"Is Grounded (Capsule): {playerController.CharacterController.isGrounded}");
             
             _currentYPosition += 5f; // Bölümler arası küçük boşluk
             
-            DrawGuiLabel($"Vertical Movement : {playerController.MovementBehaviour.VerticalMovement:F1}");
-            DrawGuiLabel($"Capsule Velocity : {playerController.MovementBehaviour.CapsulVelocity}");
-            DrawGuiLabel($"Current Movement Speed: {playerController.MovementBehaviour.CurrentSpeed:F1}");
+            DrawGuiLabel($"Vertical Movement : {playerController.MovementBehaviour.GravityHandler.VerticalMovement:F1}");
+            DrawGuiLabel($"Capsule Velocity : {playerController.MovementBehaviour.LocomotionHandler.CapsulVelocity}");
+            DrawGuiLabel($"Current Movement Speed: {playerController.MovementBehaviour.LocomotionHandler.CurrentSpeed:F1}");
 
-            DrawGuiLabel($"Ground Normal : {playerController.MovementBehaviour.GroundNormal}");
+            DrawGuiLabel($"Ground Normal : {playerController.MovementBehaviour.GroundHandler.GroundNormal}");
             DrawGuiLabel($"Movement State : {playerController.MovementBehaviour.StateManager.CurrentState?.StateName ?? "N/A"}");
 
 #if true

@@ -24,7 +24,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         {
             // Bu state'den çıkıldığında IsCrouching true ise, bu, oyuncunun
             // ayağa kalkmaya çalıştığı anlamına gelir.
-            if (Ctx.IsCrouching)
+            if (Ctx.CrouchHandler.IsCrouching)
             {
                 Ctx.CrouchHandler.HandleStandUp();
             }
@@ -34,7 +34,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void CheckSwitchStates()
         {
-            if (!Ctx.IsGrounded && Ctx.IsFalling)
+            if (!Ctx.GroundHandler.IsGrounded && Ctx.FallHandler.IsFalling)
             {
                 Ctx.StateManager.SwitchState(Factory.Fall());
                 return;
@@ -62,10 +62,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         {
             var input = Ctx.PlayerController.PlayerInput.MoveInput;
             
-            Ctx.AppliedMovementX = Mathf.Lerp(Ctx.AppliedMovementX, 
-                input.x * Ctx.LocomotionHandler.CrouchSpeed, Ctx.LocomotionHandler.SpeedTransitionDuration);
-            Ctx.AppliedMovementZ = Mathf.Lerp(Ctx.AppliedMovementZ, 
-                input.y * Ctx.LocomotionHandler.CrouchSpeed, Ctx.LocomotionHandler.SpeedTransitionDuration);
+            Ctx.LocomotionHandler.AppliedMovementX = Mathf.Lerp(Ctx.LocomotionHandler.AppliedMovementX, input.x * Ctx.LocomotionHandler.CrouchSpeed, Ctx.LocomotionHandler.SpeedTransitionDuration);
+            Ctx.LocomotionHandler.AppliedMovementZ = Mathf.Lerp(Ctx.LocomotionHandler.AppliedMovementZ, input.y * Ctx.LocomotionHandler.CrouchSpeed, Ctx.LocomotionHandler.SpeedTransitionDuration);
         }
     }
 }

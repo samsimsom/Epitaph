@@ -21,7 +21,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         private void ManageCoyoteTime()
         {
-            if (MovementBehaviour.IsGrounded)
+            if (MovementBehaviour.GroundHandler.IsGrounded)
             {
                 CoyoteTimeCounter = CoyoteTime;
             }

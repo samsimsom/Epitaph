@@ -9,7 +9,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void EnterState()
         {
-            Ctx.IsWalking = true;
+            Ctx.LocomotionHandler.IsWalking = true;
         }
 
         public override void UpdateState()
@@ -22,14 +22,14 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         
         public override void ExitState()
         {
-            Ctx.IsWalking = false;
+            Ctx.LocomotionHandler.IsWalking = false;
         }
 
         public override void InitializeSubState() { }
 
         public override void CheckSwitchStates()
         {
-            if (!Ctx.IsGrounded && Ctx.IsFalling)
+            if (!Ctx.GroundHandler.IsGrounded && Ctx.FallHandler.IsFalling)
             {
                 Ctx.StateManager.SwitchState(Factory.Fall());
                 return;
@@ -48,8 +48,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             {
                 Ctx.StateManager.SwitchState(Factory.Idle());
             }
-            else if (Ctx.PlayerController.PlayerInput.IsMoveInput && 
-                     Ctx.PlayerController.PlayerInput.IsRunPressed)
+            else if (Ctx.PlayerController.PlayerInput.IsMoveInput && Ctx.PlayerController.PlayerInput.IsRunPressed)
             {
                 Ctx.StateManager.SwitchState(Factory.Run());
             }
@@ -58,8 +57,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         private void HandleMovementInput()
         {
             var input = Ctx.PlayerController.PlayerInput.MoveInput;
-            Ctx.AppliedMovementX = Mathf.Lerp(Ctx.AppliedMovementX, input.x * Ctx.LocomotionHandler.WalkSpeed, Ctx.LocomotionHandler.SpeedTransitionDuration);
-            Ctx.AppliedMovementZ = Mathf.Lerp(Ctx.AppliedMovementZ, input.y * Ctx.LocomotionHandler.WalkSpeed, Ctx.LocomotionHandler.SpeedTransitionDuration);
+            Ctx.LocomotionHandler.AppliedMovementX = Mathf.Lerp(Ctx.LocomotionHandler.AppliedMovementX, input.x * Ctx.LocomotionHandler.WalkSpeed, Ctx.LocomotionHandler.SpeedTransitionDuration);
+            Ctx.LocomotionHandler.AppliedMovementZ = Mathf.Lerp(Ctx.LocomotionHandler.AppliedMovementZ, input.y * Ctx.LocomotionHandler.WalkSpeed, Ctx.LocomotionHandler.SpeedTransitionDuration);
         }
     }
 }

@@ -8,6 +8,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public float Gravity = 25.0f;
         public float VerticalMovementLimit = -10.0f;
         
+        public float VerticalMovement { get; set; }
+        
         public GravityHandler(MovementBehaviour movementBehaviour, 
             PlayerController playerController) : base(movementBehaviour, playerController) { }
         
@@ -23,17 +25,15 @@ namespace Epitaph.Scripts.Player.MovementSystem
         
         private void HandleGravity()
         {
-            if (!MovementBehaviour.IsGrounded && 
-                MovementBehaviour.VerticalMovement > VerticalMovementLimit)
+            if (!MovementBehaviour.GroundHandler.IsGrounded && VerticalMovement > VerticalMovementLimit)
             {
-                MovementBehaviour.VerticalMovement -= Gravity * Time.fixedDeltaTime;
+                VerticalMovement -= Gravity * Time.fixedDeltaTime;
             }
         }
 
         private void CheckIsFalling()
         {
-            MovementBehaviour.IsFalling = !MovementBehaviour.GroundHandler.IsGrounded && 
-                                          MovementBehaviour.VerticalMovement < 0;
+            MovementBehaviour.FallHandler.IsFalling = !MovementBehaviour.GroundHandler.IsGrounded && VerticalMovement < 0;
         }
         
     }

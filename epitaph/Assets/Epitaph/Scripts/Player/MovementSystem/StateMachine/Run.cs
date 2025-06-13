@@ -9,7 +9,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         
         public override void EnterState()
         {
-            Ctx.IsRunning = true;
+            Ctx.LocomotionHandler.IsRunning = true;
         }
 
         public override void UpdateState()
@@ -22,14 +22,14 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void ExitState()
         {
-            Ctx.IsRunning = false;
+            Ctx.LocomotionHandler.IsRunning = false;
         }
 
         public override void InitializeSubState() { }
 
         public override void CheckSwitchStates()
         {
-            if (!Ctx.IsGrounded && Ctx.IsFalling)
+            if (!Ctx.GroundHandler.IsGrounded && Ctx.FallHandler.IsFalling)
             {
                 Ctx.StateManager.SwitchState(Factory.Fall());
                 return;
@@ -40,8 +40,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 Ctx.StateManager.SwitchState(Factory.Crouch());
             }
             // Zıplama kontrolünü JumpHandler'a devret
-            else if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame && 
-                     Ctx.JumpHandler.CanJump())
+            else if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame && Ctx.JumpHandler.CanJump())
             {
                 Ctx.StateManager.SwitchState(Factory.Jump());
             }
@@ -49,8 +48,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             {
                 Ctx.StateManager.SwitchState(Factory.Idle());
             }
-            else if (Ctx.PlayerController.PlayerInput.IsMoveInput && 
-                     !Ctx.PlayerController.PlayerInput.IsRunPressed)
+            else if (Ctx.PlayerController.PlayerInput.IsMoveInput && !Ctx.PlayerController.PlayerInput.IsRunPressed)
             {
                 Ctx.StateManager.SwitchState(Factory.Walk());
             }
@@ -59,8 +57,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         private void HandleMovementInput()
         {
             var input = Ctx.PlayerController.PlayerInput.MoveInput;
-            Ctx.AppliedMovementX = Mathf.Lerp(Ctx.AppliedMovementX, input.x * Ctx.LocomotionHandler.RunSpeed, Ctx.LocomotionHandler.SpeedTransitionDuration);
-            Ctx.AppliedMovementZ = Mathf.Lerp(Ctx.AppliedMovementZ, input.y * Ctx.LocomotionHandler.RunSpeed, Ctx.LocomotionHandler.SpeedTransitionDuration);
+            Ctx.LocomotionHandler.AppliedMovementX = Mathf.Lerp(Ctx.LocomotionHandler.AppliedMovementX, input.x * Ctx.LocomotionHandler.RunSpeed, Ctx.LocomotionHandler.SpeedTransitionDuration);
+            Ctx.LocomotionHandler.AppliedMovementZ = Mathf.Lerp(Ctx.LocomotionHandler.AppliedMovementZ, input.y * Ctx.LocomotionHandler.RunSpeed, Ctx.LocomotionHandler.SpeedTransitionDuration);
         }
     }
 }

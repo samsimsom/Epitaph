@@ -7,11 +7,12 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void EnterState()
         {
-            Ctx.IsFalling = true;
+            Ctx.FallHandler.IsFalling = true;
+            
             // Fall state'e girdiğinde jump state'den geliyorsak IsJumping'i false yap
-            if (Ctx.IsJumping)
+            if (Ctx.JumpHandler.IsJumping)
             {
-                Ctx.IsJumping = false;
+                Ctx.JumpHandler.IsJumping = false;
             }
         }
 
@@ -25,7 +26,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         
         public override void ExitState()
         {
-            Ctx.IsFalling = false;
+            Ctx.FallHandler.IsFalling = false;
         }
 
         public override void InitializeSubState() { }
@@ -33,9 +34,9 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         public override void CheckSwitchStates()
         {
             // Yere değdiğinde fall state'den çık
-            if (Ctx.IsGrounded && Ctx.VerticalMovement <= 0)
+            if (Ctx.GroundHandler.IsGrounded && Ctx.GravityHandler.VerticalMovement <= 0)
             {
-                if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame || Ctx.IsCrouching)
+                if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame || Ctx.CrouchHandler.IsCrouching)
                 {
                     Ctx.StateManager.SwitchState(Factory.Crouch());
                 }
@@ -68,8 +69,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             // Fall state'de daha az air control (jump'tan daha az)
             var fallAirControlFactor = Ctx.JumpHandler.AirControlFactor * 0.8f;
             
-            Ctx.AppliedMovementX = input.x * Ctx.LocomotionHandler.WalkSpeed * fallAirControlFactor;
-            Ctx.AppliedMovementZ = input.y * Ctx.LocomotionHandler.WalkSpeed * fallAirControlFactor;
+            Ctx.LocomotionHandler.AppliedMovementX = input.x * Ctx.LocomotionHandler.WalkSpeed * fallAirControlFactor;
+            Ctx.LocomotionHandler.AppliedMovementZ = input.y * Ctx.LocomotionHandler.WalkSpeed * fallAirControlFactor;
         }
     }
 }

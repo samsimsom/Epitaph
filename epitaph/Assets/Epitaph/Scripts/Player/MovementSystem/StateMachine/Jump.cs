@@ -24,7 +24,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
 
         public override void ExitState()
         {
-            Ctx.IsJumping = false;
+            Ctx.JumpHandler.IsJumping = false;
         }
         
         // public override void InitializeSubState() { }
@@ -32,9 +32,9 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         public override void CheckSwitchStates()
         {
             // Yere değdiğinde ve dikey hız negatif veya sıfıra yakınsa
-            if (Ctx.IsGrounded && Ctx.CapsulVelocity.y <= 0 && Ctx.VerticalMovement <= 0)
+            if (Ctx.GroundHandler.IsGrounded && Ctx.LocomotionHandler.CapsulVelocity.y <= 0 && Ctx.GravityHandler.VerticalMovement <= 0)
             {
-                if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame || Ctx.IsCrouching)
+                if (Ctx.PlayerController.PlayerInput.IsCrouchPressedThisFrame || Ctx.CrouchHandler.IsCrouching)
                 {
                     Ctx.StateManager.SwitchState(Factory.Crouch());
                 }
@@ -52,7 +52,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
                 }
             }
             // Jump'tan Fall'a geçiş - dikey hız negatif olduğunda
-            else if (Ctx.IsFalling && Ctx.VerticalMovement < 0)
+            else if (Ctx.FallHandler.IsFalling && Ctx.GravityHandler.VerticalMovement < 0)
             {
                 Ctx.StateManager.SwitchState(Factory.Fall());
             }
@@ -63,8 +63,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             var input = Ctx.PlayerController.PlayerInput.MoveInput;
             var airControlFactor = Ctx.JumpHandler.AirControlFactor;
             
-            Ctx.AppliedMovementX = input.x * (Ctx.StateManager.CurrentState is Run ? Ctx.LocomotionHandler.RunSpeed * airControlFactor : Ctx.LocomotionHandler.WalkSpeed * airControlFactor);
-            Ctx.AppliedMovementZ = input.y * (Ctx.StateManager.CurrentState is Run ? Ctx.LocomotionHandler.RunSpeed * airControlFactor : Ctx.LocomotionHandler.WalkSpeed* airControlFactor);
+            Ctx.LocomotionHandler.AppliedMovementX = input.x * (Ctx.StateManager.CurrentState is Run ? Ctx.LocomotionHandler.RunSpeed * airControlFactor : Ctx.LocomotionHandler.WalkSpeed * airControlFactor);
+            Ctx.LocomotionHandler.AppliedMovementZ = input.y * (Ctx.StateManager.CurrentState is Run ? Ctx.LocomotionHandler.RunSpeed * airControlFactor : Ctx.LocomotionHandler.WalkSpeed* airControlFactor);
         }
     }
 }

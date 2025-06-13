@@ -4,6 +4,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class CrouchHandler : MovementSubBehaviour
     {
+        public bool IsCrouching { get; private set; }
+        
         // Crouch Configuration
         public float NormalHeight = 1.8f;
         public float CrouchHeight = 0.9f;
@@ -40,7 +42,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public void HandleCrouch()
         {
-            MovementBehaviour.IsCrouching = true;
+            IsCrouching = true;
             _targetHeight = CrouchHeight;
             _targetCenter = CrouchControllerCenter;
             PlayerController.ViewBehaviour.SetCameraHeight(CrouchCameraHeight);
@@ -48,7 +50,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public void HandleStandUp()
         {
-            MovementBehaviour.IsCrouching = false;
+            IsCrouching = false;
             _targetHeight = NormalHeight;
             _targetCenter = NormalControllerCenter;
             PlayerController.ViewBehaviour.SetCameraHeight(NormalCameraHeight);
@@ -75,7 +77,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         private void VisualizeCrouchSpace()
         {
-            if (!MovementBehaviour.IsCrouching || !Application.isPlaying) return;
+            if (!MovementBehaviour.CrouchHandler.IsCrouching || !Application.isPlaying) return;
 
             // Visualize the space needed to stand up
             var controller = PlayerController.CharacterController;

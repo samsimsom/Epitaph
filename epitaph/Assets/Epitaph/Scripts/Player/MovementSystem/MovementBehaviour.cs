@@ -16,29 +16,12 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public GroundHandler GroundHandler { get; private set; }
         public GravityHandler GravityHandler { get; private set; }
         public JumpHandler JumpHandler { get; private set; }
+        public FallHandler FallHandler { get; private set; }
         public CrouchHandler CrouchHandler { get; private set; }
         public LocomotionHandler LocomotionHandler { get; private set; }
         public CoyoteTimeHandler CoyoteTimeHandler { get; private set; }
 
         #endregion
-
-        // Getters & Setters (Alt davranışlar tarafından yönetilecek)
-        public bool IsWalking { get; internal set; }
-        public bool IsRunning { get; internal set; }
-        public bool IsFalling { get; internal set; }
-        public bool IsJumping { get; internal set; }
-        public bool IsCrouching { get; internal set; }
-        public bool IsGrounded => GroundHandler.IsGrounded;
-        public Vector3 GroundNormal => GroundHandler.GroundNormal;
-        
-        public float CoyoteTimeCounter => CoyoteTimeHandler.CoyoteTimeCounter;
-        
-        public Vector3 CapsulVelocity { get; internal set; }
-        public float CurrentSpeed { get; internal set; }
-        public float VerticalMovement { get; internal set; }
-
-        public float AppliedMovementX { get; internal set; }
-        public float AppliedMovementZ { get; internal set; }
 
         // ---------------------------------------------------------------------------- //
         
@@ -58,8 +41,9 @@ namespace Epitaph.Scripts.Player.MovementSystem
             GroundHandler = CreateAndAddBehaviour<GroundHandler>();
             GravityHandler = CreateAndAddBehaviour<GravityHandler>();
             JumpHandler = CreateAndAddBehaviour<JumpHandler>();
-            CrouchHandler = CreateAndAddBehaviour<CrouchHandler>();
+            FallHandler = CreateAndAddBehaviour<FallHandler>();
             LocomotionHandler = CreateAndAddBehaviour<LocomotionHandler>();
+            CrouchHandler = CreateAndAddBehaviour<CrouchHandler>();
             CoyoteTimeHandler = CreateAndAddBehaviour<CoyoteTimeHandler>();
         }
         
@@ -85,7 +69,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public override void Start()
         {
-            AdjustPlayerPosition();
             _movementBehaviourManager?.ExecuteOnAll(b => b.Start());
         }
 
@@ -122,7 +105,7 @@ namespace Epitaph.Scripts.Player.MovementSystem
 
         public override void OnDrawGizmos()
         {
-            DrawCharacterControllerGizmo();
+            DrawCharacterControllerGizmos();
             _movementBehaviourManager?.ExecuteOnAll(b => b.OnDrawGizmos());
         }
 #endif
@@ -130,28 +113,13 @@ namespace Epitaph.Scripts.Player.MovementSystem
         #endregion
 
         // ---------------------------------------------------------------------------- //
-        
-        #region Movement Methods
 
-        private void AdjustPlayerPosition()
-        {
-            if (PlayerController.CharacterController != null)
-            {
-                var position = PlayerController.transform.position;
-                position.y += PlayerController.CharacterController.skinWidth;
-                PlayerController.transform.position = position;
-            }
-        }
-        
-        #endregion
-        
-#if UNITY_EDITOR
-        
-        private void DrawCharacterControllerGizmo()
+        #region Unity Editor Methods
+
+        private void DrawCharacterControllerGizmos()
         {
             Gizmos.color = new Color(0.2f, 0.6f, 1f, 1.0f);
-            var center = PlayerController.CharacterController.transform.position 
-                         + PlayerController.CharacterController.center;
+            var center = PlayerController.CharacterController.transform.position + PlayerController.CharacterController.center;
             var height = PlayerController.CharacterController.height;
             var radius = PlayerController.CharacterController.radius;
             var cylinderHeight = Mathf.Max(0, height / 2f - radius);
@@ -165,8 +133,10 @@ namespace Epitaph.Scripts.Player.MovementSystem
             Gizmos.DrawLine(top + PlayerController.CharacterController.transform.forward * radius, bottom + PlayerController.CharacterController.transform.forward * radius);
             Gizmos.DrawLine(top - PlayerController.CharacterController.transform.forward * radius, bottom - PlayerController.CharacterController.transform.forward * radius);
         }
+
+        #endregion
         
-#endif
+        // ---------------------------------------------------------------------------- //
         
     }
 }

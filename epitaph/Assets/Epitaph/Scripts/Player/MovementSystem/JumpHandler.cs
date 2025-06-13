@@ -4,6 +4,8 @@ namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class JumpHandler : MovementSubBehaviour
     {
+        public bool IsJumping { get; set; }
+        
         // Jump Variables
         public float JumpForce = 5.0f;
         public float AirControlFactor = 1.25f;
@@ -14,19 +16,19 @@ namespace Epitaph.Scripts.Player.MovementSystem
         public void PerformJump()
         {
             // Zıplamadan önce dikey hızı sıfırlayarak birikmiş yerçekimi etkisini kaldır.
-            MovementBehaviour.VerticalMovement = 0f;
+            MovementBehaviour.GravityHandler.VerticalMovement = 0f;
             
             // Zıplama kuvvetini uygula.
             MovementBehaviour.GroundHandler.OnJumpStarted();
-            MovementBehaviour.VerticalMovement += JumpForce;
-            MovementBehaviour.IsJumping = true;
+            MovementBehaviour.GravityHandler.VerticalMovement += JumpForce;
+            IsJumping = true;
         }
         
         public bool CanJump()
         {
             // Zıplayabilmek için coyote time'ın geçerli olması ve
             // karakterin üzerinde bir engel olmaması gerekir.
-            return MovementBehaviour.CoyoteTimeCounter > 0f && !HasObstacleAbove();
+            return MovementBehaviour.CoyoteTimeHandler.CoyoteTimeCounter > 0f && !HasObstacleAbove();
         }
         
         private bool HasObstacleAbove()

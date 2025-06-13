@@ -30,7 +30,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         public override void CheckSwitchStates()
         {
             // Önce düşme kontrolü - en yüksek öncelik
-            if (!Ctx.IsGrounded && Ctx.IsFalling)
+            if (!Ctx.GroundHandler.IsGrounded && Ctx.FallHandler.IsFalling)
             {
                 Ctx.StateManager.SwitchState(Factory.Fall());
                 return;
@@ -40,7 +40,7 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
             {
                 Ctx.StateManager.SwitchState(Factory.Crouch());
             }
-            else if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame && Ctx.CoyoteTimeCounter > 0f)
+            else if (Ctx.PlayerController.PlayerInput.IsJumpPressedThisFrame && Ctx.CoyoteTimeHandler.CoyoteTimeCounter > 0f)
             {
                 Ctx.StateManager.SwitchState(Factory.Jump());
             }
@@ -57,8 +57,8 @@ namespace Epitaph.Scripts.Player.MovementSystem.StateMachine
         private void HandleMovementInput()
         {
             // var input = Ctx.PlayerController.PlayerInput.MoveInput;
-            Ctx.AppliedMovementX = Mathf.Lerp(Ctx.AppliedMovementX, 0f, Ctx.LocomotionHandler.IdleTransitionDuration);
-            Ctx.AppliedMovementZ = Mathf.Lerp(Ctx.AppliedMovementZ, 0f, Ctx.LocomotionHandler.IdleTransitionDuration);
+            Ctx.LocomotionHandler.AppliedMovementX = Mathf.Lerp(Ctx.LocomotionHandler.AppliedMovementX, 0f, Ctx.LocomotionHandler.IdleTransitionDuration);
+            Ctx.LocomotionHandler.AppliedMovementZ = Mathf.Lerp(Ctx.LocomotionHandler.AppliedMovementZ, 0f, Ctx.LocomotionHandler.IdleTransitionDuration);
         }
         
     }
