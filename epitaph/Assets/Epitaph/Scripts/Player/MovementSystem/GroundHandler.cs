@@ -1,120 +1,126 @@
+using UnityEditor;
 using UnityEngine;
 
 namespace Epitaph.Scripts.Player.MovementSystem
 {
     public class GroundHandler : MovementSubBehaviour
     {
+        private const float RadiusMultiplier = 1.1f;
+        private const float RayDistanceMultiplier = 1.5f;
+        private const int MinimumHitsForGrounded = 2;
+
         public bool IsGrounded { get; private set; }
         public Vector3 GroundNormal { get; private set; }
         
-        // Debug bilgileri için ek özellikler
-        private bool _capsuleGroundCheck;
-        private bool _customGroundCheck;
-        private bool _rayBasedGroundCheck;
-        private int _successfulHits;
+        // Debug information
+        private GroundCheckDebugInfo _debugInfo;
         
         public GroundHandler(MovementBehaviour movementBehaviour, PlayerController playerController) 
-            : base(movementBehaviour, playerController){ }
+            : base(movementBehaviour, playerController)
+        {
+            _debugInfo = new GroundCheckDebugInfo();
+        }
 
         public override void Update()
         {
-            var (normalCalculated, rayBasedGroundCheck) = CalculateGroundNormalWithGroundCheck();
+            var groundCheckResult = PerformGroundCheck();
             
-            _capsuleGroundCheck = PlayerController.CharacterController.isGrounded;
-            _rayBasedGroundCheck = rayBasedGroundCheck;
-            IsGrounded = _capsuleGroundCheck && _rayBasedGroundCheck;
+            _debugInfo.UpdateDebugInfo(
+                PlayerController.CharacterController.isGrounded,
+                groundCheckResult.IsGrounded,
+                groundCheckResult.SuccessfulHits
+            );
             
-            GroundNormal = normalCalculated;
+            IsGrounded = _debugInfo.CapsuleGroundCheck && groundCheckResult.IsGrounded;
+            GroundNormal = groundCheckResult.Normal;
         }
         
         // ---------------------------------------------------------------------------- //
         
-        private (Vector3 normal, bool isGrounded) CalculateGroundNormalWithGroundCheck()
+        private GroundCheckResult PerformGroundCheck()
+        {
+            var raycastConfig = CreateRaycastConfiguration();
+            var rayOrigins = GenerateRayOrigins(raycastConfig);
+            
+            return CalculateGroundFromRaycasts(rayOrigins, raycastConfig);
+        }
+
+        private RaycastConfiguration CreateRaycastConfiguration()
         {
             var controller = PlayerController.CharacterController;
-            var controllerPosition = controller.transform.position;
-            var layerMask = ~LayerMask.GetMask("Player");
             
-            // Ray distance'ı daha konservatif yap
-            var rayDistance = controller.radius * 1.5f; // 2f'den 1.5f'e düşür
-            var characterBaseWorld = controllerPosition + controller.center - Vector3.up * (controller.height / 2f - controller.radius);
-            
-            // 8 ray origin pozisyonu - radius'u biraz küçült
-            var radiusMultiplier = 0.8f; // Radius'un %80'ini kullan
-            var origins = new[]
+            return new RaycastConfiguration
             {
-                // Ana 4 yön
-                characterBaseWorld + Vector3.left * (controller.radius * radiusMultiplier),
-                characterBaseWorld + Vector3.right * (controller.radius * radiusMultiplier),
-                characterBaseWorld + Vector3.forward * (controller.radius * radiusMultiplier),
-                characterBaseWorld + Vector3.back * (controller.radius * radiusMultiplier),
-                
-                // Diagonal 4 yön
-                characterBaseWorld + (Vector3.forward + Vector3.left).normalized * (controller.radius * radiusMultiplier),
-                characterBaseWorld + (Vector3.forward + Vector3.right).normalized * (controller.radius * radiusMultiplier),
-                characterBaseWorld + (Vector3.back + Vector3.left).normalized * (controller.radius * radiusMultiplier),
-                characterBaseWorld + (Vector3.back + Vector3.right).normalized * (controller.radius * radiusMultiplier)
+                Controller = controller,
+                ControllerPosition = controller.transform.position,
+                LayerMask = ~LayerMask.GetMask("Player"),
+                RayDistance = controller.radius * RayDistanceMultiplier,
+                CharacterBaseWorld = CalculateCharacterBasePosition(controller),
+                EffectiveRadius = controller.radius * RadiusMultiplier
             };
-            
-            var summedNormals = Vector3.zero;
-            var successfulHits = 0;
-            RaycastHit hitInfo;
+        }
 
-            // 8 ray için loop
+        private Vector3 CalculateCharacterBasePosition(CharacterController controller)
+        {
+            return controller.transform.position + controller.center - Vector3.up * (controller.height / 2f - controller.radius);
+        }
+
+        private Vector3[] GenerateRayOrigins(RaycastConfiguration config)
+        {
+            var basePosition = config.CharacterBaseWorld;
+            var radius = config.EffectiveRadius;
+            
+            return new[]
+            {
+                // Cardinal directions
+                basePosition + Vector3.left * radius,
+                basePosition + Vector3.right * radius,
+                basePosition + Vector3.forward * radius,
+                basePosition + Vector3.back * radius,
+                
+                // Diagonal directions
+                basePosition + (Vector3.forward + Vector3.left).normalized * radius,
+                basePosition + (Vector3.forward + Vector3.right).normalized * radius,
+                basePosition + (Vector3.back + Vector3.left).normalized * radius,
+                basePosition + (Vector3.back + Vector3.right).normalized * radius
+            };
+        }
+
+        private GroundCheckResult CalculateGroundFromRaycasts(Vector3[] origins, RaycastConfiguration config)
+        {
+            var normalSum = Vector3.zero;
+            var successfulHits = 0;
+
             foreach (var origin in origins)
             {
-                if (TryGroundNormalCheck(origin, rayDistance, layerMask, out hitInfo))
+                if (TryRaycastToGround(origin, config, out var hitInfo))
                 {
-                    summedNormals += hitInfo.normal;
+                    normalSum += hitInfo.normal;
                     successfulHits++;
                 }
             }
 
-            _successfulHits = successfulHits; // Debug için sakla
+            var isGrounded = successfulHits >= MinimumHitsForGrounded;
+            var calculatedNormal = isGrounded ? (normalSum / successfulHits).normalized : Vector3.up;
 
-            Vector3 calculatedNormal;
-            bool rayBasedGrounded;
-
-            if (successfulHits > 2) // En az 3 ray hit olması gereksin (daha katı kontrol)
-            {
-                calculatedNormal = (summedNormals / successfulHits).normalized;
-                rayBasedGrounded = true;
-            }
-            else
-            {
-                calculatedNormal = Vector3.up;
-                rayBasedGrounded = false;
-            }
-
-            return (calculatedNormal, rayBasedGrounded);
+            return new GroundCheckResult(calculatedNormal, isGrounded, successfulHits);
         }
 
-        private bool TryGroundNormalCheck(Vector3 origin, float rayDistance, LayerMask layerMask, out RaycastHit hitInfo)
+        private bool TryRaycastToGround(Vector3 origin, RaycastConfiguration config, out RaycastHit hitInfo)
         {
             var ray = new Ray(origin, Vector3.down);
-            var groundCheckHits = new RaycastHit[1];
+            var hits = new RaycastHit[1];
             
-            var numberOfHits = Physics.RaycastNonAlloc(ray, groundCheckHits, rayDistance, layerMask);
+            var hitCount = Physics.RaycastNonAlloc(ray, hits, config.RayDistance, config.LayerMask);
 
-            if (numberOfHits > 0)
+            if (hitCount > 0)
             {
-                // İlk çarpışma bilgisini out parametresine ata
-                hitInfo = groundCheckHits[0];
-
-                // Debug için ışınları çiz
-                // Debug.DrawRay(origin, Vector3.down * hitInfo.distance, Color.green);
-                // Debug.DrawRay(hitInfo.point, hitInfo.normal * 0.5f, Color.blue);
-            
+                hitInfo = hits[0];
                 return true;
             }
-            else
-            {
-                // Çarpışma yoksa, varsayılan RaycastHit değerini ata ve kırmızı ışın çiz
-                hitInfo = default; // RaycastHit bir struct olduğu için default değeri atanır
-                // Debug.DrawRay(origin, Vector3.down * rayDistance, Color.red);
-            
-                return false;
-            }
+
+            hitInfo = default;
+            return false;
         }
         
         // ---------------------------------------------------------------------------- //
@@ -122,90 +128,130 @@ namespace Epitaph.Scripts.Player.MovementSystem
         #region Gizmos
 
 #if UNITY_EDITOR
-        public override void OnGUI()
+        public override void OnGUI() 
         {
             if (!Application.isPlaying) return;
+            
+            // Debug bilgilerini ekranın sol üst köşesinde göster
+            GUILayout.BeginArea(new Rect(10, 10, 300, 200));
+            GUILayout.BeginVertical("box");
+            
+            GUILayout.Label("Ground Handler Debug Info", EditorStyles.boldLabel);
+            GUILayout.Space(5);
+            
+            GUILayout.Label($"Is Grounded: {IsGrounded}");
+            GUILayout.Label($"Capsule Ground Check: {_debugInfo.CapsuleGroundCheck}");
+            GUILayout.Label($"Ray Based Ground Check: {_debugInfo.RayBasedGroundCheck}");
+            GUILayout.Label($"Successful Hits: {_debugInfo.SuccessfulHits}");
+            GUILayout.Label($"Ground Normal: {GroundNormal:F2}");
+            
+            // Renk kodlu durum göstergesi
+            var statusColor = IsGrounded ? "green" : "red";
+            GUILayout.Label($"<color={statusColor}>Status: {(IsGrounded ? "GROUNDED" : "AIRBORNE")}</color>", 
+                new GUIStyle(GUI.skin.label) { richText = true });
+            
+            GUILayout.EndVertical();
+            GUILayout.EndArea();
         }
 
         public override void OnDrawGizmos()
         {
-            DrawGroundNormalGizmo();
+            if (!Application.isPlaying) return;
+            DrawGroundCheckVisualization();
         }
 
-#if true
-        private void DrawGroundNormalGizmo()
+        private void DrawGroundCheckVisualization()
         {
-            if (!Application.isPlaying) return;
+            var config = CreateRaycastConfiguration();
+            var origins = GenerateRayOrigins(config);
             
-            var controller = PlayerController.CharacterController;
-            var controllerPosition = controller.transform.position;
-            var center = controller.center;
-            var height = controller.height;
-            var radius = controller.radius;
-            var rayDistance = controller.radius * 1.5f; // Güncellenmiş ray distance
-            var layerMask = ~LayerMask.GetMask("Player");
-            var characterBaseWorld = controllerPosition + center - Vector3.up * (height / 2f - radius);
-            
-            var radiusMultiplier = 0.8f;
-            
-            // 8 raycast origin pozisyonu
-            var raycastOrigins = new[]
-            {
-                // Ana 4 yön
-                characterBaseWorld + (Vector3.left * (radius * radiusMultiplier)),
-                characterBaseWorld + (Vector3.right * (radius * radiusMultiplier)),
-                characterBaseWorld + (Vector3.forward * (radius * radiusMultiplier)),
-                characterBaseWorld + (Vector3.back * (radius * radiusMultiplier)),
-                
-                // Diagonal 4 yön
-                characterBaseWorld + ((Vector3.forward + Vector3.left).normalized * (radius * radiusMultiplier)),
-                characterBaseWorld + ((Vector3.forward + Vector3.right).normalized * (radius * radiusMultiplier)),
-                characterBaseWorld + ((Vector3.back + Vector3.left).normalized * (radius * radiusMultiplier)),
-                characterBaseWorld + ((Vector3.back + Vector3.right).normalized * (radius * radiusMultiplier))
-            };
+            DrawRayOrigins(origins);
+            DrawRaycastResults(origins, config);
+            DrawCalculatedGroundNormal(config.CharacterBaseWorld);
+        }
 
-#if true
-            // Origin noktalarını çiz
+        private void DrawRayOrigins(Vector3[] origins)
+        {
             Gizmos.color = Color.yellow;
-            foreach (var origin in raycastOrigins)
+            foreach (var origin in origins)
             {
                 Gizmos.DrawWireSphere(origin, 0.025f);
             }
-            
-            foreach (var origin in raycastOrigins)
-            {
-                DrawRaycastResult(origin, rayDistance, layerMask);
-            }
-#endif
-            
-            // Hesaplanan ortalama ground normal'i çiz
-            Gizmos.color = Color.magenta;
-            Gizmos.DrawRay(characterBaseWorld, GroundNormal * 1f);
         }
 
-        private void DrawRaycastResult(Vector3 origin, float rayDistance, LayerMask layerMask)
+        private void DrawRaycastResults(Vector3[] origins, RaycastConfiguration config)
         {
-            if (TryGroundNormalCheck(origin, rayDistance, layerMask, out var hitInfo))
+            foreach (var origin in origins)
             {
-                // Hit varsa - yeşil çizgi ve mavi normal
-                Gizmos.color = Color.green;
-                Gizmos.DrawLine(origin, hitInfo.point);
-                Gizmos.color = Color.blue;
-                Gizmos.DrawRay(hitInfo.point, hitInfo.normal * 0.5f);
-            }
-            else
-            {
-                // Hit yoksa - kırmızı çizgi
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(origin, origin + Vector3.down * rayDistance);
+                if (TryRaycastToGround(origin, config, out var hitInfo))
+                {
+                    // Hit - green line and blue normal
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawLine(origin, hitInfo.point);
+                    Gizmos.color = Color.blue;
+                    Gizmos.DrawRay(hitInfo.point, hitInfo.normal * 0.5f);
+                }
+                else
+                {
+                    // Miss - red line
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawLine(origin, origin + Vector3.down * config.RayDistance);
+                }
             }
         }
-#endif
+
+        private void DrawCalculatedGroundNormal(Vector3 basePosition)
+        {
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawRay(basePosition, GroundNormal * 1f);
+        }
 
 #endif
         
         #endregion
-        
-        // ---------------------------------------------------------------------------- //
     }
+
+    // ---------------------------------------------------------------------------- //
+    // Supporting Data Structures
+    // ---------------------------------------------------------------------------- //
+
+    public struct RaycastConfiguration
+    {
+        public CharacterController Controller;
+        public Vector3 ControllerPosition;
+        public LayerMask LayerMask;
+        public float RayDistance;
+        public Vector3 CharacterBaseWorld;
+        public float EffectiveRadius;
+    }
+
+    public struct GroundCheckResult
+    {
+        public Vector3 Normal;
+        public bool IsGrounded;
+        public int SuccessfulHits;
+
+        public GroundCheckResult(Vector3 normal, bool isGrounded, int successfulHits)
+        {
+            Normal = normal;
+            IsGrounded = isGrounded;
+            SuccessfulHits = successfulHits;
+        }
+    }
+
+    public class GroundCheckDebugInfo
+    {
+        public bool CapsuleGroundCheck { get; private set; }
+        public bool CustomGroundCheck { get; private set; }
+        public bool RayBasedGroundCheck { get; private set; }
+        public int SuccessfulHits { get; private set; }
+
+        public void UpdateDebugInfo(bool capsuleCheck, bool rayBasedCheck, int hits)
+        {
+            CapsuleGroundCheck = capsuleCheck;
+            RayBasedGroundCheck = rayBasedCheck;
+            SuccessfulHits = hits;
+        }
+    }
+    
 }
