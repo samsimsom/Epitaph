@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 276a39a5a210b124885f0eff3e80f1f3
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 271620
+  packageName: POLYGON - Alpine Mountain - Nature Biomes - 3D Environment Art by
+    Synty
+  packageVersion: 1.4.1
+  assetPath: Assets/PolygonNatureBiomes/PNB_Core/Shaders/SyntyStudios_WaterShader.shader
+  uploadId: 738033

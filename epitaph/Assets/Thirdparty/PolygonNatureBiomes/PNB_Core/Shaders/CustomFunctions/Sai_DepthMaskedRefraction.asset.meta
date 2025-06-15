@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e8291053a8c19b44d9e8c33748602d4f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 271620
+  packageName: POLYGON - Alpine Mountain - Nature Biomes - 3D Environment Art by
+    Synty
+  packageVersion: 1.4.1
+  assetPath: Assets/PolygonNatureBiomes/PNB_Core/Shaders/CustomFunctions/Sai_DepthMaskedRefraction.asset
+  uploadId: 738033
