@@ -128,10 +128,20 @@ namespace Epitaph.Scripts.Player.MovementSystem
         #region Gizmos
 
 #if UNITY_EDITOR
-        public override void OnGUI() 
+        public override void OnGUI()
         {
             if (!Application.isPlaying) return;
-            
+            // DisplayGroundHandlerDebugInfo();
+        }
+
+        public override void OnDrawGizmos()
+        {
+            if (!Application.isPlaying) return;
+            DrawGroundCheckVisualization();
+        }
+        
+        private void DisplayGroundHandlerDebugInfo()
+        {
             // Debug bilgilerini ekranın sol üst köşesinde göster
             GUILayout.BeginArea(new Rect(10, 10, 300, 200));
             GUILayout.BeginVertical("box");
@@ -152,12 +162,6 @@ namespace Epitaph.Scripts.Player.MovementSystem
             
             GUILayout.EndVertical();
             GUILayout.EndArea();
-        }
-
-        public override void OnDrawGizmos()
-        {
-            if (!Application.isPlaying) return;
-            DrawGroundCheckVisualization();
         }
 
         private void DrawGroundCheckVisualization()
