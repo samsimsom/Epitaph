@@ -2814,7 +2814,6 @@ GameObject:
   - component: {fileID: 5179560183433562993}
   - component: {fileID: 1351170892812645195}
   - component: {fileID: 7253282461990109471}
-  - component: {fileID: 3043275450915170113}
   m_Layer: 3
   m_Name: FpCamera
   m_TagString: Untagged
@@ -2989,23 +2988,6 @@ MonoBehaviour:
         DecelTime: 0.1
   PlayerIndex: -1
   AutoEnableInputs: 1
---- !u!114 &3043275450915170113
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3596739065261231417}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsGlobal: 1
-  priority: 0
-  blendDistance: 0
-  weight: 1
-  sharedProfile: {fileID: 11400000, guid: 19acbb18272cfcc41b1bd388078f83ad, type: 2}
 --- !u!1 &3669999590055034491
 GameObject:
   m_ObjectHideFlags: 0
