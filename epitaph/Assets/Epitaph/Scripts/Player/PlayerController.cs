@@ -1,3 +1,4 @@
+using System;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -24,7 +25,7 @@ namespace Epitaph.Scripts.Player
         
         // ---------------------------------------------------------------------------- //
 
-        private void Start()
+        private void Awake()
         {
             Debug.Log(FpCamera.name);
         }
