@@ -1,4 +1,5 @@
 using Epitaph.Scripts.Player.BaseBehaviour;
+using Epitaph.Scripts.Player.ViewSystem;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -10,6 +11,8 @@ namespace Epitaph.Scripts.Player
         [SerializeField] private CharacterController characterController;
         [SerializeField] private Camera playerCamera;
         [SerializeField] private Transform cameraTransform;
+
+        #region Getters and Setters
 
         public PlayerInput PlayerInput => playerInput;
         public CharacterController CharacterController => characterController;
@@ -23,12 +26,16 @@ namespace Epitaph.Scripts.Player
             }
         }
         public Transform CameraTransform => cameraTransform;
+
+        #endregion
         
         // ---------------------------------------------------------------------------- //
         
         #region Player Behaviours
         
         private PlayerBehaviourManager<PlayerBehaviour> _behaviourManager;
+        
+        public ViewBehaviour ViewBehaviour { get; private set; }
 
         #endregion
         
@@ -99,6 +106,8 @@ namespace Epitaph.Scripts.Player
         private void InitializeBehaviours()
         {
             _behaviourManager = new PlayerBehaviourManager<PlayerBehaviour>(this);
+
+            ViewBehaviour = _behaviourManager.AddBehaviour(new ViewBehaviour(this));
         }
 
         #endregion
